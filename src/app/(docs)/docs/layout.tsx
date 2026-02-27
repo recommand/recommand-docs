@@ -6,7 +6,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
       tree={docsSource.pageTree}
-      nav={{ enabled: false }}
+      nav={{ title: false }}
+      searchToggle={{ enabled: false }}
     >
       {children}
     </DocsLayout>

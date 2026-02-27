@@ -10,28 +10,31 @@
   --paper: oklch(93.27% 0.0161 82.79);
   --files: oklch(88.79% 0.0181 92.7);
   --shadow: oklch(79.58% 0.0208 100.66);
-  --shadow-light: oklch(0.93 0.01 98.88);
+  --shadow-light: oklch(93% 0.01 98.88);
   --stone: oklch(69.25% 0.008 149);
   --stone-dark: oklch(48% 0.005 149);
   --folder: oklch(75.66% 0.1426 158.72);
   --folder-mid: oklch(60% 0.12 158.72);
-  --folder-dark: oklch(0.48 0.0968 157.61);
+  --folder-dark: oklch(48% 0.0968 157.61);
 
   --slate: oklch(32% 0.0354 149.18);
   --darkslate: oklch(26.91% 0.027 148.96);
 
   --warning: oklch(70.31% 0.1662 45.04);
   --warning-mid: oklch(58% 0.15 45.04);
-  --warning-dark: oklch(0.45 0.1296 41.65);
+  --warning-dark: oklch(45% 0.1296 41.65);
   --danger: oklch(65% 0.15 30);
   --danger-mid: oklch(55% 0.14 30);
   --danger-dark: oklch(44% 0.12 30);
   --data: oklch(89.46% 0.1231 93.95);
-  --data-mid: oklch(0.65 0.1306 89.78);
+  --data-mid: oklch(65% 0.1306 89.78);
   --data-dark: oklch(58% 0.13 89.78);
   --progress: oklch(63.08% 0.1404 258.32);
   --progress-mid: oklch(53% 0.14 258.32);
+  --progress-dark: oklch(43% 0.11 258.32);
   --const: oklch(84.65% 0.0705 307.54);
+  --const-mid: oklch(65% 0.06 307.54);
+  --const-dark: oklch(48% 0.05 307.54);
 
   --radius: 0.625rem;
 
@@ -133,6 +136,7 @@
   --color-stone: var(--stone);
   --color-stone-dark: var(--stone-dark);
   --color-folder: var(--folder);
+  --color-folder-mid: var(--folder-mid);
   --color-folder-dark: var(--folder-dark);
   --color-slate: var(--slate);
   --color-darkslate: var(--darkslate);
@@ -140,11 +144,17 @@
   --color-warning-mid: var(--warning-mid);
   --color-warning-dark: var(--warning-dark);
   --color-danger: var(--danger);
+  --color-danger-mid: var(--danger-mid);
   --color-danger-dark: var(--danger-dark);
   --color-data: var(--data);
+  --color-data-mid: var(--data-mid);
   --color-data-dark: var(--data-dark);
   --color-progress: var(--progress);
+  --color-progress-mid: var(--progress-mid);
+  --color-progress-dark: var(--progress-dark);
   --color-const: var(--const);
+  --color-const-mid: var(--const-mid);
+  --color-const-dark: var(--const-dark);
 
   /* Override Tailwind colors used by fumadocs-openapi method badges */
   --color-green-600: var(--folder-mid);
