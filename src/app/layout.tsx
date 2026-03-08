@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rethink_Sans, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const rethinkSans = Rethink_Sans({
@@ -47,7 +48,7 @@ export default function RootLayout({
       <body
         className={`${rethinkSans.variable} ${nohemi.variable} ${geistMono.variable}`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
