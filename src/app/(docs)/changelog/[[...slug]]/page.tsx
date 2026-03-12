@@ -68,7 +68,11 @@ function ChangelogIndex() {
     <DocsPage full>
       <DocsTitle>Changelog</DocsTitle>
       <DocsDescription>
-        Stay up to date with the latest changes to the Recommand API.
+        Stay up to date with the latest changes to the Recommand Peppol API.
+        Subscribe to the changelog{" "}
+        <a href="/rss/changelog.xml" className="font-medium text-fd-foreground underline">RSS</a> feed, or follow along in our{" "}
+        <a href="https://discord.gg/a2tcQYA3ew" className="font-medium text-fd-foreground underline">Discord</a> announcements
+        channel.
       </DocsDescription>
       <div className="flex-1 space-y-10">
         {groups.map((group) => (
