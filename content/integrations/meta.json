@@ -3,6 +3,7 @@
   "defaultOpen": true,
   "pages": [
     "harvest",
+    "business-central",
     "erpnext",
     "exact-online",
     "yuki",

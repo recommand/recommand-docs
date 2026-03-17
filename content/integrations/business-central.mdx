@@ -1,0 +1,135 @@
+---
+title: Microsoft Business Central Integration
+description: Send and receive Peppol e-invoices directly from Microsoft Business Central using the Recommand E-Document extension. Step-by-step setup and configuration guide.
+icon: business-central
+---
+
+<Callout type="warn" title="Not yet distributed via Microsoft AppSource">
+  This extension is not yet distributed via Microsoft AppSource. If you are interested in using the Business Central integration, please contact us at [support@recommand.eu](mailto:support@recommand.eu).
+</Callout>
+
+This guide explains how to set up and use the Recommand E-Document extension for Microsoft Dynamics 365 Business Central. The extension allows you to send and receive Peppol e-invoices directly from Business Central.
+
+## Overview
+
+The Recommand E-Document extension integrates with Business Central's built-in E-Document framework. Once configured, invoices and credit notes you post in Business Central are automatically sent to your customers via the Peppol network through Recommand. You can also receive incoming Peppol documents directly into Business Central.
+
+## Prerequisites
+
+Before setting up the integration, ensure you have:
+
+- A Recommand account (we can only provide support for paid plans)
+- A registered company in your Recommand account
+- Microsoft Business Central 2024 Wave 1 (v27.0) or later
+
+## Installation
+
+1. In Business Central, search for **"Extension Management"** (Alt+Q)
+2. Upload the Recommand E-Document `.app` file
+3. Wait until the extension is installed; you can monitor progress through the installation status menu
+
+## Setup
+
+### 1. Configure the Recommand Connection
+
+1. In Business Central, search for **"Recommand Setup"** (Alt+Q)
+2. Configure the following fields:
+
+   | Field | Description |
+   |-------|-------------|
+   | **Service URL** | The Recommand API URL. Pre-filled with `https://app.recommand.eu` |
+   | **Company ID** | Your Recommand Company ID. Find this in the [Recommand dashboard](https://app.recommand.eu) under Companies |
+   | **API Key** | Your Recommand API Key. Create this in the Recommand dashboard under [API Keys](https://app.recommand.eu/api-keys) |
+   | **API Secret** | Your Recommand API Secret. Created in the same step as the API Key |
+
+3. Close the page
+
+### 2. Create an E-Document Service
+
+1. Search for **"E-Document Services"**
+2. Click **New**
+3. Fill in the following fields:
+
+   | Field | Value |
+   |-------|-------|
+   | **Code** | `RECOMMAND` |
+   | **Document Format** | `PEPPOL BIS 3.0` |
+   | **Service Integration** | `Recommand` |
+
+4. Click **Configure documents to export** in the action menu
+5. Add the document types you want to support:
+   - Sales Invoice
+   - Sales Credit Memo
+
+### 3. Create and Configure the Workflow
+
+1. Search for **"Workflows"**
+2. Create a new workflow from scratch with code `RECOMMAND`
+3. In the workflow steps, add a new step with trigger `E-document Created`, on condition `<Always>` and action `Send E-Document using service: RECOMMAND`
+4. **Enable** the workflow by toggling the **Enabled** field to `Yes`
+
+The workflow structure should look like this:
+
+| When Event | Then Response |
+|------------|---------------|
+| E-document Created | Send E-Document using service: RECOMMAND |
+
+### 4. Create a Document Sending Profile
+
+1. Search for **"Document Sending Profiles"**
+2. Click **New**
+3. Fill in:
+
+   | Field | Value |
+   |-------|-------|
+   | **Code** | `RECOMMAND` |
+   | **Description** | `Recommand E-Document Sending` |
+   | **Electronic Document** | `E-Document Worklow` |
+   | **E-Document Workflow** | `RECOMMAND` |
+
+### 5. Assign to Customers
+
+1. Search for **"Customers"**
+2. Open a customer card
+3. Under **General**, set **Document Sending Profile** to `RECOMMAND`
+
+Repeat this for every customer you want to send Peppol invoices to.
+This can also be overridden on a per-invoice basis when sending the invoice.
+
+## Sending Documents
+
+Once configured, sending a Peppol invoice is part of your normal workflow:
+
+1. Create a **Sales Invoice** for a customer with the e-document sending profile
+2. **Post and Send** the invoice
+3. The invoice is automatically sent to Recommand and delivered via Peppol
+
+You can verify the status in the [Recommand dashboard](https://app.recommand.eu).
+
+## Receiving Documents
+
+The extension can also receive incoming Peppol documents from your Recommand inbox.
+
+1. Business Central periodically polls for new documents based on your E-Document Service configuration. You can also manually trigger a poll by clicking the **Receive** action in the E-Document Service card.
+2. Received documents appear on the **Inbound E-Documents** page in Business Central
+
+## Troubleshooting
+
+### Documents Not Sending Automatically
+
+1. Search for **"E-Documents"** to check the document status
+2. Click on an e-document and view **E-Document Service Status** for details
+3. Verify that the workflow is **enabled** and properly configured
+4. You can manually send a document by clicking the **Send** action on the e-document
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| "Service URL is not configured" | Go to **Recommand Setup** and verify the Service URL is filled in |
+| HTTP errors | Verify the Service URL is correct and that your API credentials are valid |
+| Missing buyer electronic address | For Belgian customers, also set the **Enterprise No.** on the customer card. In other cases, where addressing based on Global Location Number (GLN) is used, you might want to enable **"Use GLN in Electronic Document"** so a buyer electronic address is included in the invoice. |
+
+If you run into any issues, please contact us at [support@recommand.eu](mailto:support@recommand.eu).
+Please include as much information as possible to help us troubleshoot the issue.
+We are only able to provide support for paid plans.

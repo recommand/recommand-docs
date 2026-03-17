@@ -21,6 +21,7 @@ const integrationIcons: Record<string, string> = {
   exact: "/integrations/exact.png",
   yuki: "/integrations/yuki.png",
   clearfacts: "/integrations/clearfacts.png",
+  "business-central": "/integrations/business-central.svg",
 };
 
 export const integrationsSource = loader({
