@@ -1,0 +1,26 @@
+---
+title: Base Quantity Support for Line Items
+description: Invoice and credit note line items now support a base quantity, allowing you to express prices that are based on a batch or pack rather than a single unit.
+date: 2026-03-24
+---
+
+Invoice and credit note line items now support a **base quantity** field, so you can express prices that are based on a batch or pack rather than a single unit.
+
+### What changed
+
+- **New `baseQuantity` field on line items**: An optional field that indicates how many units the `netPriceAmount` refers to. When omitted or set to `"1"`, behaviour is unchanged — the price is per unit.
+- **Correct line amount calculation**: When `baseQuantity` is greater than 1, the line amount is calculated as `quantity * (netPriceAmount / baseQuantity)`, following PEPPOL rule EN16931-R120.
+- **UBL round-trip**: `BaseQuantity` is written into the generated UBL XML when greater than 1, and parsed back from incoming documents.
+- **Document preview**: The preview renders batch prices clearly, showing the price alongside the pack size (e.g. "51.98 / 10 pieces").
+
+### Why this matters
+
+Many suppliers — especially in construction, hardware, and wholesale — quote prices per pack rather than per unit. For example, a box of 200 screws might be priced at 51.98 per 10 pieces. Without base quantity support, you'd have to calculate the per-unit price yourself and risk rounding differences that break Peppol validation.
+
+With `baseQuantity`, you can now express prices exactly as they appear on the original quote:
+
+- A line with `quantity: "2"`, `netPriceAmount: "73.47"`, and `baseQuantity: "10"` means "2 units ordered at a price of 73.47 per 10", giving a line total of 14.69
+- A feed supplier invoicing 12000 kg of cow feed priced at 285.00 per 1000 kg: `quantity: "12000"`, `netPriceAmount: "285.00"`, `baseQuantity: "1000"` — line total of 3420.00
+- A line with `quantity: "5"`, `netPriceAmount: "10.00"`, and `baseQuantity: "1"` (or omitted) works the same as before — 5 units at 10.00 each, totalling 50.00
+
+This avoids manual per-unit price conversion and ensures your invoices stay compliant with the Peppol calculation rules.
