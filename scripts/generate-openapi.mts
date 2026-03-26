@@ -639,6 +639,27 @@ function renderModelPropertyRow(
   return `| ${nameCell} | ${typeStr} | ${req} | ${desc} |`;
 }
 
+function toHeadingAnchor(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[`'"]/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+function getNestedAnchor(fullPath: string, nested: any): string | undefined {
+  if (!nested || (!nested.properties && !nested.oneOf && !nested.anyOf)) {
+    return undefined;
+  }
+
+  if (nested.oneOf || nested.anyOf) {
+    return toHeadingAnchor(`${fullPath} ${nested.oneOf ? "one-of" : "any-of"}`);
+  }
+
+  return toHeadingAnchor(`${fullPath} properties`);
+}
+
 for (const [schemaName, schema] of Object.entries<any>(schemas)) {
   const slug = toKebabCase(schemaName);
   const title = schema.title || schemaName.replace(/([a-z])([A-Z])/g, "$1 $2");
@@ -663,14 +684,9 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
     const nestedAnchors = new Map<string, string>();
     for (const [propName, prop] of Object.entries<any>(schema.properties)) {
       const nested = getNestedSchema(prop);
-      if (!nested || (!nested.properties && !nested.oneOf && !nested.anyOf))
-        continue;
-      if (nested.oneOf || nested.anyOf) {
-        const keyword = nested.oneOf ? "one-of" : "any-of";
-        nestedAnchors.set(propName, `${propName.toLowerCase()}-${keyword}`);
-      } else {
-        nestedAnchors.set(propName, `${propName.toLowerCase()}-properties`);
-      }
+      const anchor = getNestedAnchor(propName, nested);
+      if (!anchor) continue;
+      nestedAnchors.set(propName, anchor);
     }
 
     lines.push("## Properties");
@@ -727,8 +743,15 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
               for (const [vName, vProp] of Object.entries<any>(
                 variant.properties,
               )) {
+                const fullPath = `${prefix}${propName}.${vName}`;
+                const vNested = getNestedSchema(vProp);
                 lines.push(
-                  renderModelPropertyRow(vName, vProp, vReq.has(vName)),
+                  renderModelPropertyRow(
+                    vName,
+                    vProp,
+                    vReq.has(vName),
+                    getNestedAnchor(fullPath, vNested),
+                  ),
                 );
               }
               lines.push("");
@@ -749,8 +772,15 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
           for (const [nName, nProp] of Object.entries<any>(
             nested.properties,
           )) {
+            const fullPath = `${prefix}${propName}.${nName}`;
+            const nNested = getNestedSchema(nProp);
             lines.push(
-              renderModelPropertyRow(nName, nProp, nReq.has(nName)),
+              renderModelPropertyRow(
+                nName,
+                nProp,
+                nReq.has(nName),
+                getNestedAnchor(fullPath, nNested),
+              ),
             );
           }
           lines.push("");
