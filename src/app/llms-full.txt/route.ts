@@ -29,6 +29,28 @@ async function getReferenceMdTexts(): Promise<string[]> {
   return texts;
 }
 
+async function getModelTexts(): Promise<string[]> {
+  const modelsDir = path.join(process.cwd(), "content/reference/models");
+  const texts: string[] = [];
+
+  try {
+    const files = await fs.readdir(modelsDir);
+    for (const file of files.filter((f) => f.endsWith(".mdx"))) {
+      const content = await fs.readFile(path.join(modelsDir, file), "utf-8");
+      // Extract title from frontmatter
+      const titleMatch = content.match(/^---[\s\S]*?title:\s*"([^"]+)"[\s\S]*?---/);
+      const title = titleMatch?.[1] ?? file.replace(/\.mdx$/, "");
+      // Strip frontmatter
+      const body = content.replace(/^---[\s\S]*?---\s*/, "");
+      texts.push(`# ${title} (Model)\n\n${body.trim()}`);
+    }
+  } catch {
+    // If models directory doesn't exist, return empty
+  }
+
+  return texts;
+}
+
 export async function GET() {
   const allPages = [
     ...docsSource.getPages(),
@@ -38,8 +60,9 @@ export async function GET() {
 
   const texts = await Promise.all(allPages.map(getLLMText));
   const refTexts = await getReferenceMdTexts();
+  const modelTexts = await getModelTexts();
 
-  return new Response([...texts, ...refTexts].join("\n\n"), {
+  return new Response([...texts, ...refTexts, ...modelTexts].join("\n\n"), {
     headers: {
       "Content-Type": "text/plain",
     },

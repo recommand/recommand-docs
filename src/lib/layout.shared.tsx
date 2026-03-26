@@ -1,6 +1,12 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import type { RootProviderProps } from "fumadocs-ui/provider/next";
+import StructuredSearchDialog from "@/components/search-dialog";
 import RecommandLogo from "@/components/recommand-logo";
 import { BookOpen, Code2, History, HelpCircle, Puzzle } from "lucide-react";
+
+export const searchOptions: RootProviderProps["search"] = {
+  SearchDialog: StructuredSearchDialog,
+};
 
 export function baseOptions(): BaseLayoutProps {
   return {

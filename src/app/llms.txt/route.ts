@@ -1,4 +1,4 @@
-import { docsSource, changelogSource, faqSource } from "@/lib/source";
+import { docsSource, referenceSource, changelogSource, faqSource } from "@/lib/source";
 import fs from "fs/promises";
 import path from "path";
 
@@ -47,6 +47,18 @@ export async function GET() {
     );
     lines.push("");
   }
+
+  // Models — list all model pages from reference/models
+  lines.push("## Models");
+  lines.push("");
+  for (const page of referenceSource.getPages()) {
+    if (!page.url.startsWith("/reference/models/")) continue;
+    const title = page.data.title ?? page.url;
+    const description = page.data.description;
+    const suffix = description ? `: ${description}` : "";
+    lines.push(`- [${title}](${page.url}.mdx)${suffix}`);
+  }
+  lines.push("");
 
   lines.push("## Changelog");
   lines.push("");
