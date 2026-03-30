@@ -96,6 +96,13 @@ The workflow structure should look like this:
 Repeat this for every customer you want to send Peppol invoices to.
 This can also be overridden on a per-invoice basis when sending the invoice.
 
+For Belgian customers, it is important to set the **Enterprise No.** on the customer card.
+This will be used to generate the buyer electronic address in the invoice.
+Microsoft Business Central will automatically transform this into a `9925:vat-number` Peppol address.
+As the primary addressing scheme in Belgium is `0208:enterprise-number`, we automatically try deliverying to the `0208:enterprise-number` address if delivering to the `9925:vat-number` address fails.
+
+In other cases, where addressing based on Global Location Number (GLN) is used, you might want to enable **"Use GLN in Electronic Document"** so a buyer electronic address is included in the invoice.
+
 ## Sending Documents
 
 Once configured, sending a Peppol invoice is part of your normal workflow:
@@ -128,7 +135,7 @@ The extension can also receive incoming Peppol documents from your Recommand inb
 |-------|----------|
 | "Service URL is not configured" | Go to **Recommand Setup** and verify the Service URL is filled in |
 | HTTP errors | Verify the Service URL is correct and that your API credentials are valid |
-| Missing buyer electronic address | For Belgian customers, also set the **Enterprise No.** on the customer card. In other cases, where addressing based on Global Location Number (GLN) is used, you might want to enable **"Use GLN in Electronic Document"** so a buyer electronic address is included in the invoice. |
+| Missing buyer electronic address | For Belgian customers, set the **Enterprise No.** on the customer card. In other cases, where addressing based on Global Location Number (GLN) is used, you might want to enable **"Use GLN in Electronic Document"** so a buyer electronic address is included in the invoice. |
 
 If you run into any issues, please contact us at [support@recommand.eu](mailto:support@recommand.eu).
 Please include as much information as possible to help us troubleshoot the issue.
