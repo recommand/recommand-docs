@@ -7,7 +7,9 @@
     "dev": "bun run generate:api && next dev --turbopack",
     "build": "bun run generate:api && next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "format": "biome format --write .",
     "lint:links": "bun run scripts/lint-links.ts"
   },
   "dependencies": {
@@ -16,7 +18,7 @@
     "feed": "^5.2.0",
     "fumadocs-core": "^16.6.5",
     "fumadocs-mdx": "^14.2.8",
-    "fumadocs-openapi": "^10.3.12",
+    "fumadocs-openapi": "10.3.18",
     "fumadocs-ui": "^16.6.5",
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
@@ -31,8 +33,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "@biomejs/biome": "2.4.9",
     "next-validate-link": "^1.6.4",
     "tailwindcss": "^4",
     "typescript": "^5"
@@ -44,5 +45,8 @@
   "trustedDependencies": [
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "patchedDependencies": {
+    "fumadocs-openapi@10.3.18": "patches/fumadocs-openapi@10.3.18.patch"
+  }
 }

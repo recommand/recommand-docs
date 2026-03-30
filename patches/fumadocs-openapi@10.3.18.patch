@@ -1,0 +1,205 @@
+diff --git a/node_modules/fumadocs-openapi/.bun-tag-628ea3af02aa13fa b/.bun-tag-628ea3af02aa13fa
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/fumadocs-openapi/.bun-tag-7aaee1d9638948d0 b/.bun-tag-7aaee1d9638948d0
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/fumadocs-openapi/.bun-tag-e0d6d8404b054033 b/.bun-tag-e0d6d8404b054033
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/fumadocs-openapi/.bun-tag-f8ac185a7b1b35ba b/.bun-tag-f8ac185a7b1b35ba
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/ui/schema/client.js b/dist/ui/schema/client.js
+index cd9ac802d9e8d07269ad13f1ef42980d3225800e..fd402603d504b685648049a001253785737386c2 100644
+--- a/dist/ui/schema/client.js
++++ b/dist/ui/schema/client.js
+@@ -3,7 +3,7 @@ import { cn } from "../../utils/cn.js";
+ import { Badge } from "../components/method-label.js";
+ import { Fragment, Suspense, createContext, use, useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+ import { Fragment as Fragment$1, jsx, jsxs } from "react/jsx-runtime";
+-import { ChevronDown, FilterIcon } from "lucide-react";
++import { ChevronDown, FilterIcon, Plus, X } from "lucide-react";
+ import { cva } from "class-variance-authority";
+ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "fumadocs-ui/components/ui/collapsible";
+ import { buttonVariants } from "fumadocs-ui/components/ui/button";
+@@ -30,11 +30,61 @@ function SchemaUI({ name, required = false, as = "property", generated }) {
+ 		})
+ 	});
+ }
++
++// Inline collapsible wrapper for nested child attributes (Scalar-style)
++function InlineChildAttributes({ children }) {
++	const [open, setOpen] = useState(false);
++	return /* @__PURE__ */ jsx("div", {
++		className: "mt-2",
++		children: open
++			? /* @__PURE__ */ jsxs(Fragment$1, {
++				children: [
++					/* @__PURE__ */ jsxs("button", {
++						type: "button",
++						onClick: () => setOpen(false),
++						className: "flex items-center gap-1.5 text-xs text-fd-muted-foreground hover:text-fd-foreground transition-colors py-1",
++						children: [
++							/* @__PURE__ */ jsx(X, { className: "size-3" }),
++							"Hide Child Attributes"
++						]
++					}),
++					/* @__PURE__ */ jsx("div", {
++						className: "border-l-2 border-fd-border pl-4 ml-0.5",
++						children
++					})
++				]
++			})
++			: /* @__PURE__ */ jsxs("button", {
++				type: "button",
++				onClick: () => setOpen(true),
++				className: "flex items-center gap-1.5 text-xs text-fd-muted-foreground hover:text-fd-foreground transition-colors py-1",
++				children: [
++					/* @__PURE__ */ jsx(Plus, { className: "size-3" }),
++					"Show Child Attributes"
++				]
++			})
++	});
++}
++
+ function SchemaUIProperty({ name, $type, variant = "default", overrides, objectSearchOverrides }) {
+ 	const { refs } = useData();
+ 	const schema = refs[$type];
+ 	const renderRef = useRenderRef();
+ 	let type = schema.typeName;
++	let inlineContent = null;
++
++	// Helper: check if a schema type is structurally complex (has expandable children)
++	function isComplex(s) {
++		if (!s) return false;
++		if (s.type === "primitive") return false;
++		if (s.type === "array") return isComplex(refs[s.item.$type]);
++		return true; // object, or, and
++	}
++	// Helper: check if a union has at least one complex child
++	function hasComplexChild(items) {
++		return items.some((item) => isComplex(refs[item.$type]));
++	}
++
+ 	if ((schema.type === "or" || schema.type === "and") && schema.items.length > 0) {
+ 		if (variant === "expand") return /* @__PURE__ */ jsxs(Tabs, {
+ 			defaultValue: schema.items[0].$type,
+@@ -51,18 +101,44 @@ function SchemaUIProperty({ name, $type, variant = "default", overrides, objectS
+ 				})
+ 			}, item.$type))]
+ 		});
+-		type = renderRef({
+-			pathName: name,
+-			$ref: $type
+-		});
++		// Inline collapsible for unions with complex children
++		if (hasComplexChild(schema.items)) {
++			inlineContent = /* @__PURE__ */ jsx(InlineChildAttributes, {
++				children: /* @__PURE__ */ jsxs(Tabs, {
++					defaultValue: schema.items[0].$type,
++					children: [/* @__PURE__ */ jsx(TabsList, { children: schema.items.map((item) => /* @__PURE__ */ jsx(TabsTrigger, {
++						value: item.$type,
++						children: item.name
++					}, item.$type)) }), schema.items.map((item) => /* @__PURE__ */ jsx(TabsContent, {
++						value: item.$type,
++						forceMount: void 0,
++						className: "pt-2 pb-0",
++						children: /* @__PURE__ */ jsx(SchemaUIProperty, {
++							...item,
++							variant: "expand"
++						})
++					}, item.$type))]
++				})
++			});
++		}
+ 	} else if (schema.type === "object" && schema.props.length > 0) {
+-		if (variant === "expand") return /* @__PURE__ */ jsx(ObjectSearch, {
+-			properties: schema.props,
+-			...objectSearchOverrides
++		if (variant === "expand") return /* @__PURE__ */ jsxs(Fragment$1, {
++			children: [schema.description && /* @__PURE__ */ jsx("div", {
++				className: "prose-no-margin text-sm mb-2",
++				children: schema.description
++			}), /* @__PURE__ */ jsx(ObjectSearch, {
++				properties: schema.props,
++				...objectSearchOverrides
++			})]
+ 		});
+-		type = renderRef({
+-			pathName: name,
+-			$ref: $type
++		// Inline collapsible for object types
++		inlineContent = /* @__PURE__ */ jsx(InlineChildAttributes, {
++			children: /* @__PURE__ */ jsxs(Fragment$1, {
++				children: [schema.description && /* @__PURE__ */ jsx("div", {
++					className: "prose-no-margin text-sm mb-2 mt-2",
++					children: schema.description
++				}), /* @__PURE__ */ jsx(ChildProps, { props: schema.props })]
++			})
+ 		});
+ 	} else if (schema.type === "array") {
+ 		if (variant === "expand") return /* @__PURE__ */ jsxs(Collapsible, {
+@@ -82,15 +158,25 @@ function SchemaUIProperty({ name, $type, variant = "default", overrides, objectS
+ 				})
+ 			})]
+ 		});
+-		type = renderRef({
+-			pathName: name,
+-			$ref: $type
+-		});
++		// Inline collapsible for arrays with complex item types
++		const itemSchema = refs[schema.item.$type];
++		if (isComplex(itemSchema)) {
++			inlineContent = /* @__PURE__ */ jsx(InlineChildAttributes, {
++				children: /* @__PURE__ */ jsx(ChildProps, {
++					props: itemSchema.type === "object" ? itemSchema.props : [{
++						name: "",
++						$type: schema.item.$type,
++						required: false
++					}]
++				})
++			});
++		}
+ 	}
++
+ 	const child = /* @__PURE__ */ jsxs(Fragment$1, { children: [schema.description, schema.infoTags && schema.infoTags.length > 0 && /* @__PURE__ */ jsx("div", {
+ 		className: "flex flex-row gap-2 flex-wrap my-2 not-prose empty:hidden",
+ 		children: schema.infoTags.map((tag) => /* @__PURE__ */ jsx(InfoTag, { tag }, tag.label))
+-	})] });
++	}), inlineContent] });
+ 	if (variant === "expand") return child;
+ 	return /* @__PURE__ */ jsx(Property, {
+ 		name,
+@@ -100,6 +186,16 @@ function SchemaUIProperty({ name, $type, variant = "default", overrides, objectS
+ 		children: child
+ 	});
+ }
++
++// Renders child properties without the filter search (cleaner for nested inline display)
++function ChildProps({ props }) {
++	return props.map((prop) => /* @__PURE__ */ jsx(SchemaUIProperty, {
++		name: prop.name,
++		$type: prop.$type,
++		overrides: { required: prop.required }
++	}, prop.name));
++}
++
+ function ObjectSearch({ properties, container, open }) {
+ 	const [search, setSearch] = useState("");
+ 	const deferredValue = useDeferredValue(search);
+diff --git a/dist/ui/schema/index.js b/dist/ui/schema/index.js
+index 4e66f190601b51855c88dc9b719df3fe361aa474..6e95966692b8f90c0210f875d9adcec9c4158f64 100644
+--- a/dist/ui/schema/index.js
++++ b/dist/ui/schema/index.js
+@@ -59,6 +59,10 @@ function generateSchemaUI({ root, readOnly, writeOnly }, ctx) {
+ 			label: "Example",
+ 			value: JSON.stringify(example, null, 2)
+ 		});
++		if (showExample && schema.example !== void 0 && !schema.examples) fields.push({
++			label: "Example",
++			value: JSON.stringify(schema.example)
++		});
+ 		return fields;
+ 	}
+ 	let _counter = 0;

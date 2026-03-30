@@ -290,7 +290,11 @@ function buildPropertyDescription(prop: any): string {
       parts.push(`Map of string keys to ${renderType(ap)} values`);
     }
   }
-  return parts.join(". ").replace(/\|/g, "\\|").replace(/\n/g, " ");
+  return parts
+    .map((p) => p.replace(/\.+$/, ""))
+    .join(". ")
+    .replace(/\|/g, "\\|")
+    .replace(/\n/g, " ");
 }
 
 function getNestedSchema(prop: any): any {
@@ -603,4 +607,277 @@ fs.writeFileSync(path.join(REFERENCE_MD_DIR, "index.md"), indexLines.join("\n"))
 
 console.log(
   `Generated ${allEndpoints.length} endpoint markdown files in ${REFERENCE_MD_DIR}/`,
+);
+
+// ──────────────────────────────────────────────
+// Part 3: Models pages (content/reference/models)
+// ──────────────────────────────────────────────
+
+const MODELS_DIR = path.join(REFERENCE_DIR, "models");
+
+// Clean and recreate models directory
+if (fs.existsSync(MODELS_DIR)) {
+  fs.rmSync(MODELS_DIR, { recursive: true });
+}
+fs.mkdirSync(MODELS_DIR, { recursive: true });
+
+const schemas = resolved.components?.schemas ?? {};
+const modelSlugs: string[] = [];
+
+function renderModelPropertyRow(
+  name: string,
+  prop: any,
+  required: boolean,
+  anchor?: string,
+): string {
+  const typeStr = renderType(prop);
+  const req = required ? "Yes" : "No";
+  const desc = buildPropertyDescription(prop);
+  const nameCell = anchor
+    ? `[\`${name}\`](#${anchor})`
+    : `\`${name}\``;
+  return `| ${nameCell} | ${typeStr} | ${req} | ${desc} |`;
+}
+
+function toHeadingAnchor(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[`'"]/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+function getNestedAnchor(fullPath: string, nested: any): string | undefined {
+  if (!nested || (!nested.properties && !nested.oneOf && !nested.anyOf)) {
+    return undefined;
+  }
+
+  if (nested.oneOf || nested.anyOf) {
+    return toHeadingAnchor(`${fullPath} ${nested.oneOf ? "one-of" : "any-of"}`);
+  }
+
+  return toHeadingAnchor(`${fullPath} properties`);
+}
+
+for (const [schemaName, schema] of Object.entries<any>(schemas)) {
+  const slug = toKebabCase(schemaName);
+  const title = schema.title || schemaName.replace(/([a-z])([A-Z])/g, "$1 $2");
+  const description = schema.description || "";
+
+  const lines: string[] = [];
+  lines.push("---");
+  lines.push(`title: "${title}"`);
+  if (description) {
+    lines.push(
+      `description: "${description.replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
+    );
+  }
+  lines.push("---");
+  lines.push("");
+
+  // Render properties table
+  if (schema.properties) {
+    const requiredSet = new Set(schema.required ?? []);
+
+    // Determine which properties have nested sections and their anchor slugs
+    const nestedAnchors = new Map<string, string>();
+    for (const [propName, prop] of Object.entries<any>(schema.properties)) {
+      const nested = getNestedSchema(prop);
+      const anchor = getNestedAnchor(propName, nested);
+      if (!anchor) continue;
+      nestedAnchors.set(propName, anchor);
+    }
+
+    lines.push("## Properties");
+    lines.push("");
+    lines.push("| Name | Type | Required | Description |");
+    lines.push("|------|------|----------|-------------|");
+
+    for (const [propName, prop] of Object.entries<any>(schema.properties)) {
+      lines.push(
+        renderModelPropertyRow(
+          propName,
+          prop,
+          requiredSet.has(propName),
+          nestedAnchors.get(propName),
+        ),
+      );
+    }
+    lines.push("");
+
+    // Render nested object details (recursive)
+    function renderNestedDetails(
+      properties: Record<string, any>,
+      prefix: string,
+      depth: number,
+    ) {
+      if (depth > 4) return; // prevent infinite recursion
+      for (const [propName, prop] of Object.entries<any>(properties)) {
+        const nested = getNestedSchema(prop);
+        if (!nested || (!nested.properties && !nested.oneOf && !nested.anyOf))
+          continue;
+
+        const heading = "#".repeat(Math.min(3 + depth, 6));
+
+        if (nested.oneOf || nested.anyOf) {
+          const variants = nested.oneOf || nested.anyOf;
+          const keyword = nested.oneOf ? "One of" : "Any of";
+          lines.push(
+            `${heading} \`${prefix}${propName}\` (${keyword})`,
+          );
+          lines.push("");
+          for (const variant of variants) {
+            const label =
+              variant.title || variant.description || renderType(variant);
+            if (variant.properties) {
+              lines.push(`**${label}:**`);
+              if (variant.description) {
+                lines.push("");
+                lines.push(variant.description);
+              }
+              lines.push("");
+              lines.push("| Name | Type | Required | Description |");
+              lines.push("|------|------|----------|-------------|");
+              const vReq = new Set(variant.required ?? []);
+              for (const [vName, vProp] of Object.entries<any>(
+                variant.properties,
+              )) {
+                const fullPath = `${prefix}${propName}.${vName}`;
+                const vNested = getNestedSchema(vProp);
+                lines.push(
+                  renderModelPropertyRow(
+                    vName,
+                    vProp,
+                    vReq.has(vName),
+                    getNestedAnchor(fullPath, vNested),
+                  ),
+                );
+              }
+              lines.push("");
+              // Recurse into variant properties
+              renderNestedDetails(
+                variant.properties,
+                `${prefix}${propName}.`,
+                depth + 1,
+              );
+            }
+          }
+        } else if (nested.properties) {
+          lines.push(`${heading} \`${prefix}${propName}\` properties`);
+          lines.push("");
+          lines.push("| Name | Type | Required | Description |");
+          lines.push("|------|------|----------|-------------|");
+          const nReq = new Set(nested.required ?? []);
+          for (const [nName, nProp] of Object.entries<any>(
+            nested.properties,
+          )) {
+            const fullPath = `${prefix}${propName}.${nName}`;
+            const nNested = getNestedSchema(nProp);
+            lines.push(
+              renderModelPropertyRow(
+                nName,
+                nProp,
+                nReq.has(nName),
+                getNestedAnchor(fullPath, nNested),
+              ),
+            );
+          }
+          lines.push("");
+          // Recurse into nested properties
+          renderNestedDetails(
+            nested.properties,
+            `${prefix}${propName}.`,
+            depth + 1,
+          );
+        }
+      }
+    }
+    renderNestedDetails(schema.properties, "", 0);
+  } else if (schema.anyOf || schema.oneOf) {
+    // Top-level union type (e.g., VatTotals anyOf)
+    const variants = schema.anyOf || schema.oneOf;
+    const keyword = schema.anyOf ? "Any of" : "One of";
+    lines.push(`## ${keyword}`);
+    lines.push("");
+    for (const variant of variants) {
+      const label =
+        variant.title || variant.description || renderType(variant);
+      lines.push(`### ${label}`);
+      lines.push("");
+      if (variant.description) {
+        lines.push(variant.description);
+        lines.push("");
+      }
+      if (variant.properties) {
+        lines.push("| Name | Type | Required | Description |");
+        lines.push("|------|------|----------|-------------|");
+        const vReq = new Set(variant.required ?? []);
+        for (const [vName, vProp] of Object.entries<any>(variant.properties)) {
+          lines.push(renderModelPropertyRow(vName, vProp, vReq.has(vName)));
+        }
+        lines.push("");
+      }
+    }
+  } else if (schema.type === "string" || schema.type === "number") {
+    // Simple type schema
+    lines.push(`**Type:** \`${renderType(schema)}\``);
+    lines.push("");
+  }
+
+  // Write used-by section (which endpoints reference this schema)
+  const usedByEndpoints: { tag: string; slug: string; title: string }[] = [];
+  for (const [pathStr, methods] of Object.entries<any>(spec.paths ?? {})) {
+    for (const [, op] of Object.entries<any>(methods)) {
+      if (!op?.operationId) continue;
+      const opStr = JSON.stringify(op);
+      if (opStr.includes(`"#/components/schemas/${schemaName}"`)) {
+        const opSlug = toKebabCase(op.operationId);
+        const opTag = op.tags?.[0]?.replace(/\s+/g, "-").toLowerCase();
+        if (opTag) {
+          usedByEndpoints.push({
+            tag: opTag,
+            slug: opSlug,
+            title: op.summary || op.operationId,
+          });
+        }
+      }
+    }
+  }
+
+  if (usedByEndpoints.length > 0) {
+    lines.push("## Used by");
+    lines.push("");
+    for (const ep of usedByEndpoints) {
+      lines.push(
+        `- [${ep.title}](/reference/${ep.tag}/${ep.slug})`,
+      );
+    }
+    lines.push("");
+  }
+
+  fs.writeFileSync(path.join(MODELS_DIR, `${slug}.mdx`), lines.join("\n"));
+  modelSlugs.push(slug);
+}
+
+// Write models meta.json
+fs.writeFileSync(
+  path.join(MODELS_DIR, "meta.json"),
+  JSON.stringify({ title: "Models", pages: modelSlugs }, null, 2),
+);
+
+// Update root meta.json to include models
+const rootMeta = JSON.parse(
+  fs.readFileSync(path.join(REFERENCE_DIR, "meta.json"), "utf-8"),
+);
+if (!rootMeta.pages.includes("models")) {
+  rootMeta.pages.push("models");
+  fs.writeFileSync(
+    path.join(REFERENCE_DIR, "meta.json"),
+    JSON.stringify(rootMeta, null, 2),
+  );
+}
+
+console.log(
+  `Generated ${modelSlugs.length} model pages in ${MODELS_DIR}/`,
 );
