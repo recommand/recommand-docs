@@ -23,6 +23,11 @@ A company in Recommand represents a business entity that can send or receive Pep
 
 Your team ID is required for most company management operations. You can find it in the Recommand dashboard under [Account > API Keys](https://app.recommand.eu/api-keys).
 
+## Strict Identifier Validation
+
+Recommand enforces strict format validation on Peppol identifiers and company VAT and enterprise numbers. Numbers that do not pass national validation rules (such as the Belgian modulo-97 check digit) are rejected at creation and update time. Ensure the values you submit are correctly formatted.
+
+
 ## Listing Companies
 
 To retrieve all companies associated with your team using the [list companies endpoint](/reference/companies/get-companies):
@@ -90,6 +95,8 @@ const newCompany = await createCompany("your_team_id", {
 
 if (newCompany.success) {
   console.log(`Company created with ID: ${newCompany.company.id}`);
+  console.log(`Verification URL: ${newCompany.verificationUrl}`);
+  // Present this URL to your user — they can complete or forward the identity check from there
 } else {
   console.error("Failed to create company:", newCompany.errors);
 }
@@ -106,6 +113,7 @@ if (newCompany.success) {
 | `country`          | Country code (2-letter ISO code) | Yes      | `"BE"`               |
 | `enterpriseNumber` | Enterprise number                | No       | `"0123456789"`       |
 | `vatNumber`        | VAT registration number          | No       | `"BE0123456789"`     |
+| `isVerified`       | Whether the company has been verified (read-only) | — | `false`         |
 
 ## Retrieving a Company
 
@@ -172,10 +180,15 @@ const updateResult = await updateCompany("company_id", {
 
 if (updateResult.success) {
   console.log("Company updated successfully");
+  // If vatNumber or enterpriseNumber changed, isVerified is reset to false — reverification required
 } else {
   console.error("Failed to update company:", updateResult.errors);
 }
 ```
+
+<Callout type="warn" title="Updating identifiers resets verification">
+  If you update a company's `vatNumber` or `enterpriseNumber`, `isVerified` is automatically reset to `false` and the company must be verified again before it can participate on the Peppol network.
+</Callout>
 
 ## Deleting a Company
 
@@ -206,6 +219,33 @@ if (deleteResult.success) {
   console.error("Failed to delete company:", deleteResult.errors);
 }
 ```
+
+## Verifying a Company
+
+After creating a company, an authorised representative must complete an identity check before the company can send or receive documents on the Peppol network. The `isVerified` field on a company object reflects whether this step has been completed.
+
+The create company response already includes a `verificationUrl` — present it to your user straight away. The verification page lets them forward the link to the right person within their organisation. If you need a fresh URL later (e.g. the link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company):
+
+```javascript
+const result = await fetch(
+  `https://app.recommand.eu/api/v1/companies/${companyId}/verify`,
+  {
+    method: "POST",
+    headers: {
+      Authorization:
+        "Basic " +
+        Buffer.from("your_api_key:your_api_secret").toString("base64"),
+    },
+  }
+).then((r) => r.json());
+
+if (result.success) {
+  console.log("Verification URL:", result.verificationUrl);
+  // Present this URL to your user — they can complete or forward the identity check from there
+}
+```
+
+Verification can also be completed directly from the [Recommand dashboard](https://app.recommand.eu/companies) without using the API. For the full flow, see the [Company Verification](/docs/company-verification) guide.
 
 ## Complete Example: Company Management
 
@@ -371,6 +411,9 @@ manageCompanies().catch((error) => {
   </Card>
   <Card href="/docs/working-with-webhooks" title="Working with Webhooks">
     Receive events across your companies and teams.
+  </Card>
+  <Card href="/docs/company-verification" title="Company Verification">
+    Verify a company before it can participate on the Peppol network.
   </Card>
   <Card href="/docs/verifying-recipients" title="Verifying Recipients">
     Check recipients before sending documents.

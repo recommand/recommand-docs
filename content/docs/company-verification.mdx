@@ -1,0 +1,139 @@
+---
+title: Company Verification
+description: Verify that a company representative is authorised to act on behalf of a company before it can participate on the Peppol network.
+---
+
+This guide explains how company verification works and how to complete it — either directly from the [Recommand dashboard](https://app.recommand.eu) or via the API.
+
+## Overview
+
+Before a company can send or receive documents on the Peppol network, an authorised representative must complete a short identity check to confirm they are entitled to act on behalf of that company. This produces a clear, auditable record of authorisation for every company on the network.
+
+Each company has an `isVerified` field. As long as this field is `false`, the company cannot participate in document exchange on Peppol.
+
+<Callout type="info" title="No API required">
+  Verification can be completed entirely from the [Recommand dashboard](https://app.recommand.eu/companies) without writing any code. The API is only needed if you want to initiate or automate verification programmatically.
+</Callout>
+
+## Prerequisites
+
+- A Recommand account with API access
+- Your API key and secret
+- The ID of the company you want to verify
+
+## Initiating Verification
+
+When you create a company, the response already includes a `verificationUrl` — present it to your user immediately without any additional API call. The verification page itself lets them forward the link to an authorised representative if needed. If you need a fresh URL later (e.g. the original link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company) to generate a new verification session.
+
+```javascript
+async function initiateVerification(companyId) {
+  const response = await fetch(
+    `https://app.recommand.eu/api/v1/companies/${companyId}/verify`,
+    {
+      method: "POST",
+      headers: {
+        Authorization:
+          "Basic " +
+          Buffer.from("your_api_key:your_api_secret").toString("base64"),
+      },
+    }
+  );
+
+  return response.json();
+}
+
+// Example usage
+const result = await initiateVerification("company_id");
+if (result.success) {
+  console.log("Verification URL:", result.verificationUrl);
+  // Present this URL to your user — they can forward it to an authorised representative if needed
+} else {
+  console.error("Failed to initiate verification:", result.errors);
+}
+```
+
+### Response Structure
+
+```json
+{
+  "success": true,
+  "verificationUrl": "https://app.recommand.eu/company-verification/cvl_01ABCDE/verify"
+}
+```
+
+- `verificationUrl`: A URL to present to your user. From that page, they can complete the identity check themselves or forward the link to the appropriate person within their organisation.
+
+## Presenting the Verification URL
+
+Present the `verificationUrl` to your user — for example, display it in your UI or redirect them to it directly. The verification page is self-contained and works in any browser; no Recommand account is required. From there, the user can forward the link to whoever in their organisation is authorised to complete the identity check.
+
+You can also kick off verification directly from the [Recommand dashboard](https://app.recommand.eu) without using the API.
+
+## Checking Verification Status
+
+The `isVerified` field on the company object reflects the current verification state. You can poll it using the [get company endpoint](/reference/companies/get-company):
+
+```javascript
+async function getCompany(companyId) {
+  const response = await fetch(
+    `https://app.recommand.eu/api/v1/companies/${companyId}`,
+    {
+      headers: {
+        Authorization:
+          "Basic " +
+          Buffer.from("your_api_key:your_api_secret").toString("base64"),
+      },
+    }
+  );
+
+  return response.json();
+}
+
+// Example usage
+const result = await getCompany("company_id");
+if (result.success) {
+  console.log("Verified:", result.company.isVerified);
+}
+```
+
+`isVerified` becomes `true` once the identity check is successfully completed. It is automatically reset to `false` if the company's `vatNumber` or `enterpriseNumber` is changed — in that case the company must go through verification again before it can participate on the Peppol network.
+
+## Webhook Notification
+
+Rather than polling, you can listen for the `company.verification` webhook event, which fires when verification reaches a final state. The payload includes a `status` field:
+
+- `"verified"` — identity check passed and the company is active on the Peppol network
+- `"rejected"` — identity check failed
+- `"error"` — identity check completed, but a subsequent Peppol network operation failed; the company is not yet active. An `errorMessage` field is included with details. Contact [support@recommand.eu](mailto:support@recommand.eu) if this occurs and you are not sure what to do.
+
+```json
+{
+  "eventType": "company.verification",
+  "companyId": "c_xxx",
+  "teamId": "team_xxx",
+  "status": "verified"
+}
+```
+
+See [Working with Webhooks](/docs/working-with-webhooks) for how to register a webhook endpoint.
+
+## Best Practices
+
+1. **Verify early**: Initiate verification as soon as you create a company.
+2. **Present the URL to your user**: Display it in your UI or redirect to it. The verification page lets the user forward the link to whoever in their organisation can complete the identity check.
+3. **Watch for reverification after updates**: If you update a company's `vatNumber` or `enterpriseNumber`, `isVerified` is reset automatically. Check the field after updates and present a new `verificationUrl` to your user if needed.
+4. **One session at a time**: Each call to the verify endpoint creates a new session. Avoid initiating multiple sessions for the same company unnecessarily.
+
+## Next Steps
+
+<Cards>
+  <Card href="/docs/managing-companies" title="Managing Companies">
+    Create and update company profiles.
+  </Card>
+  <Card href="/docs/sending-invoices" title="Sending Invoices">
+    Send invoices from a verified company.
+  </Card>
+  <Card href="/reference/companies/verify-company" title="API Reference">
+    Full reference for the verify company endpoint.
+  </Card>
+</Cards>

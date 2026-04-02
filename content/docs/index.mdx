@@ -132,7 +132,7 @@ const response = await fetch("https://app.recommand.eu/api/v1/companies", {
 
 ### Companies
 
-Companies represent businesses that can send or receive Peppol documents. Each company must be registered before sending documents using the [companies endpoint](/reference/companies):
+Companies represent businesses that can send or receive Peppol documents. Each company must be [registered](/docs/managing-companies) and [verified](/docs/company-verification) before it can participate in document exchange:
 
 ```javascript
 const response = await fetch("https://app.recommand.eu/api/v1/companies", {
@@ -355,6 +355,9 @@ const invoice = {
   </Card>
   <Card href="/docs/managing-companies" title="Managing Companies">
     Create and manage company profiles.
+  </Card>
+  <Card href="/docs/company-verification" title="Company Verification">
+    Verify a company before it can send or receive documents.
   </Card>
   <Card href="/docs/sending-invoices" title="Sending Invoices">
     Create and send your first invoice.

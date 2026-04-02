@@ -303,6 +303,42 @@ async function markDocumentAsRead(documentId) {
 }
 ```
 
+### Company Verification Event
+
+Fired when a company's verification is completed — either successfully or rejected. Use this event to update your system's record of a company's verified status without polling.
+
+For a full walkthrough of the verification process, see the [Company Verification](/docs/company-verification) guide.
+
+```json
+{
+  "eventType": "company.verification",
+  "companyId": "c_xxx",
+  "teamId": "team_xxx",
+  "status": "verified"
+}
+```
+
+- `status`: One of `"verified"`, `"rejected"`, or `"error"`
+  - `"verified"` — identity check passed and the company is active on the Peppol network
+  - `"rejected"` — identity check failed
+  - `"error"` — identity check completed, but a subsequent Peppol network operation failed; the company is not yet active
+- `errorMessage`: Only present when `status` is `"error"`. Contains a description of what went wrong.
+
+```javascript
+if (event.eventType === "company.verification") {
+  if (event.status === "verified") {
+    console.log(`Company ${event.companyId} is now verified.`);
+    // e.g. update your local database, enable document sending for this company
+  } else if (event.status === "rejected") {
+    console.log(`Company ${event.companyId} verification was rejected.`);
+    // e.g. notify your team, trigger a new verification attempt
+  } else if (event.status === "error") {
+    console.error(`Company ${event.companyId} verification error: ${event.errorMessage}`);
+    // e.g. alert your team — contact support@recommand.eu for assistance
+  }
+}
+```
+
 ### Label Events
 
 Labels can be attached to or removed from documents manually or via automatic propagation from matched suppliers. These actions trigger label events you can use for routing and integrations (e.g., forward documents with label `"ERP"` or `"Accounting"` to specific systems).

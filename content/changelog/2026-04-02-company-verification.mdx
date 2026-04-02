@@ -1,0 +1,25 @@
+---
+title: Explicit company verification required
+description: Companies must now be verified by an authorised representative before they can participate on the Peppol network. A new API endpoint and dashboard flow are available to initiate and complete verification.
+date: 2026-04-02
+---
+
+Companies on Recommand now go through an explicit verification step before they can send or receive documents on the Peppol network. This replaces the implicit background checks that were previously part of onboarding.
+
+### What changed
+
+- **New `isVerified` field on company objects**: Indicates whether a company has passed verification. Companies where this is `false` cannot participate in Peppol document exchange.
+- **`verificationUrl` included in the create company response**: When creating a company, the response now includes a `verificationUrl` to present to your user immediately. From the verification page, they can complete or forward the identity check without any additional API calls.
+- **New `POST /companies/:companyId/verify` endpoint**: Generates a fresh verification session for an existing company and returns a new `verificationUrl`. Use this if the original link was lost or you want to verify an existing company. See the [API reference](/reference/companies/verify-company).
+- **Dashboard support**: Verification can be initiated and completed entirely from the [Recommand dashboard](https://app.recommand.eu/companies) without using the API.
+- **New `company.verification` webhook event**: Fires when verification reaches a final state. `status` is `"verified"`, `"rejected"`, or `"error"` (identity check succeeded but a Peppol network operation failed — `errorMessage` is included). See [Working with Webhooks](/docs/working-with-webhooks).
+- **Verification reset on identifier change**: Updating a company's `vatNumber` or `enterpriseNumber` automatically resets `isVerified` to `false`. The company must be reverified before it can participate on the Peppol network again.
+- **Stricter identifier validation**: VAT numbers and enterprise numbers are now validated against national format rules (e.g. the Belgian modulo-97 check digit) at creation and update time.
+
+### Why this matters
+
+The Peppol network relies on accurate and trustworthy participant registrations. Explicit verification gives a clear, auditable confirmation that companies are registered by people genuinely authorised to act for them, reducing the risk of erroneous registrations.
+
+### What you need to do
+
+Verify your companies before they need to send or receive documents. You can do this from the dashboard or via the API. For the full flow, see the [Company Verification guide](/docs/company-verification).
