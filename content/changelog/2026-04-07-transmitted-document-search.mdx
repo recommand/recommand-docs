@@ -1,0 +1,21 @@
+---
+title: Search documents by company name and document number
+description: The existing document search now matches sender and receiver names plus invoice or credit note numbers, making it easier to find billing documents in the API and dashboard.
+date: 2026-04-07
+---
+
+Finding the right transmitted document is now much easier. The existing `search` filter in the API and the search box in the dashboard now include document-aware search fields alongside the existing technical identifiers.
+
+### What changed
+
+- **Search by sender or receiver name**: For invoices, credit notes, and self-billing documents, search now matches the sender and receiver company names extracted from the document.
+- **Search by invoice or credit note number**: The same `search` filter now also matches the document number from billing documents.
+- **Still supports technical identifiers**: Search continues to match the Recommand document ID, sender and receiver Peppol identifiers, document type ID, process ID, and country code.
+
+### Why this matters
+
+Previously, finding a document often meant searching with a Peppol participant ID or a Recommand document ID. You can now search using the invoice number or company names that users actually recognize from the document itself.
+
+### What you need to do
+
+No integration changes are required. Keep using the existing `search` parameter on the [list documents endpoint](/reference/documents/get-documents) or the search box in the [transmitted documents dashboard](https://app.recommand.eu/transmitted-documents).
