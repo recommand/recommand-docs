@@ -177,3 +177,9 @@ Each document-level discount or surcharge contributes to the VAT subtotal for it
 - Surcharges **increase** the taxable amount for their VAT category
 
 Line-level discounts and surcharges are factored into their line's net amount, which contributes to the line's VAT category subtotal.
+
+## Advanced: Financial Discounts
+
+A **financial discount** (early-payment discount, or *korting contant* in Dutch) is conditional — it only applies when the customer pays within an agreed period. Because the invoice must still show the full amount due when the discount is not taken, it is modeled with a document-level allowance and a matching document-level charge rather than a plain discount.
+
+See the [Financial Discounts](/docs/financial-discounts) guide for the rules, a worked example, and a minimal request payload.

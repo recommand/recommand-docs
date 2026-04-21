@@ -1,0 +1,108 @@
+---
+title: Financial Discount
+description: Model a conditional early-payment discount (korting contant) on a Peppol document using a matching allowance and charge so that the payable amount stays the full amount due.
+---
+
+This guide shows how to apply a **financial discount** — also called an early-payment discount, or *korting contant* in Dutch — on a Peppol document sent through the [Recommand JSON API](/reference/sending/send-document).
+
+A financial discount differs from a regular [document-level discount](/docs/discounts-and-surcharges) because it is **conditional**: it only applies when the customer pays within an agreed period. The invoice must still show the full amount due when the discount is not taken.
+
+## Principles
+
+- A financial discount is conditional: it only applies when the customer pays within the agreed period.
+- The invoice VAT is calculated on the discounted amount.
+- The invoice should still show the full amount due when the discount is not taken.
+- In UBL/Peppol, that is modeled with a document-level **allowance** for the discount and a matching document-level **charge** for the non-discounted amount.
+
+## Rules
+
+- Use a document-level **allowance** for the financial discount and a matching document-level **charge** to keep the payable amount unchanged.
+- As the balancing charge uses VAT category `E` (exempt), include `document.vat.exemptionReason` or `document.vat.exemptionReasonCode`.
+
+<Callout type="info" title="Why two entries?">
+  The allowance reduces the VAT base (so VAT is calculated on the discounted amount), while the matching charge (at VAT category `E` — exempt) keeps the payable total equal to the full amount due. This way, the customer pays the reduced amount only when they pay within the discount period, and the full amount otherwise.
+</Callout>
+
+## Example
+
+Given a single line of `1000.00 EUR` at 21% VAT and a `100.00 EUR` financial discount for payment within one week:
+
+| Field                                    | Amount (EUR) |
+| ---------------------------------------- | -----------: |
+| Line amount                              |      1000.00 |
+| Financial discount allowance             |       -100.00 |
+| VAT base                                 |       900.00 |
+| VAT (21%)                                |       189.00 |
+| Balancing charge (vat exempt)            |       100.00 |
+| **Total payable if the discount is not taken** | **1189.00** |
+| **Total payable if the discount is taken**     | **1089.00** |
+
+The invoice total shows the full amount due when the discount is not taken. In the invoice payment terms, explain that when the discount is taken, the total payable amount is `1089,00 EUR`.
+
+## Minimal Send Document JSON
+The following is a minimal example of a send document request payload for a financial discount that can be sent through the [Recommand Send Document JSON API](/reference/sending/send-document).
+
+```json
+{
+  "recipient": "0208:1012081766",
+  "documentType": "invoice",
+  "document": {
+    "invoiceNumber": "FIN-DISCOUNT-001",
+    "buyer": {
+      "name": "Example Customer",
+      "street": "Kerkstraat 1",
+      "city": "Hasselt",
+      "postalZone": "3500",
+      "country": "BE"
+    },
+    "paymentTerms": {
+      "note": "Financial discount of 100,00 EUR for payment within 1 week. When paying within 1 week, the total payable amount is 1089,00 EUR. Otherwise, the total payable amount is 1189,00 EUR."
+    },
+    "lines": [
+      {
+        "name": "Example Product",
+        "quantity": "1",
+        "netPriceAmount": "1000.00",
+        "vat": {
+          "category": "S",
+          "percentage": "21.00"
+        }
+      }
+    ],
+    "discounts": [
+      {
+        "reason": "Financial discount of 100,00 EUR for payment within 1 week.",
+        "amount": "100.00",
+        "vat": {
+          "category": "S",
+          "percentage": "21.00"
+        }
+      }
+    ],
+    "surcharges": [
+      {
+        "reason": "Financial discount balancing charge",
+        "amount": "100.00",
+        "vat": {
+          "category": "E",
+          "percentage": "0.00"
+        }
+      }
+    ],
+    "vat": {
+      "exemptionReason": "Financial discount"
+    }
+  }
+}
+```
+
+## Related
+
+<Cards>
+  <Card href="/docs/discounts-and-surcharges" title="Discounts & Surcharges">
+    General guide to document-level and line-level discounts and surcharges.
+  </Card>
+  <Card href="/reference/sending/send-document" title="API Reference">
+    Full reference for the send document endpoint.
+  </Card>
+</Cards>
