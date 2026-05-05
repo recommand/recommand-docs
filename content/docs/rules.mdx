@@ -1,0 +1,181 @@
+---
+title: Working with Rules
+description: Create automations that send webhooks or emails when supported Peppol events happen, with optional filters for company, document type, labels, and more.
+---
+
+Rules let you automate what happens after key Peppol events in Recommand. Today, rules are configured in the dashboard and are intended for teams who want more control than the classic webhook setup.
+
+<Callout type="info" title="Already using webhooks?">
+  Rules are a more powerful and flexible alternative to our original and simpler webhook setup. If you only need simple webhook flows without conditions, filters, or more advanced features like HMAC signing, see [Working with Webhooks](/docs/working-with-webhooks).
+</Callout>
+
+## Overview
+
+Each rule has four parts:
+
+- **Trigger**: the event that starts the rule
+- **Conditions**: optional filters to narrow the rule down
+- **Actions**: what should happen when the rule matches
+
+In the dashboard, you manage these from **Webhooks and rules** (accessible via the user selector in the bottom left corner).
+
+## When to Use Rules
+
+Use a rule when you want to:
+
+- send a webhook only for certain events instead of all webhook events
+- notify one or more email recipients when something happens
+- combine multiple actions, such as sending both a webhook and an email
+- take automated action on certain conditions, such as when a certain label is assigned to a document
+- filter by details such as document type, sender, label, or verification status
+
+If you only want one webhook endpoint that receives all supported webhook events, you can still use the simpler webhook flow described in [Working with Webhooks](/docs/working-with-webhooks).
+
+## Supported Triggers
+
+At the moment, rules can react to these Peppol events:
+
+- **Document received**
+- **Document sent**
+- **Document label assigned**
+- **Document label unassigned**
+- **Company verification**
+
+The exact filter options depend on the event you choose. Common examples include:
+
+- company
+- document type
+- sender address
+- receiver address
+- label
+- verification status
+
+The dashboard rule builder only shows filters that are supported for the selected event type.
+
+## Supported Actions
+
+Rules currently support these actions:
+
+- **Webhook**: send an HTTP POST request to your endpoint, with an optional signing secret
+- **Email**: send a notification email to one or more recipients
+
+A single rule can have more than one action. For example, you can send a webhook to your ERP and also email your operations team.
+
+For email actions, Recommand can also include relevant attachments for supported document events, such as:
+
+- embedded attachments
+- the original XML document
+- an auto-generated PDF
+- a `document.json` attachment
+
+## Creating a Rule in the Dashboard
+
+1. Open **Webhooks and rules** in the dashboard via the user selector in the bottom left corner.
+2. Click **Create rule**.
+3. Choose whether the rule is **team-wide** or **company-specific**.
+4. Select the event type you want to react to.
+5. Optionally add one or more conditions.
+6. Add one or more actions.
+7. Enable the rule and save it.
+
+If you want a broad webhook subscription, choose **All supported webhook events**. This is the closest equivalent to the classic webhook setup.
+
+This option is limited to webhook delivery only. It does not support conditions or email actions.
+
+## Delivery and Monitoring
+
+Rules run asynchronously.
+In the dashboard you can review deliveries per rule, including:
+
+- current status
+- number of attempts
+- processed time
+- last error
+
+If a delivery fails, Recommand retries it automatically for a limited number of times. You can also manually retry failed deliveries from the dashboard.
+After the final attempt, the delivery is marked as failed permanently.
+
+In the deliveries view, you may also see statuses such as pending, in progress, succeeded, failed, and giving up.
+
+<Callout type="info" title="Why can one event create multiple deliveries?">
+  A rule with two actions creates two separate deliveries. For example, if a rule sends both a webhook and an email, those are tracked separately so you can see which action succeeded or failed.
+</Callout>
+
+## Webhook Delivery Details
+
+Webhook actions keep the same simple event payloads used by the existing webhook feature. For example, a document received event still looks like this:
+
+```json
+{
+  "eventType": "document.received",
+  "documentId": "doc_xxx",
+  "teamId": "team_xxx",
+  "companyId": "c_xxx"
+}
+```
+
+For technical integrations, Recommand also sends:
+
+- `X-Idempotency-Key` to help you deduplicate deliveries
+- `X-Signature` when you configure a signing secret
+
+As with regular webhooks, your endpoint should acknowledge quickly and handle heavier work asynchronously.
+
+## Verifying Webhook Signatures
+
+When you set a signing secret on a webhook action, Recommand signs the **raw request body** with HMAC SHA-256 and sends it as:
+
+- `X-Signature: sha256=<hex digest>`
+
+Node.js example:
+
+```javascript
+import crypto from "node:crypto";
+
+function verifySignature(rawBody, signatureHeader, secret) {
+  const expected = `sha256=${crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex")}`;
+
+  return signatureHeader === expected;
+}
+```
+
+Use the exact raw request body when verifying the signature.
+
+## Availability
+
+Rules are currently configured through the **Webhooks and rules** page in the dashboard. The dedicated rules API is not publicly available yet.
+
+If you want to integrate through a public API today, use the existing webhook endpoints. Those endpoints keep the classic broad webhook subscription model with URL and company scope, but they do not expose advanced rule features such as conditions, email actions, or signing secrets.
+
+For the currently available public endpoints, see the [API reference](/reference) and the [Working with Webhooks](/docs/working-with-webhooks) guide.
+
+## Typical Examples
+
+- Send a webhook when a new invoice is received
+- Forward incoming invoices with a specific label or from a specific supplier to an external accounting system
+- Email your operations team when a company verification finishes
+- Notify your team when a specific label is assigned to a document
+- Create a company-specific automation for one legal entity in your team
+
+## Related
+
+<Cards>
+  <Card href="/docs/working-with-webhooks" title="Working with Webhooks">
+    Use the classic webhook setup flow and see payload examples.
+  </Card>
+  <Card href="/docs/receiving-documents" title="Receiving Documents">
+    Process incoming documents after a webhook or rule fires.
+  </Card>
+  <Card href="/docs/suppliers-and-labels" title="Suppliers and Labels">
+    Use labels to help route documents and build targeted automations.
+  </Card>
+  <Card href="/docs/company-verification" title="Company Verification">
+    Understand the verification flow and related status updates.
+  </Card>
+  <Card href="/reference" title="API Reference">
+    Explore the currently available public API endpoints.
+  </Card>
+</Cards>

@@ -1,0 +1,26 @@
+---
+title: Create webhooks and email automations with rules
+description: Added a new rule system for Peppol events, with dashboard support for webhooks and email actions, optional conditions, delivery tracking, and retry handling.
+date: 2026-05-05
+---
+
+Recommand now includes a unified **Webhooks and rules** experience for Peppol automations. This gives you a more flexible way to react to important events from the dashboard while keeping the existing webhook API available for simpler integrations.
+
+### What changed
+
+- **New rules model for automations**: You can now create automations that react to supported Peppol events such as document receipt, document sending, label changes, and company verification updates.
+- **Webhook and email actions**: Rules can send a webhook, send an email, or do both from a single trigger.
+- **Optional conditions**: Narrow a rule to the events you actually care about, for example by company, document type, sender, label, or verification status.
+- **Dashboard support**: A new **Webhooks and rules** page lets you create, edit, monitor, and retry automations without leaving the dashboard.
+- **Rules are currently managed in the UI**: The dedicated rules API is not publicly available yet, giving us time to refine the feature before opening that surface more broadly.
+- **Webhook security**: Webhook actions can include an optional signing secret for HMAC SHA-256 verification.
+- **Delivery tracking and retries**: Failed deliveries are visible per rule, retried automatically, and can also be retried manually from the dashboard.
+- **Existing webhook compatibility**: Classic webhook payloads remain simple and familiar, so existing webhook consumers do not need to adopt a new payload format.
+
+### Why this matters
+
+Many teams start with one webhook endpoint, but eventually need more control. Rules make it easier to build targeted automations without setting up separate infrastructure for every use case, while still keeping the simple webhook flow available for straightforward integrations.
+
+### What you need to do
+
+Nothing if your current webhook integration already does what you need. If you want more control, start with the new [Working with Rules guide](/docs/rules). If you only want the classic setup, continue using [Working with Webhooks](/docs/working-with-webhooks).
