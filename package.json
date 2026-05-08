@@ -21,17 +21,17 @@
     "fumadocs-openapi": "10.3.18",
     "fumadocs-ui": "^16.6.5",
     "lucide-react": "^0.575.0",
-    "next": "16.1.6",
+    "next": "16.2.6",
     "next-plausible": "^3.12.5",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
     "shiki": "^3.22.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "@biomejs/biome": "2.4.9",
     "next-validate-link": "^1.6.4",
@@ -48,5 +48,9 @@
   ],
   "patchedDependencies": {
     "fumadocs-openapi@10.3.18": "patches/fumadocs-openapi@10.3.18.patch"
+  },
+  "overrides": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3"
   }
 }
