@@ -60,7 +60,10 @@ companies.forEach((company) => {
 
 To create a new company using the [create company endpoint](/reference/companies/create-company).
 When creating a new company, it is automatically registered in the Peppol network.
-If the company is already registered through another provider, this will fail.
+
+If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents.
+If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to regiter the company even if it is already registered through another Peppol provider for receiving documents.
+
 Companies that are registered with the Belgian government portal Hermes (as is the case for most Belgian companies) are automatically migrated over to Recommand.
 
 ```javascript
