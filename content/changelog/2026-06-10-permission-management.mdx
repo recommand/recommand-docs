@@ -1,0 +1,29 @@
+---
+title: Team permission management
+description: Team members can now be granted or revoked specific permissions. The first permission, Manage Team, controls who can invite members, update team settings, and manage other members' access.
+date: 2026-06-10
+---
+
+Recommand now supports granular permission management at the team level. Instead of every team member having the same administrative access, you can control exactly who is allowed to manage the team and its members.
+
+### What changed
+
+- **Permission management system**: Permissions are assigned per user within a team. Users with the right permissions can grant or revoke access for other members from the dashboard.
+- **`Manage Team` permission: The first team permission controls administrative actions, including:
+  - Inviting and removing team members
+  - Updating the team name and logo
+  - Deleting the team
+  - Managing permissions for other members
+- **Team creator gets access automatically**: When you create a team, you receive the `Manage Team` permission immediately.
+- **New members do not get admin access by default**: Members invited to an existing team can use the team, but cannot manage it unless someone with `Manage Team` grants them the permission.
+- **Dashboard support**: From the [Team settings page](https://app.recommand.eu/team), open a member's permissions to toggle what they are allowed to do.
+
+### Why this matters
+
+Larger teams often include people who need to view or work with documents without being able to change team membership or settings. Permission management gives you control over who can administer the team, while keeping day-to-day access unchanged for everyone else.
+
+### What you need to do
+
+No integration changes are required. Existing team members retain their previous access — everyone who could manage a team before this release still has the `Manage Team` permission.
+
+Review your team on the [Team settings page](https://app.recommand.eu/team) and adjust permissions for members who should or should not be able to manage the team.
