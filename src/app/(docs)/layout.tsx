@@ -4,7 +4,7 @@ import { baseOptions, searchOptions } from "@/lib/layout.shared";
 import type { ReactNode } from "react";
 
 /**
- * Brand polish for the fumadocs chrome (see DESIGN.md in recommand-site):
+ * Brand polish for the fumadocs chrome (Recommand visual system):
  * hairline borders, mint active-item accents and eyebrow-style sidebar
  * section labels. Applied here via scoped CSS variables + descendant
  * selectors so globals.css stays untouched.

@@ -256,7 +256,7 @@ form.not-prose button[role="combobox"] {
 }
 
 
-/* ——— Recommand visual system (see DESIGN.md in recommand-site + recommand-brand) ——— */
+/* ——— Recommand visual system: warm paper surfaces, dark green ink, mint accent ——— */
 
 @layer utilities {
   /* Brand "Files" texture, pre-lightened with a sheet wash. Light mode only. */

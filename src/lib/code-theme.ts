@@ -1,7 +1,7 @@
 import type { ThemeRegistration } from "shiki";
 
 /**
- * Recommand brand code themes (see DESIGN.md in recommand-site + recommand-brand).
+ * Recommand brand code themes, built from the brand color tokens.
  *
  * Two inks carry the code, like the rest of the site: warm paper / dark green
  * ink for plain text, with restrained accent moments:
