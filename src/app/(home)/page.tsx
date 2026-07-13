@@ -1,28 +1,30 @@
 import Link from "next/link";
 import {
-  BookOpen,
-  Code2,
-  History,
-  HelpCircle,
-  Puzzle,
-  KeyRound,
-  Send,
-  Building2,
-  Inbox,
   ArrowRight,
-  ChevronRight,
+  ArrowUpRight,
+  BookOpen,
+  Building2,
+  Code2,
+  HelpCircle,
+  History,
+  Inbox,
+  KeyRound,
+  Puzzle,
+  Send,
 } from "lucide-react";
-import { Card, Cards } from "fumadocs-ui/components/card";
 import { SearchTrigger } from "@/components/search-trigger";
-import RecommandIcon from "@/components/recommand-icon";
 import { changelogSource } from "@/lib/source";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Peppol API Documentation",
   description:
     "Everything you need to send and receive documents over the Peppol network. Explore guides, API references, and examples to integrate in minutes.",
 };
+
+/* Hairline rule, letterhead style: ink on light, sheet on dark */
+const hairline = "border-darkslate/10 dark:border-sheet/15";
 
 const quickStartGuides = [
   {
@@ -47,6 +49,39 @@ const quickStartGuides = [
   },
 ];
 
+const entryPoints = [
+  {
+    title: "Documentation",
+    description: "Guides and tutorials for the Recommand Peppol API.",
+    href: "/docs",
+    icon: BookOpen,
+  },
+  {
+    title: "API Reference",
+    description: "Complete endpoint reference generated from the OpenAPI spec.",
+    href: "/reference",
+    icon: Code2,
+  },
+  {
+    title: "Integrations",
+    description: "Connect Recommand with your existing tools and workflows.",
+    href: "/integrations",
+    icon: Puzzle,
+  },
+  {
+    title: "Changelog",
+    description: "Track the latest changes, features, and fixes.",
+    href: "/changelog",
+    icon: History,
+  },
+  {
+    title: "FAQ",
+    description: "Frequently asked questions about the Recommand Peppol API.",
+    href: "/faq",
+    icon: HelpCircle,
+  },
+];
+
 function getLatestChangelog() {
   const pages = changelogSource.getPages();
   return [...pages]
@@ -61,142 +96,198 @@ function getLatestChangelog() {
       description: page.data.description,
       url: page.url,
       date: page.data.date
-        ? new Date(page.data.date).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
+        ? new Date(page.data.date).toISOString().slice(0, 10)
         : null,
     }));
+}
+
+function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <div className="eyebrow flex items-center gap-2.5 text-folder-dark dark:text-folder">
+      <span
+        aria-hidden="true"
+        className="inline-block h-2 w-2 rounded-[2px] bg-folder"
+      />
+      {children}
+    </div>
+  );
+}
+
+function ArrowLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group inline-flex items-center gap-1.5 text-sm font-medium text-folder-dark transition-colors hover:text-darkslate dark:text-folder dark:hover:text-sheet"
+    >
+      {children}
+      <ArrowRight
+        aria-hidden="true"
+        className="size-3.5 transition-transform group-hover:translate-x-0.5"
+      />
+    </Link>
+  );
 }
 
 export default function HomePage() {
   const latestChanges = getLatestChangelog();
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-6 py-16">
-      {/* Hero */}
-      <div className="flex flex-col items-center text-center mb-16">
-        <RecommandIcon className="mb-8 size-12 text-fd-foreground" />
-        <h1 className="text-4xl font-heading font-normal mb-4 sm:text-5xl">
-          Recommand Documentation
-        </h1>
-        <p className="text-fd-muted-foreground text-lg max-w-2xl mb-8">
-          Everything you need to send and receive documents over the Peppol
-          network. Explore guides, API references, and examples to integrate in
-          minutes.
-        </p>
-        <div className="w-full max-w-md">
-          <SearchTrigger />
-        </div>
-      </div>
+    <>
+      {/* Letterhead hero */}
+      <header
+        className={`grain relative w-full overflow-hidden border-b ${hairline}`}
+      >
+        <style>{`
+@keyframes shard-drift{0%,100%{transform:translate3d(0,0,0)}33%{transform:translate3d(6px,-10px,0)}66%{transform:translate3d(-5px,6px,0)}}
+.shard-drift{animation:shard-drift 14s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.shard-drift{animation:none}}
+        `}</style>
+        <div
+          aria-hidden="true"
+          className="shard-drift absolute -top-24 right-[6%] h-64 w-52 rotate-12 rounded-[2.5rem] bg-folder/15 blur-3xl"
+        />
+        <div className="relative mx-auto w-full max-w-5xl px-6 pt-16 pb-12 md:pt-20">
+          <div className="grid items-end gap-x-16 gap-y-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <div>
+              <Eyebrow>Recommand · Peppol API</Eyebrow>
+              <h1 className="display mt-5 text-5xl text-fd-foreground sm:text-6xl lg:text-7xl">
+                Documentation
+              </h1>
+            </div>
+            <p className="max-w-md text-lg leading-relaxed text-fd-muted-foreground lg:justify-self-end lg:pb-2">
+              Everything you need to send and receive documents over the Peppol
+              network. Explore guides, API references, and examples to
+              integrate in minutes.
+            </p>
+          </div>
 
-      {/* Section cards */}
-      <Cards>
-        <Card
-          icon={<BookOpen />}
-          title="Documentation"
-          description="Guides and tutorials for the Recommand Peppol API."
-          href="/docs"
-        />
-        <Card
-          icon={<Code2 />}
-          title="API Reference"
-          description="Complete endpoint reference generated from the OpenAPI spec."
-          href="/reference"
-        />
-      </Cards>
-      <Cards className="mt-3 grid-cols-3">
-        <Card
-          icon={<Puzzle />}
-          title="Integrations"
-          description="Connect Recommand with your existing tools and workflows."
-          href="/integrations"
-        />
-        <Card
-          icon={<History />}
-          title="Changelog"
-          description="Track the latest changes, features, and fixes."
-          href="/changelog"
-        />
-        <Card
-          icon={<HelpCircle />}
-          title="FAQ"
-          description="Frequently asked questions about the Recommand Peppol API."
-          href="/faq"
-        />
-      </Cards>
+          <div className="mt-10 max-w-xl">
+            <SearchTrigger />
+          </div>
 
-      {/* Quick Start */}
-      <div className="mt-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Quick Start</h2>
-          <Link
-            href="/docs"
-            className="inline-flex items-center gap-1 text-sm text-fd-muted-foreground hover:text-fd-foreground transition-colors"
-          >
-            View all guides
-            <ArrowRight className="size-3.5" />
-          </Link>
+          {/* Quick start: ruled rows */}
+          <div className="mt-14">
+            <div className="flex items-baseline justify-between pb-4">
+              <span className="eyebrow text-fd-muted-foreground">
+                Quick start
+              </span>
+              <ArrowLink href="/docs">View all guides</ArrowLink>
+            </div>
+            <div className="grid gap-x-14 sm:grid-cols-2">
+              {quickStartGuides.map((guide, i) => {
+                const Icon = guide.icon;
+                return (
+                  <Link
+                    key={guide.href}
+                    href={guide.href}
+                    className={`group flex items-center gap-4 border-t py-4 ${hairline}`}
+                  >
+                    <span className="font-mono text-xs tabular-nums text-stone transition-colors group-hover:text-folder-dark dark:group-hover:text-folder">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <Icon
+                      aria-hidden="true"
+                      className="size-4 shrink-0 text-fd-muted-foreground"
+                    />
+                    <span className="text-sm font-medium text-fd-foreground">
+                      {guide.title}
+                    </span>
+                    <ArrowRight
+                      aria-hidden="true"
+                      className="ml-auto size-4 text-fd-muted-foreground/60 transition-all group-hover:translate-x-1 group-hover:text-folder-dark dark:group-hover:text-folder"
+                    />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {quickStartGuides.map((guide) => {
-            const Icon = guide.icon;
+      </header>
+
+      {/* Entry points: ruled link rows */}
+      <section className="mx-auto w-full max-w-5xl px-6 py-16 md:py-20">
+        <Eyebrow>Browse</Eyebrow>
+        <h2 className="display mt-4 text-3xl text-fd-foreground sm:text-4xl">
+          Find your way in
+        </h2>
+        <div className="mt-8 grid gap-x-14 md:grid-cols-2">
+          {entryPoints.map((entry) => {
+            const Icon = entry.icon;
             return (
               <Link
-                key={guide.href}
-                href={guide.href}
-                className="group flex items-center gap-3 rounded-lg border border-fd-border p-4 transition-colors hover:border-fd-primary"
+                key={entry.href}
+                href={entry.href}
+                className={`group flex items-start justify-between gap-6 border-b py-6 ${hairline}`}
               >
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-fd-primary/10 text-fd-primary">
-                  <Icon className="size-4.5" />
+                <div className="flex min-w-0 items-start gap-4">
+                  <Icon
+                    aria-hidden="true"
+                    className="mt-0.5 size-5 shrink-0 text-fd-muted-foreground transition-colors group-hover:text-folder-dark dark:group-hover:text-folder"
+                  />
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-fd-foreground transition-colors group-hover:text-folder-dark dark:group-hover:text-folder">
+                      {entry.title}
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-fd-muted-foreground">
+                      {entry.description}
+                    </p>
+                  </div>
                 </div>
-                <span className="font-medium text-sm">{guide.title}</span>
-                <ChevronRight className="ml-auto size-4 text-fd-muted-foreground transition-transform group-hover:translate-x-1" />
+                <ArrowUpRight
+                  aria-hidden="true"
+                  className="mt-1 size-5 shrink-0 text-fd-muted-foreground/50 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-folder-dark dark:group-hover:text-folder"
+                />
               </Link>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* Latest Updates */}
-      <div className="mt-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Latest Updates</h2>
-          <Link
-            href="/changelog"
-            className="inline-flex items-center gap-1 text-sm text-fd-muted-foreground hover:text-fd-foreground transition-colors"
-          >
-            Full changelog
-            <ArrowRight className="size-3.5" />
-          </Link>
-        </div>
-        <div className="space-y-3">
-          {latestChanges.map((entry) => (
-            <Link
-              key={entry.url}
-              href={entry.url}
-              className="flex items-start justify-between gap-4 rounded-lg border border-fd-border bg-fd-card p-4 transition-colors hover:bg-fd-accent no-underline"
-            >
-              <div className="min-w-0">
-                <h3 className="font-semibold text-fd-foreground mb-0.5">
-                  {entry.title}
-                </h3>
-                {entry.description && (
-                  <p className="text-sm text-fd-muted-foreground line-clamp-1">
-                    {entry.description}
-                  </p>
+      {/* Latest updates: paper band with mono-dated hairline rows */}
+      <section
+        className={`w-full border-t bg-paper/40 dark:bg-slate/20 ${hairline}`}
+      >
+        <div className="mx-auto w-full max-w-5xl px-6 py-16 md:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <Eyebrow>Changelog</Eyebrow>
+              <h2 className="display mt-4 text-3xl text-fd-foreground sm:text-4xl">
+                Latest updates
+              </h2>
+            </div>
+            <ArrowLink href="/changelog">Full changelog</ArrowLink>
+          </div>
+          <div className="mt-8">
+            {latestChanges.map((entry) => (
+              <Link
+                key={entry.url}
+                href={entry.url}
+                className={`group flex items-baseline gap-6 border-b py-5 no-underline ${hairline}`}
+              >
+                {entry.date && (
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-fd-muted-foreground">
+                    {entry.date}
+                  </span>
                 )}
-              </div>
-              {entry.date && (
-                <span className="shrink-0 text-xs text-fd-muted-foreground mt-0.5">
-                  {entry.date}
-                </span>
-              )}
-            </Link>
-          ))}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-fd-foreground transition-colors group-hover:text-folder-dark dark:group-hover:text-folder">
+                    {entry.title}
+                  </h3>
+                  {entry.description && (
+                    <p className="mt-1 line-clamp-1 text-sm text-fd-muted-foreground">
+                      {entry.description}
+                    </p>
+                  )}
+                </div>
+                <ArrowUpRight
+                  aria-hidden="true"
+                  className="size-4 shrink-0 self-center text-fd-muted-foreground/50 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-folder-dark dark:group-hover:text-folder"
+                />
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

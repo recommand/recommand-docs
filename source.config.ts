@@ -6,6 +6,7 @@ import {
 } from "fumadocs-mdx/config";
 import { pageSchema } from "fumadocs-core/source/schema";
 import { z } from "zod";
+import { codeThemes } from "./src/lib/code-theme";
 
 export const docs = defineDocs({
   dir: "content/docs",
@@ -50,4 +51,13 @@ export const faq = defineDocs({
   },
 });
 
-export default defineConfig();
+export default defineConfig({
+  mdxOptions: {
+    // Brand code themes (src/lib/code-theme.ts) replace the github-light/dark
+    // defaults. Only `themes` is overridden: fumadocs' default transformers,
+    // meta parsing and `defaultColor: false` (CSS variables mode) are kept.
+    rehypeCodeOptions: {
+      themes: codeThemes,
+    },
+  },
+});

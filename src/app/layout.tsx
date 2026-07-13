@@ -3,6 +3,7 @@ import { Rethink_Sans, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+import "./api-reference.css";
 
 const rethinkSans = Rethink_Sans({
   variable: "--font-rethink-sans",

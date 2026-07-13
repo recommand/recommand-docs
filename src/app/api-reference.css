@@ -1,0 +1,42 @@
+/* ——— API reference brand overrides ———
+ *
+ * Import AFTER globals.css in src/app/layout.tsx:
+ *   import "./api-reference.css";
+ *
+ * Complements the @theme overrides in globals.css (which brand-map the
+ * `*-600` Tailwind colors fumadocs-openapi method badges use in LIGHT mode).
+ */
+
+/* fumadocs-openapi method badges use `dark:text-{color}-400` in dark mode,
+ * and the schema/playground UI uses `text-red-400` / `text-orange-400` in
+ * both modes. Nothing else in this repo uses the -400 Tailwind palette, so
+ * remap those variables to brand tokens. These declarations are un-layered
+ * and therefore win over Tailwind's `@layer theme` definitions.
+ *
+ * Method mapping (fumadocs, not configurable): GET green -> folder mint,
+ * POST blue -> progress, PUT yellow -> data, PATCH orange -> warning,
+ * DELETE red -> danger. */
+:root {
+  --color-red-400: var(--danger);
+  --color-orange-400: var(--warning);
+}
+
+.dark {
+  --color-green-400: var(--folder);
+  --color-blue-400: var(--progress);
+  --color-yellow-400: var(--data);
+  --color-orange-400: var(--warning);
+  --color-red-400: var(--danger);
+}
+
+/* The brand code themes (src/lib/code-theme.ts) set keywords in bold ink.
+ * Shiki emits this as `--shiki-*-font-weight` variables in dual-theme CSS
+ * variables mode, but fumadocs' preset only applies color and font-style —
+ * apply the weight here (falls back to inherit when a token sets none). */
+.shiki code span {
+  font-weight: var(--shiki-light-font-weight, inherit);
+}
+
+.dark .shiki code span {
+  font-weight: var(--shiki-dark-font-weight, inherit);
+}
