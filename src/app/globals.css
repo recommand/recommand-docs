@@ -57,7 +57,7 @@
   --secondary-foreground: var(--darkslate);
   --muted: var(--shadow-light);
   --muted-foreground: var(--stone-dark);
-  --accent: var(--folder);
+  --accent: color-mix(in oklab, var(--folder) 15%, transparent);
   --accent-foreground: var(--darkslate);
   --destructive: var(--danger);
   --destructive-foreground: var(--sheet);
@@ -75,7 +75,7 @@
   --sidebar-foreground: var(--darkslate);
   --sidebar-primary: var(--slate);
   --sidebar-primary-foreground: var(--sheet);
-  --sidebar-accent: var(--folder);
+  --sidebar-accent: color-mix(in oklab, var(--folder) 15%, transparent);
   --sidebar-accent-foreground: var(--darkslate);
   --sidebar-border: var(--shadow);
   --sidebar-ring: var(--stone);
@@ -95,7 +95,7 @@
   --secondary-foreground: var(--sheet);
   --muted: var(--slate);
   --muted-foreground: var(--stone);
-  --accent: var(--folder-dark);
+  --accent: color-mix(in oklab, var(--folder) 18%, transparent);
   --accent-foreground: var(--sheet);
   --destructive: var(--danger-mid);
   --destructive-foreground: var(--sheet);
@@ -113,7 +113,7 @@
   --sidebar-foreground: var(--sheet);
   --sidebar-primary: var(--sheet);
   --sidebar-primary-foreground: var(--darkslate);
-  --sidebar-accent: var(--folder-dark);
+  --sidebar-accent: color-mix(in oklab, var(--folder) 18%, transparent);
   --sidebar-accent-foreground: var(--sheet);
   --sidebar-border: var(--stone-dark);
   --sidebar-ring: var(--stone);

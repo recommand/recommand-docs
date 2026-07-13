@@ -20,7 +20,9 @@ export default async function Page(props: {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
+      <DocsTitle className="display font-normal text-3xl sm:text-4xl">
+        {page.data.title}
+      </DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <div className="flex flex-row items-center gap-2 border-b pt-2 pb-6">
         <PageActions markdownUrl={`${page.url}.md`} />
