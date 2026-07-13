@@ -1,21 +1,13 @@
-import { RootProvider } from "fumadocs-ui/provider/next";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
-import { baseOptions, chromeClassName, searchOptions } from "@/lib/layout.shared";
+import { baseOptions, chromeClassName } from "@/lib/layout.shared";
 import { LayoutTransitionGuard } from "@/components/layout-transition-guard";
 import type { ReactNode } from "react";
 
 export default function DocsRootLayout({ children }: { children: ReactNode }) {
   return (
-    <RootProvider
-      search={searchOptions}
-      theme={{
-        enabled: true,
-      }}
-    >
-      <HomeLayout {...baseOptions()} className={chromeClassName}>
-        <LayoutTransitionGuard />
-        {children}
-      </HomeLayout>
-    </RootProvider>
+    <HomeLayout {...baseOptions()} className={chromeClassName}>
+      <LayoutTransitionGuard />
+      {children}
+    </HomeLayout>
   );
 }

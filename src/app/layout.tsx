@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Rethink_Sans, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import { Providers } from "@/components/providers";
+import { searchOptions } from "@/lib/layout.shared";
 import "./globals.css";
 import "./api-reference.css";
 
@@ -49,7 +51,11 @@ export default function RootLayout({
       <body
         className={`${rethinkSans.variable} ${nohemi.variable} ${geistMono.variable}`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <RootProvider search={searchOptions} theme={{ enabled: true }}>
+            {children}
+          </RootProvider>
+        </Providers>
       </body>
     </html>
   );
