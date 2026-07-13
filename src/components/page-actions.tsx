@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { Check, ChevronDown, Copy, ExternalLinkIcon } from "lucide-react";
 import { useCopyButton } from "fumadocs-ui/utils/use-copy-button";
-import { buttonVariants } from "fumadocs-ui/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -113,41 +112,44 @@ export function PageActions({ markdownUrl }: CommonProps) {
     ] as const;
   }, [markdownUrl]);
 
+  // Outline buttons in the brand pattern: hairline darkslate borders that
+  // deepen on hover, quiet paper hover fill (no full accent fills on light
+  // surfaces). Written out instead of buttonVariants to avoid its accent
+  // hover styles.
+  const buttonClassName =
+    "inline-flex items-center justify-center border px-2 py-1.5 text-xs font-medium transition-colors duration-100 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-ring " +
+    "border-darkslate/20 bg-transparent hover:border-darkslate/40 hover:bg-paper/60 dark:border-sheet/20 dark:hover:border-sheet/40 dark:hover:bg-sheet/10";
+
   return (
-    <div className="inline-flex items-stretch rounded-md shadow-xs">
+    <div className="inline-flex items-stretch rounded-lg shadow-xs">
       <button
         type="button"
         disabled={isLoading}
         onClick={copyToClipboard}
-        className={buttonVariants({
-          variant: "outline",
-          size: "sm",
-          className: "gap-2 rounded-r-none",
-        })}
+        className={`${buttonClassName} gap-2 rounded-l-lg`}
       >
-        {checked ? <Check className="size-4" /> : <Copy className="size-4" />}
+        {checked ? (
+          <Check className="size-4 text-folder-dark dark:text-folder" />
+        ) : (
+          <Copy className="size-4" />
+        )}
         <span>{checked ? "Copied" : "Copy page"}</span>
       </button>
       <Popover>
         <PopoverTrigger
-          className={buttonVariants({
-            variant: "outline",
-            size: "sm",
-            className:
-              "px-2 rounded-l-none -ms-px border-l border-fd-border data-[state=open]:bg-fd-accent",
-          })}
+          className={`${buttonClassName} -ms-px rounded-r-lg px-2 data-[state=open]:border-darkslate/40 data-[state=open]:bg-folder/20 dark:data-[state=open]:border-sheet/40`}
         >
           <span className="sr-only">More page actions</span>
           <ChevronDown className="size-3.5 text-fd-muted-foreground" />
         </PopoverTrigger>
-        <PopoverContent className="flex flex-col p-1 min-w-[220px]">
+        <PopoverContent className="flex flex-col p-1 min-w-[220px] border-darkslate/10 dark:border-sheet/15">
           {items.map((item) => (
             <a
               key={item.href}
               href={item.href}
               rel="noreferrer noopener"
               target="_blank"
-              className="text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:text-fd-accent-foreground hover:bg-fd-accent [&_svg]:size-4 w-full text-left"
+              className="text-sm p-2 rounded-lg inline-flex items-center gap-2 hover:bg-folder/15 [&_svg]:size-4 w-full text-left"
             >
               {item.icon}
               {item.title}

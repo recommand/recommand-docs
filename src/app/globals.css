@@ -57,7 +57,7 @@
   --secondary-foreground: var(--darkslate);
   --muted: var(--shadow-light);
   --muted-foreground: var(--stone-dark);
-  --accent: var(--folder);
+  --accent: color-mix(in oklab, var(--folder) 15%, transparent);
   --accent-foreground: var(--darkslate);
   --destructive: var(--danger);
   --destructive-foreground: var(--sheet);
@@ -75,7 +75,7 @@
   --sidebar-foreground: var(--darkslate);
   --sidebar-primary: var(--slate);
   --sidebar-primary-foreground: var(--sheet);
-  --sidebar-accent: var(--folder);
+  --sidebar-accent: color-mix(in oklab, var(--folder) 15%, transparent);
   --sidebar-accent-foreground: var(--darkslate);
   --sidebar-border: var(--shadow);
   --sidebar-ring: var(--stone);
@@ -95,7 +95,7 @@
   --secondary-foreground: var(--sheet);
   --muted: var(--slate);
   --muted-foreground: var(--stone);
-  --accent: var(--folder-dark);
+  --accent: color-mix(in oklab, var(--folder) 18%, transparent);
   --accent-foreground: var(--sheet);
   --destructive: var(--danger-mid);
   --destructive-foreground: var(--sheet);
@@ -113,7 +113,7 @@
   --sidebar-foreground: var(--sheet);
   --sidebar-primary: var(--sheet);
   --sidebar-primary-foreground: var(--darkslate);
-  --sidebar-accent: var(--folder-dark);
+  --sidebar-accent: color-mix(in oklab, var(--folder) 18%, transparent);
   --sidebar-accent-foreground: var(--sheet);
   --sidebar-border: var(--stone-dark);
   --sidebar-ring: var(--stone);
@@ -253,4 +253,63 @@ form.not-prose button[role="combobox"] {
 #nd-home-layout #nd-docs-layout {
   --fd-banner-height: 3.5rem;
   --fd-docs-height: calc(100dvh - 3.5rem);
+}
+
+
+/* ——— Recommand visual system: warm paper surfaces, dark green ink, mint accent ——— */
+
+@layer utilities {
+  /* Brand "Files" texture, pre-lightened with a sheet wash. Light mode only. */
+  .texture-sheet {
+    background-image:
+      linear-gradient(
+        oklch(97.09% 0.0045 78.3 / 0.5),
+        oklch(97.09% 0.0045 78.3 / 0.5)
+      ),
+      url("/textures/files-sheet.jpg");
+    background-size: cover;
+    background-position: center;
+  }
+  .dark .texture-sheet {
+    background-image: none;
+  }
+  .texture-folder {
+    background-image: url("/textures/files-folder.jpg");
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Brand type hierarchy */
+  .eyebrow {
+    font-family: var(--font-rethink-sans);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .display {
+    font-family: var(--font-nohemi);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Subtle paper grain overlay */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.06'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .dark .grain::after {
+    opacity: 0.25;
+  }
 }

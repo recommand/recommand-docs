@@ -57,13 +57,18 @@ function StructuredItem({
   return (
     <>
       {showSection ? (
-        <div className="px-2.5 pt-3 pb-1 first:pt-1">
-          <div className="border-fd-border/80 text-fd-muted-foreground inline-flex items-center rounded-full border bg-fd-secondary/60 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em]">
+        <div className="flex items-center gap-1.5 px-2.5 pt-3 pb-1 first:pt-1">
+          <span aria-hidden className="size-1.5 rounded-[2px] bg-folder" />
+          <span className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-stone-dark dark:text-stone">
             {section.label}
-          </div>
+          </span>
         </div>
       ) : null}
-      <SearchDialogListItem item={item} onClick={onClick} />
+      <SearchDialogListItem
+        item={item}
+        onClick={onClick}
+        className="aria-selected:bg-folder/15 aria-selected:text-fd-foreground aria-selected:shadow-[inset_3px_0_0_0_var(--folder)]"
+      />
     </>
   );
 }
@@ -85,7 +90,7 @@ export default function StructuredSearchDialog(props: SharedProps) {
       {...props}
     >
       <SearchDialogOverlay />
-      <SearchDialogContent>
+      <SearchDialogContent className="border-darkslate/10 shadow-xl shadow-darkslate/10 *:border-b-darkslate/10 dark:border-sheet/15 dark:shadow-black/50 dark:*:border-b-sheet/15">
         <SearchDialogHeader>
           <SearchDialogIcon />
           <SearchDialogInput />

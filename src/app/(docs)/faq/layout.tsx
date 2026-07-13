@@ -1,14 +1,9 @@
-import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 
+/**
+ * The FAQ pages render their own letterhead sections full-bleed under the
+ * HomeLayout chrome (like the landing page), so no nested DocsLayout here.
+ */
 export default function Layout({ children }: { children: ReactNode }) {
-  return (
-    <DocsLayout
-      tree={{ name: "", children: [] }}
-      nav={{ enabled: false }}
-      sidebar={{ enabled: false }}
-    >
-      {children}
-    </DocsLayout>
-  );
+  return <>{children}</>;
 }
