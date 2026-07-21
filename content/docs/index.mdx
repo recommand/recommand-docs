@@ -73,6 +73,17 @@ const body = await res.json();
 - Sending documents simulates delivery; a document is only “received” if the recipient company exists in the same playground team
 - Configure webhooks on the playground team to receive simulated inbound events (e.g. `document.received`)
 
+To test Peppol send failure handling in playgrounds that are **not** connected to the Peppol Test Network, send to one of these recipient addresses:
+
+- `404:404` - always fails, simulating a Peppol address that does not exist
+- `0208:1234567894` - same behavior, but using a valid Peppol address
+
+The send endpoint returns **422** unless email delivery is configured as a fallback.
+
+For any other recipient that is not registered as an SMP recipient in the same playground team, Peppol delivery is skipped without an error. That is different from the addresses above, which always return an explicit failure.
+
+These addresses only apply when delivery is simulated. Test Network playgrounds send over the real Peppol test infrastructure instead.
+
 ### Check if a team is a playground
 
 <Tabs items={['cURL', 'Node.js']} groupId="language" persist>
