@@ -6,7 +6,7 @@ description: Set up webhooks to receive real-time notifications for Peppol docum
 This guide explains how to set up and use webhooks to receive real-time notifications about Peppol document events using the [Recommand API](/reference/webhooks).
 
 <Callout type="info" title="Need more control than a single webhook?">
-  Webhooks are part of Recommand's broader rule system. If you want to filter by event details, send emails, combine multiple actions, configure HMAC signing, or manage delivery retries from one place, see [Working with Rules](/docs/rules).
+  Webhooks are part of Recommand's broader rule system. If you want to filter by event details, send emails, combine multiple actions, or manage delivery retries from one place, see [Working with Rules](/docs/rules).
 </Callout>
 
 ## Overview
@@ -100,6 +100,7 @@ async function createWebhook(webhookData) {
 const webhookResult = await createWebhook({
   url: "https://your-domain.com/peppol-webhook",
   companyId: null, // null means all companies, or specify a company ID
+  secret: "your_webhook_signing_secret",
 });
 
 if (webhookResult.success) {
@@ -111,10 +112,60 @@ if (webhookResult.success) {
 
 ### Webhook Fields
 
-| Field       | Description                                | Required | Example                                    |
-| ----------- | ------------------------------------------ | -------- | ------------------------------------------ |
-| `url`       | Your webhook endpoint URL                  | Yes      | `"https://your-domain.com/peppol-webhook"` |
-| `companyId` | Specific company to monitor (null for all) | No       | `"c_123"` or `null`                        |
+| Field       | Description                                      | Required | Example                                    |
+| ----------- | ------------------------------------------------ | -------- | ------------------------------------------ |
+| `url`       | Your webhook endpoint URL                        | Yes      | `"https://your-domain.com/peppol-webhook"` |
+| `companyId` | Specific company to monitor (`null` for all)      | No       | `"c_123"` or `null`                        |
+| `secret`    | Secret used to sign deliveries with HMAC SHA-256 | No       | `"your_webhook_signing_secret"`            |
+
+## Verifying Webhook Signatures
+
+When you configure a `secret`, every delivery includes an `X-Signature` header in this format:
+
+```text
+X-Signature: sha256=<hex digest>
+```
+
+The digest is an HMAC SHA-256 signature of the **exact raw request body**. Verify it before parsing or processing the event. Use a constant-time comparison to avoid timing attacks.
+
+```javascript
+import crypto from "node:crypto";
+import express from "express";
+
+const app = express();
+const WEBHOOK_SECRET = process.env.RECOMMAND_WEBHOOK_SECRET;
+
+app.post(
+  "/peppol-webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    const received = req.get("X-Signature");
+    const expected = `sha256=${crypto
+      .createHmac("sha256", WEBHOOK_SECRET)
+      .update(req.body)
+      .digest("hex")}`;
+
+    const receivedBuffer = Buffer.from(received ?? "");
+    const expectedBuffer = Buffer.from(expected);
+    const valid =
+      receivedBuffer.length === expectedBuffer.length &&
+      crypto.timingSafeEqual(receivedBuffer, expectedBuffer);
+
+    if (!valid) {
+      return res.status(401).send("Invalid signature");
+    }
+
+    const event = JSON.parse(req.body.toString("utf8"));
+    // Process the verified event.
+
+    return res.status(200).send("Event received");
+  }
+);
+```
+
+<Callout type="warn" title="Keep the raw body unchanged">
+  Parsing the JSON and serializing it again can change whitespace or property ordering and make a valid signature fail. Configure your framework to retain the original request bytes.
+</Callout>
 
 ## Listing Webhooks
 
@@ -168,6 +219,7 @@ async function updateWebhook(webhookId, updatedData) {
 const updateResult = await updateWebhook("webhook_id", {
   url: "https://your-domain.com/updated-webhook-endpoint",
   companyId: "c_123", // Change to monitor a specific company
+  secret: "your_new_webhook_signing_secret",
 });
 
 if (updateResult.success) {
@@ -176,6 +228,8 @@ if (updateResult.success) {
   console.error("Failed to update webhook:", updateResult.errors);
 }
 ```
+
+When updating a webhook, omit `secret` to keep the current signing secret. Set it to a new non-empty string to rotate the secret, or to `null` to stop signing deliveries.
 
 ## Deleting a Webhook
 
@@ -441,8 +495,9 @@ This is particularly useful when you need to:
 2. **Process asynchronously**: Handle complex processing outside the request/response cycle
 3. **Implement retry logic**: Be prepared to handle temporary failures
 4. **Monitor webhook health**: Keep track of successful and failed webhook deliveries
-5. **Use idempotency**: Process each event exactly once, even if received multiple times
-6. **Handle all event types**: Be prepared for new event types in the future
+5. **Verify signatures**: Configure a signing secret and reject deliveries with an invalid signature
+6. **Use idempotency**: Process each event exactly once, even if received multiple times
+7. **Handle all event types**: Be prepared for new event types in the future
 
 ## Complete Webhook Integration Example
 
@@ -453,6 +508,7 @@ const API_SECRET = "your_api_secret";
 const AUTH =
   "Basic " + Buffer.from(`${API_KEY}:${API_SECRET}`).toString("base64");
 const BASE_URL = "https://app.recommand.eu/api/peppol";
+const WEBHOOK_SECRET = process.env.RECOMMAND_WEBHOOK_SECRET;
 
 // Create a webhook
 async function setupWebhook() {
@@ -464,8 +520,9 @@ async function setupWebhook() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      url: "https://your-domain.com/peppol-webhook?token=your_secret_token",
+      url: "https://your-domain.com/peppol-webhook",
       companyId: null, // For all companies
+      secret: WEBHOOK_SECRET,
     }),
   });
 
@@ -494,20 +551,31 @@ async function setupWebhook() {
 }
 
 // Example Express.js webhook handler
+const crypto = require("node:crypto");
 const express = require("express");
-const bodyParser = require("body-parser");
 const app = express();
 
-app.use(bodyParser.json());
+app.post("/peppol-webhook", express.raw({ type: "application/json" }), async (
+  req,
+  res
+) => {
+  // Verify the signature before parsing the request body
+  const received = Buffer.from(req.get("X-Signature") ?? "");
+  const expected = Buffer.from(
+    `sha256=${crypto
+      .createHmac("sha256", WEBHOOK_SECRET)
+      .update(req.body)
+      .digest("hex")}`
+  );
 
-app.post("/peppol-webhook", async (req, res) => {
-  // Verify token
-  const token = req.query.token;
-  if (token !== "your_secret_token") {
-    return res.status(403).send("Unauthorized");
+  if (
+    received.length !== expected.length ||
+    !crypto.timingSafeEqual(received, expected)
+  ) {
+    return res.status(401).send("Invalid signature");
   }
 
-  const event = req.body;
+  const event = JSON.parse(req.body.toString("utf8"));
   console.log("Received webhook event:", event);
 
   // Immediately acknowledge the webhook

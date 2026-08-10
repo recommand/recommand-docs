@@ -2,6 +2,7 @@
   "title": "Changelog",
   "defaultOpen": true,
   "pages": [
+    "2026-08-10-webhook-hmac-signatures",
     "2026-07-22-shift-click-document-selection",
     "2026-06-10-permission-management",
     "2026-04-27-webhooks-and-rules",
