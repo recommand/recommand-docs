@@ -1,0 +1,9 @@
+---
+title: Verify webhooks with HMAC signatures
+description: Webhook deliveries can now be signed with an optional secret and verified through the X-Signature header.
+date: 2026-08-10
+---
+
+Webhook subscriptions created through the API can now include an optional signing secret. Recommand uses it to sign the raw request body with HMAC SHA-256 and sends the result in the `X-Signature` header.
+
+See [Working with Webhooks](/docs/working-with-webhooks) for setup and verification examples.

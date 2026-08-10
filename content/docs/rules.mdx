@@ -6,7 +6,7 @@ description: Create automations that send webhooks or emails when supported Pepp
 Rules let you automate what happens after key Peppol events in Recommand. Today, rules are configured in the dashboard and are intended for teams who want more control than the classic webhook setup.
 
 <Callout type="info" title="Already using webhooks?">
-  Rules are a more powerful and flexible alternative to our original and simpler webhook setup. If you only need simple webhook flows without conditions, filters, or more advanced features like HMAC signing, see [Working with Webhooks](/docs/working-with-webhooks).
+  Rules are a more powerful and flexible alternative to our original webhook setup. If you only need a webhook with optional company scoping and HMAC signing, see [Working with Webhooks](/docs/working-with-webhooks).
 </Callout>
 
 ## Overview
@@ -148,7 +148,7 @@ Use the exact raw request body when verifying the signature.
 
 Rules are currently configured through the **Webhooks and rules** page in the dashboard. The dedicated rules API is not publicly available yet.
 
-If you want to integrate through a public API today, use the existing webhook endpoints. Those endpoints keep the classic broad webhook subscription model with URL and company scope, but they do not expose advanced rule features such as conditions, email actions, or signing secrets.
+If you want to integrate through a public API today, use the existing webhook endpoints. Those endpoints keep the classic broad webhook subscription model with URL and company scope and support HMAC signing secrets, but they do not expose advanced rule features such as conditions or email actions.
 
 For the currently available public endpoints, see the [API reference](/reference) and the [Working with Webhooks](/docs/working-with-webhooks) guide.
 
