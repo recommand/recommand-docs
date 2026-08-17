@@ -1,0 +1,23 @@
+---
+title: French regulated invoicing support
+description: Companies in France can now send and receive invoices and credit notes in the French UBL, CII and Factur-X formats, over both the regulated and non-regulated Peppol processes.
+date: 2026-08-17
+---
+
+Recommand now supports the French e-invoicing reform. French companies are onboarded on a French-accredited SMP and access point automatically, and invoices and credit notes can be exchanged in the formats the reform requires.
+
+### What changed
+
+- **New document formats**: Invoices and credit notes can be generated as French CIUS or Extended UBL, CII D22B (CIUS and Extended), and Factur-X, in addition to the existing Peppol BIS 3 UBL. Select one by passing its `doctypeId` on the send endpoint; without it, Peppol BIS 3 UBL stays the default.
+- **New `countrySpecific` field on invoices and credit notes**: The `FR` variant carries the information the French formats require - `billingMode` (`B1`, `S1`, `M1`, …, following AFNOR XP Z12-012), the mandatory recovery-cost, late-payment-penalty and early-payment-discount statements, and the `businessProcess`. It is required for the French document types and must be omitted for plain EN 16931 documents.
+- **Regulated and non-regulated processes**: Set `countrySpecific.businessProcess` to `REGULATED` for transactions inside the French e-invoicing perimeter (the default) or `NON_REGULATED` for transactions outside it. The document is sent over the matching French Peppol process.
+- **Factur-X in both directions**: Outgoing Factur-X is delivered as a PDF/A-3 with the CII XML embedded. Incoming Factur-X is extracted and parsed like any other document, and the original PDF is kept and included in the document's download package.
+- **Automatic French routing**: Companies registered in France are published on a French-accredited SMP and exchange documents through the matching access point, with the French document types registered by default.
+
+### Why this matters
+
+French domestic e-invoicing follows its own formats, processes and mandatory content rules. You can now serve French companies through the same API you already use, without building the French specifics yourself.
+
+### What you need to do
+
+Nothing for companies outside France. For French companies, add the `countrySpecific` `FR` block to your invoices and credit notes, and pass the `doctypeId` of the format you want to send. Check what a recipient accepts with the [verify document support endpoint](/reference/recipients/verify-document-support) before sending.
