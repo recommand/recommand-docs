@@ -1,0 +1,26 @@
+---
+title: Going live with your own company
+---
+
+## Going live
+
+A short list before you start sending or receiving real invoices:
+
+- **A valid subscription**, so sending is not blocked.
+  Playgrounds skip that check; production does not.
+- **The company verified**, with `isVerified` true. Until then it cannot exchange
+  documents.
+- **Errors surfaced, not swallowed.** Validation errors name the field that is
+  wrong; put that in front of whoever can fix it rather than logging it.
+- **Webhook endpoint hardened**, if you took that route: signature verification,
+  a fast 200, retries and idempotency on your side.
+- **One real document sent and received**, ideally between two companies you
+  control, so you have seen both ends.
+- **Notification addresses set**, so incoming documents also reach a mailbox
+  somebody reads.
+
+<Callout type="info" title="Tell your customers and suppliers">
+  Once you are live, your Peppol address is public on the network: suppliers can
+  find and reach you without any action from you. Ask customers who still email
+  PDFs to switch, and let your accountant know where the documents now land.
+</Callout>

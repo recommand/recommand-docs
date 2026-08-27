@@ -1,4 +1,10 @@
 import { docsSource, referenceSource, changelogSource, faqSource } from "@/lib/source";
+import {
+  allAnswers,
+  guideDescription,
+  guideHeading,
+  guideUrl,
+} from "@/lib/country-guides";
 import fs from "fs/promises";
 import path from "path";
 
@@ -19,6 +25,15 @@ export async function GET() {
   lines.push(
     "Each link points to a markdown version of a documentation page that is suitable for use as LLM context.",
   );
+  lines.push("");
+
+  lines.push("## Country-specific getting started guides");
+  lines.push("");
+  for (const answers of allAnswers()) {
+    lines.push(
+      `- [${guideHeading(answers)}](${guideUrl(answers)}.mdx): ${guideDescription(answers)}`,
+    );
+  }
   lines.push("");
 
   lines.push("## Guides");

@@ -1,0 +1,71 @@
+---
+title: Identifiers in other countries
+---
+
+### Identifiers and the Peppol address
+
+Three fields decide how the company is published on the network:
+
+| Field              | Value                                                              |
+| ------------------ | ------------------------------------------------------------------ |
+| `country`          | ISO 3166-1 alpha-2, e.g. `"DE"`, `"SE"`, `"IT"`                     |
+| `enterpriseNumber` | The national company or organisation number                         |
+| `vatNumber`        | The VAT number, **starting with the same country code**             |
+
+```json title="company.json"
+{
+  "name": "Exempel AB",
+  "address": "Storgatan 1",
+  "postalCode": "111 51",
+  "city": "Stockholm",
+  "country": "SE",
+  "enterpriseNumber": "5567321707",
+  "vatNumber": "SE556732170701"
+}
+```
+
+A VAT number whose country code does not match `country` is rejected — that is
+the one identifier rule enforced for every country. National format checks (the
+modulo-97 check digit for Belgium, the KVK length for the Netherlands, the CVR
+length for Denmark) only exist for the countries that have them; elsewhere the
+number is taken as given, so check it before you send it.
+
+There is also an optional `enterpriseNumberScheme`. It does not decide which
+Peppol identifier is registered — the country does, as the next section shows —
+but it is written into the documents the company sends, as the scheme of the
+seller's legal identifier. Leave it out unless the country expects a specific
+one.
+
+### Which schemes are registered for you
+
+Each country has its own [Peppol Electronic Address
+Scheme](https://docs.peppol.eu/poacc/billing/3.0/codelist/eas/), and Recommand
+tries to automatically register the correct scheme for you.
+
+<Callout type="warn" title="No identifier means no sending">
+  The Peppol address is also what a document is sent from. A company with no
+  identifier at all cannot send: the attempt fails with *no sending company
+  identifier found*, and it cannot be published as a recipient either, because
+  there is no address to publish. In some countries, adding an identifier
+  yourself is part of onboarding rather than an optional extra.
+</Callout>
+
+### Adding identifiers by hand
+
+Whatever the defaults do, the full set is yours to manage: [list
+identifiers](/reference/company-identifiers/get-company-identifiers), [add
+one](/reference/company-identifiers/create-company-identifier), [update
+one](/reference/company-identifiers/update-company-identifier) or [remove
+one](/reference/company-identifiers/delete-company-identifier). Every identifier
+you add is registered in the SMP as another address the company can be reached on.
+
+```bash
+curl -X POST https://app.recommand.eu/api/v1/{companyId}/identifiers \
+  -u key_xxx:secret_xxx \
+  -H "Content-Type: application/json" \
+  -d '{"scheme":"0007","identifier":"5567321707"}'
+```
+
+This is also the escape hatch for a country with no defaults, and for the case
+where your customers know a company by a different identifier than the one
+registered for it.

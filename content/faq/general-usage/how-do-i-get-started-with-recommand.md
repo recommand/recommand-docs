@@ -6,3 +6,5 @@ updatedAt: 2025-10-13
 ---
 
 After registering on our website, you can immediately add your company and send an invoice via the dashboard or the API. No contract or technical setup is required. A playground environment is available to set up the integration without actually sending documents over the Peppol network.
+
+For the exact steps in your situation, follow the [country-specific getting started guides](/getting-started): pick your country, whether you are setting up a single company or onboarding many, and whether you send documents, receive them, or both.

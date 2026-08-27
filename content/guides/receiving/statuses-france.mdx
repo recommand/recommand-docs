@@ -1,0 +1,64 @@
+---
+title: French invoice lifecycle statuses
+---
+
+## Report back on the invoices you receive
+
+Inside the French perimeter, receiving an invoice comes with an obligation the
+other two countries do not have: you report its lifecycle back to the sender.
+Recommand models those status messages as a document type of their own,
+`frenchInvoicingCdar`, so you send them the same way you send anything else.
+
+<Callout type="info" title="Received and made available are sent for you">
+  When an invoice arrives, Recommand automatically sends the transmission
+  statuses back to the sender: `202` (received) when the document reaches the
+  access point, and `203` (made available) when it is delivered to you. You only
+  send the later processing statuses.
+</Callout>
+
+```javascript
+await fetch(`https://app.recommand.eu/api/v1/${companyId}/send`, {
+  method: "POST",
+  headers: { Authorization: auth, "Content-Type": "application/json" },
+  body: JSON.stringify({
+    recipient: "0225:987654321",
+    documentType: "frenchInvoicingCdar",
+    document: {
+      businessProcess: "REGULATED",
+      senderRole: "WK",
+      issuerRole: "BY",
+      issuerLegalId: "123456789",
+      issuerLegalIdScheme: "0002",
+      recipientRole: "SE",
+      statusCode: "205",
+      statusDate: "2026-08-17T14:05:09",
+      invoiceId: "INV-2026-001",
+      invoiceTypeCode: "380",
+      invoiceIssueDate: "2026-08-17",
+      sellerLegalId: "987654321",
+      sellerLegalIdScheme: "0002",
+    },
+  }),
+});
+```
+
+The processing statuses that matter most on the receiving side:
+
+| Status | Meaning                               |
+| ------ | ------------------------------------- |
+| `204`  | Taken in charge (processing started)  |
+| `205`  | Approved                              |
+| `206`  | Partially approved                    |
+| `207`  | In dispute                            |
+| `210`  | Refused                               |
+| `211`  | Payment sent                          |
+
+A refusal, partial approval or dispute carries a coded reason (`DOUBLON`,
+`TX_TVA_ERR`, `NON_CONFORME`, …) and an optional free-text note, so the sender
+knows what to fix. The full status and reason lists are on the [send document
+endpoint](/reference/sending/send-document).
+
+Incoming CDAR messages are parsed, stored and shown next to your other documents,
+and delivered through your existing webhooks and notifications — so this is also
+how you learn what your customers did with the invoices you sent them, including
+the `202` and `203` their access point sent when they received yours.

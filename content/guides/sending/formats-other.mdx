@@ -1,0 +1,28 @@
+---
+title: Document formats abroad
+---
+
+## Pick the document format
+
+Send **Peppol BIS 3
+UBL**, over the standard Peppol billing process. It is the format most Peppol
+participants accept.
+
+Some countries have a national CIUS on top of EN 16931 — SI-UBL 2.0 in the
+Netherlands, for instance. If a buyer asks for one and Recommand supports it, you
+name its document type in `doctypeId` on the send request; the document you post
+stays the same, because the format decides how the XML is written, not which
+fields you fill in.
+
+Before a first send to a new recipient, check two things:
+
+- **Is the recipient on the network?** The [verify
+  endpoint](/reference/recipients/verify-recipient) answers that, and sending
+  performs the same check automatically.
+- **Does the recipient accept this document type?** The [verify document support
+  endpoint](/reference/recipients/verify-document-support) answers that, which
+  matters more abroad than at home: a recipient in another country may be
+  registered for its own national profile only.
+
+See [verifying recipients](/docs/verifying-recipients) for the full flow,
+including what to do when a recipient cannot be reached.

@@ -1,0 +1,40 @@
+---
+title: Testing before it is real (one company)
+---
+
+## Try it safely first
+
+You do not have to get anything right the first time. Everything below, adding
+the company, registering it, sending and receiving, can be done in a
+**playground team** first, where nothing is delivered over the real Peppol
+network, nothing is registered on it, and nothing is billed.
+
+Open the team switcher at the top of the [dashboard](https://app.recommand.eu)
+and pick **Add playground**. Give it a name, leave the Peppol Test Network box
+unticked, and you are switched into the new team straight away — there is nothing
+to set up beyond that.
+
+Add a company to that team and use it as both sender and recipient to watch a
+document travel end to end. When the flow does what you want, repeat it once in
+your real team.
+
+Two things worth knowing before you start:
+
+- **`POST /:companyId/generate`** takes the same body as the send endpoint and
+  returns the exact XML that sending would produce, fully validated, without
+  transmitting, storing or billing it. It also returns the resolved
+  `documentType`, `doctypeId` and `processId`.
+- **Failure addresses.** In a playground that is not connected to the Peppol Test
+  Network, sending to `404:404` or `0208:1234567894` always fails, so you can
+  exercise your error handling. Any other unregistered recipient is skipped
+  without an error.
+
+A playground stays useful after you are live, too: it is the safest place to try
+a new invoice layout or a new integration. See [how can I test without sending
+real
+invoices](/faq/api-and-development/how-can-i-test-without-sending-real-invoices).
+
+<Callout type="info" title="Playgrounds are separate">
+  Playground companies are not registered on the Peppol network and playground
+  documents never leave it, so nothing you do there affects your real company.
+</Callout>

@@ -1,0 +1,33 @@
+---
+title: Going live in France
+---
+
+### Before you go live in France
+
+France adds a few checks to the list above, all of them things that only show up
+once real documents move:
+
+- **The mandate is accepted.** `isVerified` is `true`, which for a French company
+  means the signed mandate cleared its review. Plan this in: it is the one step
+  that is not instant.
+- **The company carries the SIREN under scheme `0002`.** Both the documents you
+  send and the mandate itself are built from the company's own identifiers, so a
+  SIRET or a missing scheme surfaces as rejected documents rather than as a
+  registration error.
+- **You know which side of the perimeter you are on.** Regulated is the default;
+  transactions outside it have to say so explicitly, and the counterparty has to
+  be registered for the process you use.
+
+If the company sends documents, two more:
+
+- **The format and process are what you meant.** Check one document before the
+  first real send: the preview in the dashboard, or `generate` from the API,
+  shows the resolved `doctypeId` and `processId`.
+- **Invoices are in EUR**, with the billing mode and the three mandatory
+  statements filled in.
+
+<Callout type="info" title="Selling to consumers as well?">
+  B2B invoices are only half of the French obligation. If the company also sells
+  to private individuals, its daily B2C totals (and international B2B totals) have to be reported separately, through
+  the French B2C reporting endpoint.
+</Callout>

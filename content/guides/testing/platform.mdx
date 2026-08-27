@@ -1,0 +1,39 @@
+---
+title: Testing before it is real (many companies)
+---
+
+## Try it safely first
+
+Build the whole flow against a **playground team** before you touch production.
+Playgrounds look and behave like production teams, but nothing is delivered over
+the real Peppol network, there are no SMP registrations, no subscription checks
+and no billing.
+
+Create one from the team switcher at the top of the
+[dashboard](https://app.recommand.eu): **Add playground**, give it a name, and
+you are switched into it. There is no limit on how many you create.
+
+Everything that follows in this guide is identical there: same endpoints, same
+validation, same webhooks (triggered by simulated inbound delivery). Register a
+company in the playground and use it as both sender and recipient to see a
+document arrive.
+
+Three things worth knowing before you start:
+
+- **`POST /:companyId/generate`** takes the same body as the send endpoint and
+  returns the exact XML that sending would produce, fully validated, without
+  transmitting, storing or billing it. It also returns the resolved
+  `documentType`, `doctypeId` and `processId`, which is the quickest way to check
+  that your country-specific fields map to the format and process you expect.
+- **Failure addresses.** In a playground that is not connected to the Peppol Test
+  Network, sending to `404:404` or `0208:1234567894` always fails, so you can
+  exercise your error handling. Any other unregistered recipient is skipped
+  without an error.
+- **The Peppol Test Network.** For genuine end-to-end tests with real
+  counterparties, tick **Use Peppol Test Network** when you create the
+  playground. It then uses dedicated test access point and SMP endpoints while
+  staying fully separated from production. The setting cannot be changed after
+  creation, so make a second playground if you want both.
+
+More detail in the [getting started guide](/docs) and [how do I use the playground
+environment](/faq/api-and-development/how-do-i-use-the-playground-environment).

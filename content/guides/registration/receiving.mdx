@@ -1,0 +1,25 @@
+---
+title: Registration for receiving
+---
+
+### Registering as a recipient
+
+To receive documents, the company must be published as a recipient on an SMP (Service Metadata Publisher).
+That is what `isSmpRecipient` does, and it is the default:
+
+```json
+{
+  "isSmpRecipient": true
+}
+```
+
+What that means:
+
+- The company becomes findable on the Peppol network: any sender can look it up
+  and deliver to it via the Peppol network.
+- Recipient registration is **exclusive**. If the company is already registered
+  for receiving through another Peppol provider, registration fails until it is
+  deregistered there.
+- The document types the company accepts are registered along with it, based on
+  its country. Which ones those are is covered further down.
+- The company is only published once it is verified.

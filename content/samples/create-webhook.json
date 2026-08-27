@@ -1,0 +1,5 @@
+{
+  "url": "https://your-app.example/webhooks/recommand",
+  "companyId": null,
+  "secret": "your_webhook_signing_secret"
+}

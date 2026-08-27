@@ -1,0 +1,36 @@
+---
+title: Dutch identifiers
+---
+
+### Dutch identifiers and Peppol address
+
+| Field                    | Dutch value                                       |
+| ------------------------ | ------------------------------------------------- |
+| `country`                | `"NL"`                                            |
+| `enterpriseNumber`       | KVK number, exactly 8 digits                      |
+| `enterpriseNumberScheme` | `"0106"`                                          |
+| `vatNumber`              | `NL` + 9 digits + `B` + 2 digits                   |
+
+```json title="company.json"
+{
+  "name": "Voorbeeld B.V.",
+  "address": "Keizersgracht 1",
+  "postalCode": "1015 CJ",
+  "city": "Amsterdam",
+  "country": "NL",
+  "enterpriseNumber": "12345678",
+  "enterpriseNumberScheme": "0106",
+  "vatNumber": "NL123456789B01"
+}
+```
+
+Both are validated against the Dutch formats — an 8-digit KVK number and a VAT
+number shaped like `NL123456789B01` — and rejected if they do not match.
+
+Two Peppol identifiers are registered for the company:
+
+- `0106:12345678` — the KVK number, and the address others will use
+- `9944:NL123456789B01` — the VAT number
+
+The company's Peppol address is the first one: **`0106:` followed by the KVK
+number**.

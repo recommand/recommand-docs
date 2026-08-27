@@ -1,0 +1,33 @@
+---
+title: Registration for sending and receiving
+---
+
+### Registering for both directions
+
+Sending needs no registration of its own; receiving does. So register the company
+as a recipient, which is the default:
+
+```json
+{
+  "isSmpRecipient": true
+}
+```
+
+What that means:
+
+- The company becomes findable on the Peppol network and can be delivered to
+  through Recommand's access point, while sending its own documents out through
+  the same access point.
+- Recipient registration is **exclusive**. If the company already receives
+  through another Peppol provider, registration fails until it is deregistered
+  there. What that takes depends on the country, which the next section
+  covers.
+- The document types the company accepts are registered along with it, based on
+  its country. Which ones those are is covered further down.
+- The company is only published once it is verified.
+
+<Callout type="info" title="Sending first, receiving later">
+  If the company still receives elsewhere and you do not want to move that yet,
+  register it with `isSmpRecipient: false` and start with sending only. Flipping
+  the field later publishes it as a recipient.
+</Callout>

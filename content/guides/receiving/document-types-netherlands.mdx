@@ -1,0 +1,23 @@
+---
+title: What a Dutch company receives
+---
+
+## Document types registered for you
+
+When you register a Dutch company as a recipient, it is published for four
+document types, so senders can reach it with either the European or the Dutch
+flavour of EN 16931:
+
+| Document type                  | Process                                       |
+| ------------------------------ | --------------------------------------------- |
+| Invoice (Peppol BIS 3 UBL)     | `urn:fdc:peppol.eu:2017:poacc:billing:01:1.0` |
+| Credit note (Peppol BIS 3 UBL) | `urn:fdc:peppol.eu:2017:poacc:billing:01:1.0` |
+| Invoice (SI-UBL 2.0)           | `urn:fdc:peppol.eu:2017:poacc:billing:01:1.0` |
+| Credit note (SI-UBL 2.0)       | `urn:fdc:peppol.eu:2017:poacc:billing:01:1.0` |
+
+Whichever of the four a sender picks, you get the same parsed document out of the
+API — the format difference stays in the XML.
+
+Need more document types, such as self-billing, message level responses, invoice responses?
+Register the combinations you want with the [create company
+document type endpoint](/reference/company-document-types/create-company-document-type).

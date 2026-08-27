@@ -1,0 +1,25 @@
+---
+title: Document formats for the Netherlands
+---
+
+## Pick the document format
+
+Dutch recipients registered through Recommand accept both Peppol BIS 3 UBL and
+SI-UBL 2.0 (NLCIUS). Send BIS 3 unless a buyer asks for SI-UBL, in which case
+name the SI-UBL document type on the send request:
+
+| What you send             | `doctypeId`                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Invoice (default)         | not needed — defaults to Peppol BIS 3 UBL                                                                       |
+| Credit note (default)     | not needed — defaults to Peppol BIS 3 UBL                                                                       |
+| SI-UBL 2.0 invoice        | `urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:nen.nl:nlcius:v1.0::2.1`         |
+| SI-UBL 2.0 credit note    | `urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#compliant#urn:fdc:nen.nl:nlcius:v1.0::2.1` |
+
+The document you post is the same in both cases: the format decides how the XML
+is written, not which fields you fill in.
+
+Before a first send to a new recipient, check that the recipient exists with the
+[verify endpoint](/reference/recipients/verify-recipient) and that it accepts the
+format you intend to use with the [verify document support
+endpoint](/reference/recipients/verify-document-support) — a recipient outside
+Recommand may well be registered for BIS 3 only.

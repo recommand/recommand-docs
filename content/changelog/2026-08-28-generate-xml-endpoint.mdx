@@ -1,0 +1,19 @@
+---
+title: Generate XML without sending
+description: A new endpoint returns the exact XML document that would be sent for a given payload, fully validated, without transmitting, storing, or billing it.
+date: 2026-08-28
+---
+
+The new `POST /:companyId/generate` endpoint accepts the same body as the [send document endpoint](/reference/sending/send-document) and returns the document that sending it would produce.
+
+### What changed
+
+- **Same request, no transmission**: The body is identical to the send endpoint, minus the email delivery options and the `xml` document type, which has nothing to generate. Nothing is sent or stored.
+- **Validated like a real send**: The generated document passes the same document validation as sending, so a document that comes back here is one the Peppol network accepts.
+- **Response**: Returns the `xml` along with the resolved `documentType`, `doctypeId` and `processId`, so you can see which format and process your payload maps to.
+- **Not billed**: Documents generated through this endpoint do not count towards your subscription usage.
+
+### Why this matters
+
+Building or migrating an integration usually means inspecting the XML your payload produces. You can now do that as often as you like, without sending test documents to the network or consuming quota.
+Through this endpoint you can also generate XML for documents that are not sent over the Peppol network but that you would like to make available for your own use.

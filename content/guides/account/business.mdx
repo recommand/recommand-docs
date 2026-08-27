@@ -1,0 +1,27 @@
+---
+title: Account setup for a single company
+---
+
+## Create your account and API credentials
+
+1. Sign up at [app.recommand.eu/signup](https://app.recommand.eu/signup).
+2. Your account starts with a **team**. The team holds your company, your
+   subscription and your document history, and you can invite colleagues to it.
+3. Create an API key on the [API keys page](https://app.recommand.eu/api-keys).
+   Note the key, the secret and your team ID.
+4. Check the credentials with a request that needs no data of its own:
+
+<include cwd lang="bash">content/samples/verify-credentials.sh</include>
+
+All endpoints in this guide live under `https://app.recommand.eu/api/v1` and
+accept HTTP Basic authentication with the key as username and the secret as
+password. If you would rather not store a long-lived secret, JWT API keys and
+OAuth2 with a JWT assertion are available too, see the
+[authentication guide](/docs/authentication).
+
+<Callout type="info" title="Not planning to write any code?">
+  Sending and receiving can also be driven entirely from the dashboard or through
+  an [integration](/integrations), and each section below says how. The dashboard
+  is available in English, Dutch, French and German; pick your language on the
+  [account page](https://app.recommand.eu/account).
+</Callout>

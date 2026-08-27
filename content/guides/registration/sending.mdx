@@ -1,0 +1,32 @@
+---
+title: Registration for sending only
+---
+
+### Registering for sending only
+
+Because you are only looking to send invoices or other documents, register the company **without** recipient registration:
+set `isSmpRecipient` to `false` (or leave the checkbox unticked in the
+dashboard).
+
+```json
+{
+  "isSmpRecipient": false
+}
+```
+
+What that means:
+
+- The company is not published as a recipient on an SMP, so nothing is delivered
+  to it over Peppol through your integration.
+- Registration succeeds even when the company already receives its documents
+  through another Peppol provider. The other Peppol provider will remain in charge for 
+  processing received documents for this company.
+- Nothing changes for sending: outgoing documents leave through the access point
+  as normal.
+
+<Callout type="info" title="Adding receiving later">
+  You can flip `isSmpRecipient` to `true` on an existing company at any time.
+  Recommand then publishes it as a recipient and registers the document types for
+  its country. That registration is exclusive, so the company has to be
+  deregistered at its current provider first.
+</Callout>

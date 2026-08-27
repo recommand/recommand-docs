@@ -1,0 +1,38 @@
+---
+title: Overview for many companies
+---
+
+## What you are building
+
+You are onboarding companies that are not your own: one Recommand team, and a
+company inside it for every customer you put on the network. Your customers never
+need a Recommand account — they see your interface, and Recommand stays behind
+your API calls.
+
+That shape has a few consequences worth knowing before you write code:
+
+- **One team, many companies.** There is no limit on companies per team, and
+  billing is per team with the document volume of all companies pooled together,
+  so the more companies you onboard the lower your price per document. See
+  [pricing per team](/faq/general-usage/is-pricing-per-company-or-per-team).
+- **Every company is registered and verified individually.** Peppol identifies
+  companies, not platforms. Each company gets its own Peppol address and its own
+  authorisation record.
+- **Verification is taken care of.** Recommand hands you a URL that the
+  company's authorised representative opens to confirm their identity. You
+  present or forward that link; you never need to handle identity documents yourself.
+  If you prefer to handle verification yourself, reach out to us at support@recommand.eu,
+  we have a few other flows we can set up for you.
+- **You can run the whole flow under your own brand.** The API is designed for
+  white-label use, see
+  [can I whitelabel Recommand](/faq/general-usage/can-i-whitelabel-integrate-recommand).
+
+The [Recommand dashboard](https://app.recommand.eu) shows the same teams,
+companies and documents your API calls produce, which is the quickest way to see
+what a customer is looking at while you are debugging.
+
+<Callout type="info" title="Only setting up your own company?">
+  If the only company you will register is your own, switch the first answer
+  above to **One company** for the shorter version of this guide. The endpoints
+  are the same; there is simply less to organise.
+</Callout>

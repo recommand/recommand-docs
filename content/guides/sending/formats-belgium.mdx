@@ -1,0 +1,22 @@
+---
+title: Document formats for Belgium
+---
+
+## The document format
+
+For Belgium there is nothing to pick: leave the format alone and you send
+**Peppol BIS 3 UBL**, over the standard Peppol billing process. That is what
+Belgian recipients register, and what the Belgian B2B mandate expects.
+
+Two things are still worth checking before a first send to a new recipient:
+
+- **Is the recipient on the network?** The [verify
+  endpoint](/reference/recipients/verify-recipient) answers that, and sending
+  performs the same check automatically.
+- **Does the recipient accept this document type?** The [verify document support
+  endpoint](/reference/recipients/verify-document-support) answers that. Most
+  Belgian recipients accept invoices and credit notes; not all accept every other
+  type. This is also checked automatically when sending.
+
+See [verifying recipients](/docs/verifying-recipients) for the full flow,
+including what to do when a recipient cannot be reached.

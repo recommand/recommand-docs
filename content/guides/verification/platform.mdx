@@ -1,0 +1,33 @@
+---
+title: Verification for many companies
+---
+
+### Building verification into your onboarding
+
+With one company you would click through this once. With many, verification is
+part of the flow you build: every company you register needs its own, and it is
+the step most likely to leave a customer stuck halfway.
+
+**Show the URL immediately.** The create-company response already carries
+`verificationUrl` — no extra call needed. Put it in front of the user while they
+are still in your onboarding.
+
+**Ask for a fresh one when the moment has passed.** Links get lost, and companies
+you created earlier never had one shown. The [verify company
+endpoint](/reference/companies/verify-company) starts a new verification session:
+
+<include cwd lang="bash">content/samples/verify-company.sh</include>
+
+The `company.verification` webhook fires
+when verification reaches a final state: `verified`, `rejected` or `error`. A
+company that comes back `rejected` or `error` and is not surfaced anywhere sits
+silently unusable. See [working with webhooks](/docs/working-with-webhooks).
+
+**Respect `isVerified` in your own UI.** Do not let a user press send for a
+company that is not verified yet; this will result in an error. You should inform the user what is missing instead.
+
+**Re-verify after identifier changes.** Updating a company's `vatNumber` or
+`enterpriseNumber` resets `isVerified` to `false`. Check the field after an
+update and present a new `verificationUrl` if it flipped.
+
+The full mechanics are in the [company verification guide](/docs/company-verification).

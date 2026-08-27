@@ -1,0 +1,43 @@
+---
+title: Country context - France
+---
+
+## Peppol in France
+
+French domestic e-invoicing follows the French e-invoicing reform rather than plain Peppol BIS 3.
+Recommand covers the French specifics for you, but they do change what you
+send and how a company is onboarded.
+
+What is specific to France:
+
+- **A French-accredited access point and SMP.** Companies you register with
+  country `FR` are automatically published on a French-accredited SMP and
+  exchange documents through the matching access point. You do not choose or
+  configure this: it follows from the company's country.
+- **A signed mandate.** Before a French company can operate, its authorised
+  representative signs a mandate that lets that accredited platform act for the
+  company, and the file is reviewed before the company goes live. This is the one
+  step in this guide that is not instant, so start it early.
+- **French document formats.** Invoices and credit notes travel as French CIUS
+  or Extended UBL, CII D22B (CIUS or Extended), or Factur-X (a PDF/A-3 with the
+  CII XML embedded), next to plain Peppol BIS 3 UBL.
+- **Two processes.** The same document types are published for a **regulated**
+  process (`urn:peppol:france:billing:regulated`, transactions inside the French
+  e-invoicing perimeter) and a **non-regulated** one
+  (`urn:peppol:france:billing:non-regulated`, transactions outside it).
+- **Mandatory content.** French invoices carry a billing mode and three
+  statements (recovery costs, late-payment penalties, early-payment discount)
+  that plain EN 16931 does not require. They go in a `countrySpecific` block.
+- **Lifecycle statuses and e-reporting.** Inside the perimeter, receivers report
+  back on the invoices they receive, and B2C or international B2B transactions have to be reported.
+- **Identifiers are SIREN-based.** French companies are published under scheme
+  `0225`.
+
+<Callout type="warn" title="Dates and legal scope">
+  The reform phases the obligations in over time: from **1 September 2026** every
+  company must be able to receive electronic invoices, with issuance starting for
+  large and mid-size companies, and from **1 September 2027** issuance applies to
+  small and micro companies as well. Confirm the schedule and what falls inside
+  the perimeter with your accountant or legal advisor — this documentation
+  describes what the API does, not what your obligations are.
+</Callout>

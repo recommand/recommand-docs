@@ -1,0 +1,28 @@
+{
+  "recipient": "0208:0123456789",
+  "documentType": "invoice",
+  "document": {
+    "invoiceNumber": "INV-2026-001",
+    "issueDate": "2026-08-17",
+    "dueDate": "2026-09-16",
+    "currency": "EUR",
+    "buyer": {
+      "name": "Customer Company",
+      "street": "Customer Street 1",
+      "city": "Antwerp",
+      "postalZone": "2000",
+      "country": "BE",
+      "vatNumber": "BE0987654321"
+    },
+    "paymentMeans": [{ "iban": "BE68539007547034" }],
+    "lines": [
+      {
+        "name": "Consulting Services",
+        "quantity": "10.00",
+        "unitCode": "HUR",
+        "netPriceAmount": "100.00",
+        "vat": { "category": "S", "percentage": "21.00" }
+      }
+    ]
+  }
+}

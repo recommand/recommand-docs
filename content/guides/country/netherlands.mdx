@@ -1,0 +1,26 @@
+---
+title: Country context - Netherlands
+---
+
+## Peppol in the Netherlands
+
+The Netherlands sits between Belgium and France in complexity: the network is
+plain Peppol, but Dutch buyers commonly expect the Dutch specialisation of
+EN 16931 next to Peppol BIS 3.
+
+What is specific to the Netherlands:
+
+- **SI-UBL 2.0 (NLCIUS) alongside Peppol BIS 3.** Dutch companies are registered
+  for both, so a sender can reach them with either. Recommand can write and read
+  both formats.
+- **KVK numbers are the Peppol address.** Dutch companies are published under
+  scheme `0106` (Chamber of Commerce), so a Dutch Peppol address looks like
+  `0106:12345678`. The VAT number is registered as well, under scheme `9944`.
+- **No general B2B mandate (yet).** Unlike Belgium, the Netherlands does not
+  require electronic invoicing between businesses across the board. E-invoicing
+  is required when invoicing Dutch central government, and Peppol is the
+  established channel for it.
+
+No country-specific fields are needed on the documents themselves. A valid
+EN 16931 invoice is accepted; sending SI-UBL is a matter of selecting that
+format, not of filling in extra data.

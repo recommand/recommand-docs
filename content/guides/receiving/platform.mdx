@@ -1,0 +1,71 @@
+---
+title: Receiving for many companies
+---
+
+## Get incoming documents into your product
+
+Recommand receives, validates and stores incoming documents for every company in
+your team. You pick them up in one of two ways.
+
+### Webhooks (recommended)
+
+Register an endpoint once with the [create webhook
+endpoint](/reference/webhooks/create-webhook) or through the dashboard and events are pushed to you as
+they happen, `document.received` among them:
+
+<Tabs items={['Node.js', 'cURL']} groupId="language" persist>
+  <Tab value="Node.js">
+
+```javascript
+await fetch("https://app.recommand.eu/api/v1/webhooks", {
+  method: "POST",
+  headers: { Authorization: auth, "Content-Type": "application/json" },
+  body: JSON.stringify(webhook), // the body below
+});
+```
+
+  </Tab>
+  <Tab value="cURL">
+
+<include cwd lang="bash">content/samples/create-webhook.sh</include>
+
+  </Tab>
+</Tabs>
+
+<include cwd lang="json" meta='title="create-webhook.json"'>content/samples/create-webhook.json</include>
+
+`companyId: null` covers every company in the team.
+
+Pass a `secret` and verify the HMAC SHA-256 signature on every delivery before
+you trust the payload. Switch on `event.eventType`, and acknowledge with a 200
+before doing the heavy processing. Both are covered in [working with
+webhooks](/docs/working-with-webhooks).
+
+### Polling the inbox
+
+If you would rather pull, the [inbox
+endpoint](/reference/documents/get-inbox) lists unread documents:
+
+```javascript
+const inbox = await fetch("https://app.recommand.eu/api/v1/inbox", {
+  headers: { Authorization: auth },
+}).then((r) => r.json());
+```
+
+Mark each document as read with the [mark as read
+endpoint](/reference/documents/mark-as-read) once your system has it, so it drops
+off the list.
+
+### After you have the document
+
+- Fetch details, the original XML or a rendered PDF from the [documents
+  endpoints](/reference/documents/get-document).
+- Route documents to the right customer with [labels and
+  suppliers](/docs/suppliers-and-labels), and automate that routing with
+  [rules](/docs/rules).
+- Let Recommand mail incoming documents on to an address of your choosing when
+  that is easier than an API call, see [email delivery and
+  notifications](/docs/email-delivery-and-notifications).
+
+For the full picture, including retries and idempotency, see [receiving
+documents](/docs/receiving-documents).

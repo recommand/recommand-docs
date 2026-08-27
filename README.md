@@ -16,6 +16,8 @@ Open [http://localhost:3000](http://localhost:3000) to view the docs locally.
 ## Project Structure
 
 - `content/docs/` — Guides and tutorials
+- `content/guides/` — Fragments of the country-specific getting started guide, chained per answer combination by `src/lib/country-guides.ts`. A fragment is picked up by its path, so `bun run lint:guides` checks that every file on disk is reached by at least one combination
+- `content/samples/` — Code samples shared between pages, pulled in with `<include cwd lang="bash">content/samples/x.sh</include>`; see `content/samples/README.md`
 - `content/reference/` — API reference (auto-generated from OpenAPI spec)
 - `content/integrations/` — Integration guides
 - `content/changelog/` — Release notes

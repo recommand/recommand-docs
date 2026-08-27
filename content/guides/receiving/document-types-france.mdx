@@ -1,0 +1,31 @@
+---
+title: What a French company receives
+---
+
+## Document types registered for you
+
+A French company is published for the whole French set, all on the **regulated**
+process, so any sender inside the perimeter can reach it in the format they
+prefer:
+
+| Document type                          | Registered process                    |
+| -------------------------------------- | ------------------------------------- |
+| Invoice + credit note (Peppol BIS 3 UBL) | `urn:peppol:france:billing:regulated` |
+| Invoice + credit note (France UBL CIUS)  | `urn:peppol:france:billing:regulated` |
+| Invoice + credit note (France UBL Extended) | `urn:peppol:france:billing:regulated` |
+| Invoice + credit note (France CII CIUS)  | `urn:peppol:france:billing:regulated` |
+| Invoice + credit note (France CII Extended) | `urn:peppol:france:billing:regulated` |
+| Factur-X invoice + credit note           | `urn:peppol:france:billing:regulated` |
+| Invoice lifecycle status (CDAR)          | `urn:peppol:france:billing:regulated` |
+
+Whichever format arrives, you read the same parsed document out of the API. For
+Factur-X, the CII XML is extracted from the PDF/A-3 and parsed like any other
+document, and the original PDF is kept and included in the document's [download
+package](/reference/documents/download-package).
+
+<Callout type="info" title="Trading outside the perimeter">
+  The defaults cover the regulated process. If counterparties will send you
+  documents over `urn:peppol:france:billing:non-regulated`, register the same
+  document types for that process as well with the [create company document type
+  endpoint](/reference/company-document-types/create-company-document-type).
+</Callout>

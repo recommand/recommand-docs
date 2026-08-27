@@ -1,0 +1,56 @@
+---
+title: Registering companies through the API
+---
+
+## Register the company
+
+Create one company per customer with the [create company
+endpoint](/reference/companies/create-company). Registration on the Peppol
+network happens as part of this call: identifiers and document types are set up
+for you, based on the company's country.
+
+<Tabs items={['Node.js', 'cURL']} groupId="language" persist>
+  <Tab value="Node.js">
+
+```javascript
+const auth =
+  "Basic " + Buffer.from("key_xxx:secret_xxx").toString("base64");
+
+const response = await fetch("https://app.recommand.eu/api/v1/companies", {
+  method: "POST",
+  headers: { Authorization: auth, "Content-Type": "application/json" },
+  body: JSON.stringify(company),
+});
+
+const result = await response.json();
+if (!result.success) throw new Error(JSON.stringify(result.errors));
+
+const companyId = result.company.id;
+const verificationUrl = result.verificationUrl; // hand this to your user
+```
+
+  </Tab>
+  <Tab value="cURL">
+
+<include cwd lang="bash">content/samples/create-company.sh</include>
+
+  </Tab>
+</Tabs>
+
+The response carries a `verificationUrl` straight away. Keep it: the next step is
+to put it in front of the company's representative.
+
+<Callout type="warn" title="Only register companies you are allowed to act for">
+  Register the companies that use your platform, not the companies they invoice.
+  Customers and suppliers manage their own Peppol registration; adding them
+  causes registration conflicts. See [managing
+  companies](/docs/managing-companies).
+</Callout>
+
+The exact identifier fields to send depend on the country, which is what the next
+section covers. If you would rather create identifiers and document types
+yourself instead of accepting the country defaults, pass
+`skipDefaultCompanySetup: true` and use the [company
+identifiers](/reference/company-identifiers/create-company-identifier) and
+[company document
+types](/reference/company-document-types/get-company-document-types) endpoints.

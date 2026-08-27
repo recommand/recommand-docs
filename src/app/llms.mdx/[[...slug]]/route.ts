@@ -1,10 +1,26 @@
 import { docsSource, integrationsSource, changelogSource, faqSource } from "@/lib/source";
 import { getLLMText } from "@/lib/get-llm-text";
+import {
+  allAnswers,
+  guideMarkdown,
+  resolveAnswers,
+} from "@/lib/country-guides";
 import { notFound } from "next/navigation";
 import fs from "fs/promises";
 import path from "path";
 
 export const revalidate = false;
+
+/** slug = ["getting-started", country, audience, direction] */
+async function getCountryGuideMd(slug: string[]): Promise<string | null> {
+  const [, country, audience, direction] = slug;
+  if (!country || !audience || !direction || slug.length !== 4) return null;
+
+  const answers = resolveAnswers({ country, audience, direction });
+  if (!answers) return null;
+
+  return guideMarkdown(answers);
+}
 
 function findPage(slug?: string[]) {
   if (!slug || slug.length === 0) return null;
@@ -96,6 +112,17 @@ export async function GET(
 ) {
   const { slug } = await context.params;
 
+  // Handle the assembled country-specific getting started guides
+  if (slug && slug[0] === "getting-started") {
+    const content = await getCountryGuideMd(slug);
+    if (!content) notFound();
+    return new Response(content, {
+      headers: {
+        "Content-Type": "text/markdown",
+      },
+    });
+  }
+
   // Handle reference markdown pages
   if (slug && slug[0] === "reference") {
     const content = await getReferenceMd(slug);
@@ -132,6 +159,16 @@ export async function generateStaticParams() {
   }
   for (const page of faqSource.getPages()) {
     allParams.push({ slug: ["faq", ...page.slugs] });
+  }
+  for (const answers of allAnswers()) {
+    allParams.push({
+      slug: [
+        "getting-started",
+        answers.country.id,
+        answers.audience.id,
+        answers.direction.id,
+      ],
+    });
   }
 
   const refParams = await listReferenceMdParams();

@@ -1,0 +1,38 @@
+---
+title: Belgian identifiers
+---
+
+### Belgian identifiers and Peppol address
+
+| Field                     | Belgian value                                              |
+| ------------------------- | ---------------------------------------------------------- |
+| `country`                 | `"BE"`                                                     |
+| `enterpriseNumber`        | 10 digits, starting with `0` or `1` (modulo-97 check digit) |
+| `enterpriseNumberScheme`  | `"0208"`                                                   |
+| `vatNumber`               | `BE` + the same 10 digits                                   |
+
+```json title="company.json"
+{
+  "name": "ACME Corporation",
+  "address": "123 Main Street",
+  "postalCode": "1000",
+  "city": "Brussels",
+  "country": "BE",
+  "enterpriseNumber": "0123456789",
+  "enterpriseNumberScheme": "0208",
+  "vatNumber": "BE0123456789"
+}
+```
+
+Both numbers are validated against the national rules, including the modulo-97
+check digit, and a mismatch is rejected instead of silently registered. For
+Belgian companies the enterprise number is derived from the VAT number when you
+leave it out.
+
+Two Peppol identifiers are then registered for the company:
+
+- `0208:0123456789` — the enterprise number, and the address others will use
+- `9925:BE0123456789` — the VAT number
+
+The company's Peppol address is the first one: **`0208:` followed by the
+enterprise number**.

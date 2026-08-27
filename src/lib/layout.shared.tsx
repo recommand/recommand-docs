@@ -2,7 +2,7 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import type { RootProviderProps } from "fumadocs-ui/provider/next";
 import StructuredSearchDialog from "@/components/search-dialog";
 import RecommandLogo from "@/components/recommand-logo";
-import { BookOpen, Code2, History, HelpCircle, Puzzle } from "lucide-react";
+import { BookOpen, Code2, Compass, History, HelpCircle, Puzzle } from "lucide-react";
 
 export const searchOptions: RootProviderProps["search"] = {
   SearchDialog: StructuredSearchDialog,
@@ -61,6 +61,12 @@ export function baseOptions(): BaseLayoutProps {
     },
     githubUrl: "https://github.com/brbxai/recommand-peppol",
     links: [
+      {
+        text: "Getting started",
+        url: "/getting-started",
+        icon: <Compass />,
+        active: "nested-url",
+      },
       {
         text: "Docs",
         url: "/docs",

@@ -200,6 +200,14 @@ if (result.success) {
 }
 ```
 
+### The same request with curl
+
+The whole request is one JSON body, so nothing about it is Node-specific:
+
+<include cwd lang="bash">content/samples/send-invoice.sh</include>
+
+<include cwd lang="json" meta='title="send-invoice.json"'>content/samples/send-invoice.json</include>
+
 ## Handle Responses and Errors
 
 Along with a proper HTTP status code, the API will return a structured response indicating success or failure:
@@ -364,6 +372,24 @@ await sendPeppolInvoice();
 ```
 
 ## Advanced Features
+
+### Country-Specific Formats and Processes
+
+The examples above send Peppol BIS 3 UBL over the standard Peppol billing
+process, which is what almost every recipient expects. Two cases need more:
+
+- **French recipients inside the e-invoicing perimeter** are published for
+  `urn:peppol:france:billing:regulated` rather than the standard process, so name
+  it in `processId` — or send one of the French formats by naming its
+  `doctypeId`.
+- **A buyer who asks for a national CIUS**, such as SI-UBL 2.0 in the
+  Netherlands, is reached by naming that `doctypeId`. The invoice data itself
+  does not change.
+
+The [country-specific getting started guides](/getting-started) list the document
+types and processes per country, and
+[verifying recipients](/docs/verifying-recipients) covers how to check a
+combination before you rely on it.
 
 ### Adding Attachments
 
