@@ -1,0 +1,28 @@
+---
+title: Going live with many companies
+---
+
+## Going live
+
+Before you switch your first real customer over, walk this list:
+
+- **A valid subscription in production.** Playgrounds skip the subscription
+  check; production does not.
+- **Verification handled in your UI.** Show the `verificationUrl` at the right
+  moment, make it forwardable, and handle the `company.verification` webhook so a
+  company that comes back `rejected` or `error` does not sit silently unusable.
+- **`isVerified` respected.** Do not let a user press send for a company that is
+  not verified yet; explain what is missing instead.
+- **Webhook endpoint hardened.** Signature verification, a fast 200, retries and
+  idempotency on your side.
+- **Errors surfaced, not swallowed.** Validation errors name the field that is
+  wrong; put that in front of the person who can fix it.
+- **One real document, end to end.** Send an invoice between two companies you
+  control on production before letting customers in.
+
+<Callout type="info" title="Volume and pricing">
+  Documents are counted per team, with the volume of all your companies pooled,
+  so onboarding more companies lowers your price per document rather than adding
+  per-company fees. Generated XML through `generate` is not billed; emails and
+  submitted reports are.
+</Callout>

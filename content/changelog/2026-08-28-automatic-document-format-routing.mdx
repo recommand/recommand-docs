@@ -1,0 +1,22 @@
+---
+title: Outgoing documents pick a format the recipient accepts
+description: When you send a JSON document without naming a document type identifier, Recommand now looks up the recipient and writes it in the first format they are registered to receive.
+date: 2026-08-28
+---
+
+Sending a JSON invoice used to always produce Peppol BIS 3 UBL unless you named a `doctypeId`. Recipients who only publish a national format then failed at the far end. The [send document endpoint](/reference/sending/send-document) now looks the recipient up and picks a combination they actually accept.
+
+### What changed
+
+- **Automatic format selection**: Leave `doctypeId` off and the document is written as the first format, in our order of preference, the recipient is registered to receive.
+- **Automatic process selection**: Leave `processId` off and the process the recipient registered for that format is preferred, as far as the document itself leaves the choice open. A French invoice only travels over the regulated or non-regulated process its `countrySpecific.businessProcess` names; the other one is not treated as a fallback.
+- **Overrides still win**: Pass both `doctypeId` and `processId` and they are used as-is, with no lookup. Pass only one and routing happens inside that constraint: a named format still chooses the process the recipient registered, a named process still chooses a format published for it.
+- **Raw XML and generate-XML remain unchanged**: A document you already supply as XML is one specific format, so it is not rerouted. The [generate XML endpoint](/changelog/2026-08-17-generate-xml-endpoint) still writes the default format, because there is no transmission to route.
+
+### Why this matters
+
+National formats and country-specific processes are now the common case, not an override you have to remember per recipient. You can send the same JSON payload to a Belgian BIS 3 buyer, a Dutch SI-UBL-only buyer and a French regulated recipient, and each document is written as something that recipient published.
+
+### What you need to do
+
+Nothing if you already omit `doctypeId` and `processId`. You can stop hardcoding them for recipients that only accept a national format or a French process. Keep passing both when you need a specific combination regardless of what the recipient publishes.

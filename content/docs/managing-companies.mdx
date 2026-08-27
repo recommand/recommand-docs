@@ -64,8 +64,6 @@ When creating a new company, it is automatically registered in the Peppol networ
 If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents.
 If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to regiter the company even if it is already registered through another Peppol provider for receiving documents.
 
-Companies that are registered with the Belgian government portal Hermes (as is the case for most Belgian companies) are automatically migrated over to Recommand.
-
 ```javascript
 async function createCompany(companyData) {
   const response = await fetch(
@@ -105,6 +103,14 @@ if (newCompany.success) {
 }
 ```
 
+### The same request with curl
+
+<include cwd lang="bash">content/samples/create-company.sh</include>
+
+The `company.json` body is the JSON object shown above; the
+[country-specific guides](/getting-started) give the exact identifier fields per
+country.
+
 ### Company Fields
 
 | Field              | Description                      | Required | Example              |
@@ -115,8 +121,20 @@ if (newCompany.success) {
 | `city`             | City                             | Yes      | `"Brussels"`         |
 | `country`          | Country code (2-letter ISO code) | Yes      | `"BE"`               |
 | `enterpriseNumber` | Enterprise number                | No       | `"0123456789"`       |
+| `enterpriseNumberScheme` | Scheme of the enterprise number, written into the documents the company sends | No | `"0208"` |
 | `vatNumber`        | VAT registration number          | No       | `"BE0123456789"`     |
+| `email`            | Contact email                    | No       | `"billing@acme.be"`  |
+| `phone`            | Contact phone number             | No       | `"+32 3 123 45 67"`  |
+| `isSmpRecipient`   | Register the company to receive documents (defaults to `true`) | No | `true` |
+| `skipDefaultCompanySetup` | Skip the automatic identifiers and document types, and create them yourself | No | `false` |
 | `isVerified`       | Whether the company has been verified (read-only) | — | `false`         |
+
+Which identifiers a company needs, and which Peppol identifiers and document
+types are registered from them, depends on its country. The
+[country-specific getting started guides](/getting-started) list the exact fields
+per country: [Belgium](/getting-started/belgium), [France](/getting-started/france),
+the [Netherlands](/getting-started/netherlands) and
+[every other supported country](/getting-started/other).
 
 ## Retrieving a Company
 

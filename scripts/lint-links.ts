@@ -6,6 +6,7 @@ import {
   scanURLs,
   validateFiles,
 } from "next-validate-link";
+import { allAnswers, countries } from "../src/lib/country-guides-data";
 
 function extractHeadings(content: string): string[] {
   const headingRegex = /^#{1,6}\s+(.+)$/gm;
@@ -43,6 +44,7 @@ function getFolderSlugs(contentDir: string): string[][] {
 
 async function checkLinks() {
   const docsFiles = await readFiles("content/docs/**/*.{md,mdx}");
+  const guideFragmentFiles = await readFiles("content/guides/**/*.{md,mdx}");
   const referenceFiles = await readFiles("content/reference/**/*.{md,mdx}");
   const integrationsFiles = await readFiles(
     "content/integrations/**/*.{md,mdx}"
@@ -73,10 +75,29 @@ async function checkLinks() {
         value: toSlugs("content/integrations", file.path),
         hashes: extractHeadings(file.content),
       })),
-      "(docs)/changelog/[[...slug]]": changelogFiles.map((file) => ({
-        value: toSlugs("content/changelog", file.path),
-        hashes: extractHeadings(file.content),
+      "(docs)/changelog/[[...slug]]": [
+        // The changelog index has no file of its own: the route renders it for
+        // the empty slug.
+        { value: [] },
+        ...changelogFiles.map((file) => ({
+          value: toSlugs("content/changelog", file.path),
+          hashes: extractHeadings(file.content),
+        })),
+      ],
+      // Straight from the guide model, so a new country or direction is covered
+      // here the moment it exists.
+      "(docs)/getting-started/[country]": countries.map((country) => ({
+        value: { country: country.id },
       })),
+      "(docs)/getting-started/[country]/[audience]/[direction]": allAnswers().map(
+        (answers) => ({
+          value: {
+            country: answers.country.id,
+            audience: answers.audience.id,
+            direction: answers.direction.id,
+          },
+        }),
+      ),
       "(docs)/faq/[category]/[slug]": faqFiles.map((file) => {
         const parts = toSlugs("content/faq", file.path);
         return {
@@ -89,6 +110,7 @@ async function checkLinks() {
 
   const allFiles = [
     ...docsFiles,
+    ...guideFragmentFiles,
     ...referenceFiles,
     ...integrationsFiles,
     ...changelogFiles,

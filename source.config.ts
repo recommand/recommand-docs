@@ -37,6 +37,23 @@ export const changelog = defineCollections({
   },
 });
 
+/**
+ * Fragments of the country-specific getting started guide. These are not pages
+ * of their own: `src/lib/country-guides.ts` chains a subset of them together
+ * per answer combination, and the guide route renders the chain as one page.
+ */
+export const guideFragments = defineCollections({
+  type: "doc",
+  dir: "content/guides",
+  schema: z.object({
+    /** Short label for the fragment, only used by contributors. */
+    title: z.string(),
+  }),
+  postprocess: {
+    includeProcessedMarkdown: true,
+  },
+});
+
 export const faq = defineDocs({
   dir: "content/faq",
   docs: {

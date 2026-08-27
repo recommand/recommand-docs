@@ -1,0 +1,64 @@
+---
+title: Sending from your own company
+---
+
+## Send a document
+
+One endpoint sends everything: [`POST
+/:companyId/send`](/reference/sending/send-document). The `companyId` is the
+sender, `recipient` is the Peppol address of the receiver, and `document` is the
+invoice or credit note as JSON. Recommand will validate the document and generate the XML.
+
+<Callout type="info" title="Already producing UBL or CII XML?">
+  Raw XML sending is supported as well: set `documentType` to `xml` and pass the
+  document string in `document`, along with the correct `doctypeId`. See [working
+  with raw UBL](/docs/ubl-format-guide#working-with-raw-ubl).
+</Callout>
+
+<include cwd lang="bash">content/samples/send-invoice.sh</include>
+
+<include cwd lang="json" meta='title="send-invoice.json"'>content/samples/send-invoice.json</include>
+
+The seller block is filled in from your company when you leave it out, which is
+usually what you want: it keeps your registered identifiers and the document in
+agreement. The full field reference lives in [sending
+invoices](/docs/sending-invoices) and [sending credit
+notes](/docs/sending-credit-notes).
+
+Worth wiring up while you are here:
+
+- **Validation errors.** Outgoing documents are always validated. A `success:
+  false` response with `errors` keyed by field path is a document the recipient
+  would have rejected — surface it wherever the data was typed.
+- **Email fallback.** Pass `email.to` with `when: "on_peppol_failure"` to fall
+  back to email when a recipient turns out not to be reachable over Peppol, or
+  send with `recipient: null` for email-only delivery. See [email delivery and
+  notifications](/docs/email-delivery-and-notifications).
+- **PDFs.** `pdfGeneration.enabled` attaches a generated PDF of the document.
+  You can also attach an existing PDF (or other files) via `attachments`; see
+  [adding attachments](/docs/sending-invoices#adding-attachments).
+
+For a full field reference, see [sending invoices](/docs/sending-invoices) and
+[sending credit notes](/docs/sending-credit-notes).
+
+### Sending without writing code
+
+The same send is available two other ways, and they mix freely with the API:
+
+- **From the dashboard.** [Send document](https://app.recommand.eu/send-document)
+  takes the recipient and the invoice lines, previews what the recipient will
+  get, and remembers your usual settings. You can also drop an existing UBL or
+  CII XML file into the upload zone if your software already produces one.
+- **From your accounting or invoicing software.** If you use one of the supported
+  tools, let it do the work: your invoices flow to Recommand and out over Peppol
+  without retyping. See [integrations](/integrations) for the current list,
+  including Microsoft Business Central, Exact Online, Yuki, ClearFacts, ERPNext
+  and Harvest.
+
+<Callout type="info" title="Every outgoing document is validated">
+  Whichever route you use, Recommand validates a document before it leaves. If a
+  field is missing or malformed you get a clear error instead of a rejection from
+  the recipient days later. See the [troubleshooting
+  guide](/docs/troubleshooting-guide) for the errors you are most likely to run
+  into.
+</Callout>

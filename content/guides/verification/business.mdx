@@ -1,0 +1,23 @@
+---
+title: Verification for a single company
+---
+
+### Verifying once, in the dashboard
+
+You have one company, and it is verified once. There is nothing here worth
+automating: open [Companies](https://app.recommand.eu/companies) in the
+dashboard, pick the company and start verification. If you are authorised to act
+for the company, complete the check yourself; otherwise use the button to forward
+the link to whoever is.
+
+The page is self-contained and works in any browser — the person completing it
+does not need a Recommand account.
+
+That is the whole step. From here on the API takes over: sending and receiving
+documents is what you actually integrate.
+
+<Callout type="warn" title="Changing identifiers resets verification">
+  Updating the company's `vatNumber` or `enterpriseNumber` sets `isVerified` back
+  to `false`, and the company has to be verified again before it can exchange
+  documents.
+</Callout>

@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/letterhead";
 import { getAllFaq, getCategoryLabel } from "@/lib/faq";
 import { Eyebrow, hairline } from "./faq-ui";
 
@@ -32,12 +33,7 @@ export default function FaqIndex() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={faqJsonLd} />
 
       {/* Letterhead */}
       <header className={`grain relative w-full overflow-hidden border-b ${hairline}`}>

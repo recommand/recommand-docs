@@ -1,0 +1,25 @@
+---
+title: Country context - Belgium
+---
+
+## Peppol in Belgium
+
+Belgium runs on the standard European Peppol stack, which makes it the simplest
+of all countries to start in. Documents are exchanged as **Peppol BIS 3
+UBL**, over the standard Peppol billing process, and Recommand's own access
+point and SMP handle both directions.
+
+What is specific to Belgium:
+
+- **The B2B mandate is already in force.** Since 1 January 2026 Belgian
+  companies must be able to send and receive structured electronic invoices for
+  domestic B2B transactions. See [what if I don't switch to
+  Peppol](/faq/sending-and-error-handling/what-if-i-dont-switch-to-peppol-by-2026)
+  for what non-compliance means in practice.
+- **Enterprise numbers are the Peppol address.** Belgian companies are published
+  under scheme `0208` (enterprise number), which is why a Belgian Peppol address
+  looks like `0208:0123456789`. Sometimes, scheme `9925` is used as well, which is 
+  followed by a Belgian VAT number, like this: `9925:BE0123456789`.
+- **Representatives are checked against the CBE.** During verification, the name given for the representative is matched against the company's
+  registered representatives in the Crossroads Bank for Enterprises, so a name
+  that is not authorised is refused up front.

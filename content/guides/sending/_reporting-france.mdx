@@ -1,0 +1,46 @@
+---
+title: French B2C e-reporting
+---
+
+## Report B2C transactions
+
+Invoices cover business customers within France. For sales to private individuals or international B2B customers, France
+expects daily totals instead, and Recommand files them for you through `POST
+/:companyId/reporting/fr/b2c`. You never build a regulatory file yourself.
+
+```json
+{
+  "reference": "B2C-SALES-2026-08-17-GOODS",
+  "type": "sales",
+  "date": "2026-08-17",
+  "category": "goods",
+  "currency": "EUR",
+  "taxExclusiveAmount": "10000.00",
+  "taxAmount": "2000.00",
+  "transactionCount": 42,
+  "vatBreakdown": [
+    { "percentage": "20.00", "taxableAmount": "10000.00", "taxAmount": "2000.00" }
+  ]
+}
+```
+
+- **Sales reports** (`type: "sales"`) carry the normal daily totals, one per day
+  and category, regardless of when customers pay. Taxable goods and taxable
+  services are supported.
+- **Payment reports** (`type: "payment"`) are an extra report for services on
+  cash-basis VAT (*TVA sur les encaissements*), submitted for the day the payment
+  is received. Do not send them for goods, or for services where VAT is due on
+  invoicing (*TVA sur les débits*).
+- **`reference` makes retries safe.** Reuse it only to retry the exact same
+  request; use a new one, together with the optional `action` field, to correct or
+  cancel an earlier daily report.
+
+A submitted report is stored alongside your sent documents and counts towards your
+document quota.
+
+<Callout type="info" title="Only for French companies, API only">
+  B2C reporting is available for companies registered in France and needs a valid
+  nine-digit SIREN on the company. It is submitted through the API; if you need it
+  without building an integration, contact
+  [support@recommand.eu](mailto:support@recommand.eu).
+</Callout>

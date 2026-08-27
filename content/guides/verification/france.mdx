@@ -1,0 +1,41 @@
+---
+title: Verifying a French company
+---
+
+## Sign the mandate and verify the company
+
+French companies go through the same identity check as everyone else, plus two
+steps that are specific to France: the representative signs a mandate, and the
+resulting file is reviewed before the company goes live.
+
+1. Open the verification URL (from the create-company response, the dashboard, or
+   a fresh one from the [verify company
+   endpoint](/reference/companies/verify-company)).
+2. **Read and sign the mandate.** The verification page shows the mandate that
+   authorises the French-accredited platform to act for the company on the Peppol
+   network, naming the company by its SIREN and the establishment it is filed
+   under. The representative accepts it before the identity check starts.
+3. **Complete the identity check.** The identity verification is what signs the
+   mandate: the proof reference is recorded on it.
+4. **Wait for the review.** The signed mandate and the company's details are filed
+   with the accredited platform, and the verification sits in review until that
+   file is accepted. Only then does `isVerified` become `true` and the company
+   start operating.
+
+
+In some cases manual verification by our team will be required.
+If that's the case, `isVerified` will remain `false` until this manual verification is completed.
+The user is informed of this in the verification process.
+
+<Callout type="warn" title="Plan the review in">
+  This is the one step of French onboarding that is not immediate. Start
+  verification as soon as the company is created, and do not promise your users a
+  same-minute go-live for France. If a file seems stuck, mail
+  [support@recommand.eu](mailto:support@recommand.eu) with the company ID.
+</Callout>
+
+<Callout type="info" title="Playgrounds skip the mandate">
+  Companies in a playground team are never filed with the accredited platform, so
+  there is no mandate and no review. Test the French flow in a playground first,
+  then run the real thing once.
+</Callout>

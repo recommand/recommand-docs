@@ -1,0 +1,50 @@
+---
+title: French identifiers
+---
+
+### French identifiers and Peppol address
+
+In France the identifier you register decides whether your
+documents will pass validation later, so it is worth getting exactly right.
+
+| Field                    | French value                                                    |
+| ------------------------ | --------------------------------------------------------------- |
+| `country`                | `"FR"`                                                          |
+| `enterpriseNumber`       | The nine-digit **SIREN** of the company                          |
+| `enterpriseNumberScheme` | `"0002"`                                                        |
+| `vatNumber`              | `FR` + the French VAT number                                     |
+
+```json title="company.json"
+{
+  "name": "Société de Test SAS",
+  "address": "10 rue de la Paix",
+  "postalCode": "75002",
+  "city": "Paris",
+  "country": "FR",
+  "enterpriseNumber": "133512194",
+  "enterpriseNumberScheme": "0002",
+  "vatNumber": "FR23133512194"
+}
+```
+
+<Callout type="warn" title="Use the SIREN with scheme 0002">
+  French regulated invoices must carry the seller's nine-digit SIREN as
+  `enterpriseNumber` with `enterpriseNumberScheme` `"0002"`. Because the seller
+  block of a document defaults to the company's own details, a company registered
+  with a SIRET or without the scheme produces invoices that are rejected at
+  validation time. Register the SIREN, and name a specific establishment through
+  the document's `delivery.locationIdentifier` (scheme `0009`) when you need to.
+</Callout>
+
+One Peppol identifier is registered for the company:
+
+- `0225:133512194` — the French electronic address
+
+The company's Peppol address is therefore **`0225:` followed by the SIREN**.
+French addresses may also carry a routing suffix, as in
+`0225:987654321_STATUTS`; treat the whole string after the scheme as the
+identifier when a recipient gives you one.
+
+Both SIREN (9 digits) and SIRET (14 digits) are checked with the Luhn algorithm
+before they are filed, and numbers that disagree with each other are refused
+rather than guessed at.

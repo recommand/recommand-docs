@@ -1,0 +1,54 @@
+---
+title: Receiving into your own company
+---
+
+## Pick up incoming documents
+
+Once the company is published as a recipient, everything sent to it arrives in
+Recommand automatically. There are two ways to get the documents into your own systems.
+
+### Webhooks (recommended)
+
+Register an endpoint once with the [create webhook
+endpoint](/reference/webhooks/create-webhook) and events are pushed to you as
+they happen, `document.received` among them:
+
+<include cwd lang="bash">content/samples/create-webhook.sh</include>
+
+<include cwd lang="json" meta='title="create-webhook.json"'>content/samples/create-webhook.json</include>
+
+Pass a `secret` and verify the HMAC SHA-256 signature on every delivery before
+you trust the payload, then acknowledge with a 200 before doing the heavy
+processing. Both are covered in [working with
+webhooks](/docs/working-with-webhooks).
+
+### Polling the inbox
+
+If you would rather pull, the [inbox endpoint](/reference/documents/get-inbox)
+lists unread documents, and [mark as
+read](/reference/documents/mark-as-read) drops one off the list once your system
+has it. Fetch details, the original XML or a rendered PDF from the [documents
+endpoints](/reference/documents/get-document).
+
+### Receiving without writing code
+
+- **In the dashboard.** Incoming invoices appear under
+  [Sent and received](https://app.recommand.eu/transmitted-documents), with the original
+  XML, a readable rendering, attachments and the delivery history.
+- **By email.** Add notification email addresses per company so incoming
+  documents land in the mailbox your bookkeeping already watches, attachments
+  included. See [email delivery and
+  notifications](/docs/email-delivery-and-notifications).
+- **In your accounting software.** Forward incoming documents straight to Exact
+  Online, Yuki, ClearFacts or another supported tool, see
+  [integrations](/integrations).
+
+Two things worth setting up early, whichever route you take:
+
+- **Labels and suppliers** to keep documents organised as volume grows, see
+  [suppliers and labels](/docs/suppliers-and-labels).
+- **Rules** to act on incoming documents automatically: forwarding, labelling,
+  notifying, see [rules](/docs/rules).
+
+The full picture, including retries and idempotency, is in [receiving
+documents](/docs/receiving-documents).

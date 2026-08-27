@@ -1,0 +1,33 @@
+---
+title: Registering your company
+---
+
+## Register the company
+
+You are registering one company, once, so the dashboard is the shortest path.
+
+1. Open [Companies](https://app.recommand.eu/companies) and start the company
+   wizard.
+2. Fill in the legal name, address and country, plus the identifiers described in
+   the next section.
+3. Choose whether the company should also **receive** documents over Peppol, or
+   only send them.
+4. Save. The company is registered on the Peppol network as part of this step:
+   its identifiers and the document types for its country are set up for you.
+
+Right after saving, the dashboard offers the verification step, which the section
+below covers. Note the company's ID from its detail page — every API call for
+sending and receiving takes it in the path.
+
+<Callout type="info" title="Rather create it from code?">
+  The [create company endpoint](/reference/companies/create-company) does exactly
+  the same thing, and returns the company `id` and a `verificationUrl` in one
+  response. It is worth using when company creation is part of a flow you are
+  automating — which is likely the case if you are registering many companies.
+  Switch the first answer above to **Many companies** for that version.
+</Callout>
+
+<Callout type="info" title="More than one entity?">
+  Add each legal entity as its own company: run the wizard again. There is no
+  per-company fee, and all of them share your document volume.
+</Callout>

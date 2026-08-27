@@ -10,7 +10,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --fix .",
     "format": "biome format --write .",
-    "lint:links": "bun run scripts/lint-links.ts"
+    "lint:links": "bun run scripts/lint-links.ts",
+    "lint:guides": "bun run scripts/lint-guides.ts"
   },
   "dependencies": {
     "ajv": "^8.18.0",

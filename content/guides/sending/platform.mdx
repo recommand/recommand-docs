@@ -1,0 +1,67 @@
+---
+title: Sending for many companies
+---
+
+## Send a document
+
+One endpoint sends everything: [`POST
+/:companyId/send`](/reference/sending/send-document). The `companyId` is the
+sender, `recipient` is the Peppol address of the receiver, and `document` is the
+invoice or credit note as JSON. Recommand will validate the document and generate the XML.
+
+<Callout type="info" title="Already producing UBL or CII XML?">
+  Raw XML sending is supported as well: set `documentType` to `xml` and pass the
+  document string in `document`, along with the correct `doctypeId`. See [working
+  with raw UBL](/docs/ubl-format-guide#working-with-raw-ubl).
+</Callout>
+
+<Tabs items={['Node.js', 'cURL']} groupId="language" persist>
+  <Tab value="Node.js">
+
+```javascript
+const response = await fetch(
+  `https://app.recommand.eu/api/v1/${companyId}/send`,
+  {
+    method: "POST",
+    headers: { Authorization: auth, "Content-Type": "application/json" },
+    // The body below, with doctypeId and countrySpecific where the country
+    // needs them.
+    body: JSON.stringify(sendRequest),
+  }
+);
+
+const result = await response.json();
+if (!result.success) {
+  // result.errors is keyed by field path, e.g. { "buyer.vatNumber": [...] }
+}
+```
+
+  </Tab>
+  <Tab value="cURL">
+
+<include cwd lang="bash">content/samples/send-invoice.sh</include>
+
+  </Tab>
+</Tabs>
+
+<include cwd lang="json" meta='title="send-invoice.json"'>content/samples/send-invoice.json</include>
+
+The seller block is filled in from the company when you leave it out, which is
+usually what you want: it keeps the company's registered identifiers and the
+document in agreement.
+
+Things worth wiring up while you are here:
+
+- **Validation errors.** Outgoing documents are always validated. A `success:
+  false` response with `errors` keyed by field path is a document your recipient
+  would have rejected, so surface it to the user who typed the data.
+- **Email fallback.** Pass `email.to` with `when: "on_peppol_failure"` to fall
+  back to email when a recipient turns out not to be reachable over Peppol, or
+  send with `recipient: null` for email-only delivery. See [email delivery and
+  notifications](/docs/email-delivery-and-notifications).
+- **PDFs.** `pdfGeneration.enabled` attaches a generated PDF of the document.
+  You can also attach an existing PDF (or other files) via `attachments`; see
+  [adding attachments](/docs/sending-invoices#adding-attachments).
+
+For a full field reference, see [sending invoices](/docs/sending-invoices) and
+[sending credit notes](/docs/sending-credit-notes).

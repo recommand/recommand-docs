@@ -1,0 +1,22 @@
+---
+title: Verifying a company abroad
+---
+
+## Verify the company
+
+A company cannot exchange documents on Peppol until an authorised representative
+has confirmed their identity. The company object exposes this as `isVerified`,
+and it stays `false` until the check is done.
+
+The flow is short:
+
+1. Open the verification URL (from the create-company response, the dashboard, or
+   a fresh one from the [verify company
+   endpoint](/reference/companies/verify-company)).
+2. The representative fills in their name and completes the identity check.
+3. `isVerified` flips to `true` and the company is published on the Peppol
+   network.
+
+In some cases manual verification by our team will be required.
+If that's the case, `isVerified` will remain `false` until this manual verification is completed.
+The user is informed of this in the verification process.

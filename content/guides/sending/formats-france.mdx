@@ -1,0 +1,87 @@
+---
+title: Document formats for France
+---
+
+## Pick the French document format and process
+
+A French invoice needs three decisions: the
+format, the process, and the mandatory French content.
+
+### The format
+
+Name the format with `doctypeId` on the send request. Without it you send plain
+Peppol BIS 3 UBL, which is valid on the network but not what the French reform
+asks for inside its perimeter.
+
+| Format                     | `doctypeId`                                                                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| France UBL CIUS invoice    | `urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:peppol:france:billing:cius:1.0::2.1`   |
+| France UBL CIUS credit note | `urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#compliant#urn:peppol:france:billing:cius:1.0::2.1` |
+| France UBL Extended invoice | `urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#conformant#urn:peppol:france:billing:extended:1.0::2.1` |
+| France CII CIUS            | `urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017#compliant#urn:peppol:france:billing:cius:1.0::D22B` |
+| France CII Extended        | `urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017#conformant#urn:peppol:france:billing:extended:1.0::D22B` |
+| France Factur-X            | `urn:peppol:doctype:pdf+xml##urn:cen.eu:en16931:2017#conformant#urn:peppol:france:billing:Factur-X:1.0::D22B`                                 |
+
+The CII and Factur-X document types carry both invoices and credit notes; the
+`documentType` field of your request decides which one it is.
+
+Start with **France UBL CIUS** unless you have a reason not to. Extended is for
+data the CIUS does not carry, and Factur-X is for recipients who want a
+human-readable PDF as the carrier.
+
+### The process
+
+Set `countrySpecific.businessProcess` to say which side of the French perimeter
+the transaction is on. The document is then sent over the matching process:
+
+| `businessProcess`      | Process identifier                             | Use for                                        |
+| ---------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| `REGULATED` (default)  | `urn:peppol:france:billing:regulated`          | Transactions inside the French perimeter        |
+| `NON_REGULATED`        | `urn:peppol:france:billing:non-regulated`      | Transactions outside it                         |
+
+The recipient must have registered the document type **for that process**. Pass
+the `processId` to the [verify document support
+endpoint](/reference/recipients/verify-document-support) to check exactly that
+combination rather than "any process".
+
+### The mandatory French content
+
+French UBL, CII and Factur-X require a `countrySpecific` block with the billing
+mode and the three statements French invoices must carry. It is required for those
+document types and must be omitted for plain EN 16931 documents.
+
+```json
+{
+  "countrySpecific": {
+    "country": "FR",
+    "billingMode": "S1",
+    "businessProcess": "REGULATED",
+    "recoveryCostsNote": "Indemnité forfaitaire de 40 EUR pour frais de recouvrement.",
+    "latePaymentPenaltiesNote": "Pénalités de retard exigibles au taux prévu dans les conditions générales de vente.",
+    "earlyPaymentDiscountNote": "Aucun escompte accordé pour paiement anticipé."
+  }
+}
+```
+
+`billingMode` follows AFNOR XP Z12-012. The common ones are `B1` (goods), `S1`
+(services) and `M1` (mixed); the full list, including already-paid, advance
+payment, subcontracting and multi-seller variants, is documented on the [send
+document endpoint](/reference/sending/send-document).
+
+### Invoicing outside France
+
+The French formats and processes are for the French perimeter. A counterparty in
+another country is registered for the **standard** Peppol billing process, so a
+regulated document does not match anything they published.
+
+For those invoices, send plain Peppol BIS 3 UBL and leave
+the `countrySpecific` block out with it, it belongs to the French document types
+only. The rest of the invoice is unchanged.
+
+<Callout type="warn" title="Three rules that reject a French invoice">
+  - The seller's `enterpriseNumber` must be the nine-digit SIREN with
+    `enterpriseNumberScheme` `"0002"`.
+  - The currency must be `EUR`.
+  - Factur-X needs a compliant PDF/A-3 to embed the XML in: either attach one as an embedded
+    attachment, or let Recommand generate it with `pdfGeneration.enabled`.
+</Callout>

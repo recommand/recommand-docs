@@ -1,5 +1,6 @@
 import { docsSource, changelogSource, faqSource } from "@/lib/source";
 import { getLLMText } from "@/lib/get-llm-text";
+import { allAnswers, guideMarkdown } from "@/lib/country-guides";
 import fs from "fs/promises";
 import path from "path";
 
@@ -59,12 +60,16 @@ export async function GET() {
   ];
 
   const texts = await Promise.all(allPages.map(getLLMText));
+  const guideTexts = await Promise.all(allAnswers().map(guideMarkdown));
   const refTexts = await getReferenceMdTexts();
   const modelTexts = await getModelTexts();
 
-  return new Response([...texts, ...refTexts, ...modelTexts].join("\n\n"), {
-    headers: {
-      "Content-Type": "text/plain",
+  return new Response(
+    [...guideTexts, ...texts, ...refTexts, ...modelTexts].join("\n\n"),
+    {
+      headers: {
+        "Content-Type": "text/plain",
+      },
     },
-  });
+  );
 }

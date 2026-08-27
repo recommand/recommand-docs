@@ -1,7 +1,7 @@
 ---
 title: French invoice lifecycle statuses (CDAR)
 description: A new frenchInvoicingCdar document type lets you send and receive French invoice lifecycle statuses, such as received, approved, refused, or paid.
-date: 2026-08-17
+date: 2026-08-28
 ---
 
 French regulated invoicing requires trading partners to report back on the invoices they receive. Recommand now supports these lifecycle status messages (CDAR) as a first-class document type.
@@ -19,4 +19,4 @@ Reporting the status of an invoice back to its sender is mandatory inside the Fr
 ### What you need to do
 
 Nothing if you do not exchange French regulated documents. Otherwise, send a `frenchInvoicingCdar` document for the invoices you receive and process, and handle incoming ones in your webhook the way you already handle message level responses.
-For outgoing invoices, you do not need to send CDAR statuses yourself in normal circumstances, we automatically send them for you.
+When you receive a French invoice, Recommand automatically sends the `202` (received) and `203` (made available) statuses back to the sender; you still send the later processing statuses yourself.
