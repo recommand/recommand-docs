@@ -9,9 +9,14 @@ format, the process, and the mandatory French content.
 
 ### The format
 
-Name the format with `doctypeId` on the send request. Without it you send plain
-Peppol BIS 3 UBL, which is valid on the network but not what the French reform
-asks for inside its perimeter.
+Name the format with `doctypeId` on the send request. Leave it off and the
+recipient is looked up and the document written in the first format, in [our
+order of
+preference](/changelog/2026-08-28-automatic-document-format-routing), they are
+registered to receive. Peppol BIS 3 UBL comes first in that order, so a French
+recipient who publishes it as well receives plain BIS 3: valid on the network,
+but not what the French reform asks for inside its perimeter. Name the French
+format you want for transactions inside the perimeter.
 
 | Format                     | `doctypeId`                                                                                                                                  |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |

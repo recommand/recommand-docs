@@ -11,7 +11,7 @@ Sending a JSON invoice used to always produce Peppol BIS 3 UBL unless you named 
 - **Automatic format selection**: Leave `doctypeId` off and the document is written as the first format, in our order of preference, the recipient is registered to receive.
 - **Automatic process selection**: Leave `processId` off and the process the recipient registered for that format is preferred, as far as the document itself leaves the choice open. A French invoice only travels over the regulated or non-regulated process its `countrySpecific.businessProcess` names; the other one is not treated as a fallback.
 - **Overrides still win**: Pass both `doctypeId` and `processId` and they are used as-is, with no lookup. Pass only one and routing happens inside that constraint: a named format still chooses the process the recipient registered, a named process still chooses a format published for it.
-- **Raw XML and generate-XML remain unchanged**: A document you already supply as XML is one specific format, so it is not rerouted. The [generate XML endpoint](/changelog/2026-08-17-generate-xml-endpoint) still writes the default format, because there is no transmission to route.
+- **Raw XML and generate-XML remain unchanged**: A document you already supply as XML is one specific format, so it is not rerouted. The [generate XML endpoint](/changelog/2026-08-28-generate-xml-endpoint) still writes the default format, because there is no transmission to route.
 
 ### Why this matters
 
