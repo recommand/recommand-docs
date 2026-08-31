@@ -58,6 +58,19 @@ A refusal, partial approval or dispute carries a coded reason (`DOUBLON`,
 knows what to fix. The full status and reason lists are on the [send document
 endpoint](/reference/sending/send-document).
 
+## Report collection on the invoices you sent
+
+`212` (collected) runs the other way: it is the seller who reports that a payment
+came in. It carries `collectedAmounts`, at least one entry naming an `amount`,
+its `currency` and the `vatPercent` it falls under. A disbursement is expressed
+as a negative amount.
+
+`212` is not a terminal status. An invoice settled in several instalments gets
+one `212` per payment received, each carrying only the amount of that payment
+rather than the running total. Successive messages are told apart by the CDAR's
+own `id`, generated for you when you leave it off, with `statusDate` naming the
+moment of collection and `issueDate` the moment the message was written.
+
 Incoming CDAR messages are parsed, stored and shown next to your other documents,
 and delivered through your existing webhooks and notifications — so this is also
 how you learn what your customers did with the invoices you sent them, including
