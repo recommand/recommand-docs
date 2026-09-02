@@ -1,6 +1,33 @@
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 
+// Guide pages moved under /docs/ in the July 2026 redesign. External sites
+// still link the old bare paths - grokipedia.com (DR 78) points at
+// /ubl-format-guide and tradecentric.com at /peppol-standards-and-compliance,
+// both of which have been 404ing since. Kept as an explicit list rather than a
+// catch-all so it cannot shadow /changelog, /faq, /guides, /integrations,
+// /reference or /samples.
+const legacyDocSlugs = [
+  "authentication",
+  "company-verification",
+  "discounts-and-surcharges",
+  "email-delivery-and-notifications",
+  "financial-discounts",
+  "managing-companies",
+  "peppol-network-basics",
+  "peppol-standards-and-compliance",
+  "receiving-documents",
+  "rules",
+  "self-billing",
+  "sending-credit-notes",
+  "sending-invoices",
+  "suppliers-and-labels",
+  "troubleshooting-guide",
+  "ubl-format-guide",
+  "verifying-recipients",
+  "working-with-webhooks",
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
@@ -14,6 +41,34 @@ const nextConfig: NextConfig = {
       {
         source: "/api-reference",
         destination: "/reference",
+        permanent: true,
+      },
+      // Pre-redesign guide URLs.
+      ...legacyDocSlugs.map((slug) => ({
+        source: `/${slug}`,
+        destination: `/docs/${slug}`,
+        permanent: true,
+      })),
+      // The authentication guide was also renamed.
+      {
+        source: "/authentication-guide",
+        destination: "/docs/authentication",
+        permanent: true,
+      },
+      {
+        source: "/docs/authentication-guide",
+        destination: "/docs/authentication",
+        permanent: true,
+      },
+      // The changelog moved out from under /docs/.
+      {
+        source: "/docs/changelog",
+        destination: "/changelog",
+        permanent: true,
+      },
+      {
+        source: "/docs/changelog/:path*",
+        destination: "/changelog/:path*",
         permanent: true,
       },
     ];
