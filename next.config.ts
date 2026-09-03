@@ -2,11 +2,9 @@ import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 
 // Guide pages moved under /docs/ in the July 2026 redesign. External sites
-// still link the old bare paths - grokipedia.com (DR 78) points at
-// /ubl-format-guide and tradecentric.com at /peppol-standards-and-compliance,
-// both of which have been 404ing since. Kept as an explicit list rather than a
-// catch-all so it cannot shadow /changelog, /faq, /guides, /integrations,
-// /reference or /samples.
+// still link the old bare paths, so those need to keep resolving. Kept as an
+// explicit list rather than a catch-all on /:slug, which would shadow
+// /changelog, /faq, /guides, /integrations, /reference and /samples.
 const legacyDocSlugs = [
   "authentication",
   "company-verification",
