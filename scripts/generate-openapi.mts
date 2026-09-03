@@ -132,8 +132,7 @@ for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
 // fumadocs' generateFiles puts the operation description in the body and in
 // _openapi.structuredData, but never in a `description` frontmatter field. The
 // reference page reads page.data.description for its meta tag, so without this
-// every endpoint page shipped without one - 84 of them, per the Site Audit
-// crawl of 2026-09-03.
+// every endpoint page ships without one.
 for (const [key, summary] of Object.entries(operationSummaries)) {
   const file = path.join(REFERENCE_DIR, `${key}.mdx`);
   if (!fs.existsSync(file)) continue;
