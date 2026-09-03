@@ -183,7 +183,7 @@ async function unassignLabelFromDocument(documentId, labelId) {
 
 ## Webhook Events for Routing
 
-Use webhooks to react in real-time when labels change. See [Webhooks CRUD](/reference/webhooks).
+Use webhooks to react in real-time when labels change. See [Webhooks CRUD](/reference/webhooks/get-webhooks).
 
 Relevant label events:
 
@@ -258,13 +258,13 @@ app.post("/peppol-webhook", async (req, res) => {
   <Card href="/docs/working-with-webhooks" title="Working with Webhooks">
     Set up webhooks and process document events.
   </Card>
-  <Card href="/reference/suppliers" title="Suppliers API">
+  <Card href="/reference/suppliers/get-suppliers" title="Suppliers API">
     Upsert, list, and manage suppliers.
   </Card>
-  <Card href="/reference/labels" title="Labels API">
+  <Card href="/reference/labels/get-labels" title="Labels API">
     Create and manage labels.
   </Card>
-  <Card href="/reference/documents" title="Documents API">
+  <Card href="/reference/documents/get-documents" title="Documents API">
     Label documents, download packages, and more.
   </Card>
 </Cards>

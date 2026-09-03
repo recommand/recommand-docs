@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import {
   printErrors,
@@ -30,18 +29,6 @@ function toSlugs(basedir: string, filePath: string): string[] {
   return parts;
 }
 
-/** Find subdirectories that act as fumadocs folder pages. */
-function getFolderSlugs(contentDir: string): string[][] {
-  const slugs: string[][] = [];
-  const entries = fs.readdirSync(contentDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      slugs.push([entry.name]);
-    }
-  }
-  return slugs;
-}
-
 async function checkLinks() {
   const docsFiles = await readFiles("content/docs/**/*.{md,mdx}");
   const guideFragmentFiles = await readFiles("content/guides/**/*.{md,mdx}");
@@ -52,11 +39,6 @@ async function checkLinks() {
   const changelogFiles = await readFiles("content/changelog/**/*.{md,mdx}");
   const faqFiles = await readFiles("content/faq/**/*.{md,mdx}");
 
-  // Folder slugs for fumadocs category/group pages (no index file but valid URLs)
-  const referenceFolderSlugs = getFolderSlugs("content/reference").map(
-    (slug) => ({ value: slug })
-  );
-
   const scanned = await scanURLs({
     preset: "next",
     populate: {
@@ -64,13 +46,14 @@ async function checkLinks() {
         value: toSlugs("content/docs", file.path),
         hashes: extractHeadings(file.content),
       })),
-      "(docs)/reference/[[...slug]]": [
-        ...referenceFiles.map((file) => ({
-          value: toSlugs("content/reference", file.path),
-          hashes: extractHeadings(file.content),
-        })),
-        ...referenceFolderSlugs,
-      ],
+      // Only real files. A category folder such as /reference/companies is not
+      // a page: generate-openapi.mts writes a meta.json for the sidebar and
+      // deletes any index.mdx, so those URLs 404. Registering them as valid is
+      // what let eight broken links reach production.
+      "(docs)/reference/[[...slug]]": referenceFiles.map((file) => ({
+        value: toSlugs("content/reference", file.path),
+        hashes: extractHeadings(file.content),
+      })),
       "(docs)/integrations/[[...slug]]": integrationsFiles.map((file) => ({
         value: toSlugs("content/integrations", file.path),
         hashes: extractHeadings(file.content),

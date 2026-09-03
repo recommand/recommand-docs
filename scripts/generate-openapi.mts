@@ -98,8 +98,22 @@ await generateFiles({
   },
 });
 
+/** First sentence of a description, collapsed to one line and capped at 155
+ * characters so it fits a meta description without being truncated by Google. */
+function firstSentence(text?: string): string {
+  if (!text) return "";
+  const flat = text.replace(/\s+/g, " ").trim();
+  const end = flat.search(/\.\s|\.$/);
+  const sentence = end === -1 ? flat : flat.slice(0, end + 1);
+  if (sentence.length <= 155) return sentence;
+  const cut = sentence.slice(0, 155);
+  return `${cut.slice(0, cut.lastIndexOf(" "))}...`;
+}
+
 // Build ordered list of operation slugs per tag from the spec
 const tagOperations: Record<string, string[]> = {};
+// tag/slug -> the one-line summary used as the page's meta description
+const operationSummaries: Record<string, string> = {};
 for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
   for (const [method, op] of Object.entries(methods as Record<string, any>)) {
     if (!op?.tags) continue;
@@ -109,8 +123,30 @@ for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
       const tagSlug = tag.replace(/\s+/g, "-").toLowerCase();
       if (!tagOperations[tagSlug]) tagOperations[tagSlug] = [];
       tagOperations[tagSlug].push(slug);
+      const summary = firstSentence(op.description) || op.summary || "";
+      if (summary) operationSummaries[`${tagSlug}/${slug}`] = summary;
     }
   }
+}
+
+// fumadocs' generateFiles puts the operation description in the body and in
+// _openapi.structuredData, but never in a `description` frontmatter field. The
+// reference page reads page.data.description for its meta tag, so without this
+// every endpoint page shipped without one - 84 of them, per the Site Audit
+// crawl of 2026-09-03.
+for (const [key, summary] of Object.entries(operationSummaries)) {
+  const file = path.join(REFERENCE_DIR, `${key}.mdx`);
+  if (!fs.existsSync(file)) continue;
+
+  const content = fs.readFileSync(file, "utf8");
+  if (/^description:/m.test(content)) continue;
+
+  const escaped = summary.replace(/"/g, '\\"');
+  const updated = content.replace(
+    /^(---\ntitle: .*\n)/,
+    `$1description: "${escaped}"\n`,
+  );
+  if (updated !== content) fs.writeFileSync(file, updated);
 }
 
 // Write root meta.json with ordered pages
