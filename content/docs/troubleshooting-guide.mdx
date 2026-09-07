@@ -128,17 +128,26 @@ async function verifyWithRetry(peppolAddress, maxRetries = 3) {
 
 ### Validation Errors
 
-If document validation fails when using the [send document endpoint](/reference/sending/send-document):
+If document validation fails when using the [send document endpoint](/reference/sending/send-document), the response is **HTTP 400**. The document is not sent and the attempt does not count toward your usage:
 
 ```json
 {
   "success": false,
   "errors": {
-    "invoiceNumber": ["Invoice number is required"],
-    "buyer.vatNumber": ["Invalid VAT number format"]
+    "root": [
+      "Document validation failed. Please ensure your document complies with all requirements (e.g. EN16931, PEPPOL BIS 3.0, etc.).",
+      "PEPPOL-EN16931-R020: Seller electronic address MUST be provided."
+    ],
+    "buyer.vatNumber": ["BR-CO-09: The Seller VAT identifier shall have a prefix in accordance with ISO code ISO 3166-1 alpha-2."]
   }
 }
 ```
+
+`errors` is keyed by the field the error maps to; `root` is always present and carries the general message plus every error that has no field mapping. Each message starts with the validation rule identifier when the validator reports one, so you can look the rule up in the Peppol BIS Billing or EN 16931 rule lists.
+
+Validation is about structure and rules, not content: a wrong price or a mistyped address passes validation.
+
+HTTP 422 is different: the document was valid but could not be delivered (see [delivery errors](#delivery-errors) below).
 
 **Possible causes and solutions:**
 
@@ -218,21 +227,26 @@ function validateInvoice(invoice) {
 
 ### Delivery Errors
 
-If document delivery fails:
+If the document is valid but cannot be delivered, the response is **HTTP 422**. The document is not sent and the attempt does not count toward your usage:
 
 ```json
 {
   "success": false,
-  "error": "Failed to deliver to recipient's Access Point"
+  "errors": {
+    "root": ["Failed to send document over Peppol network. No additional context available, please contact support@recommand.eu if you could use our help."]
+  }
 }
 ```
+
+A 422 means Recommand did not get a delivery confirmation from the recipient's access point. The body does not carry the other side's status code: an outage, a timeout or an error response on their side all arrive as the same 422. When the recipient is not registered for the document type you sent, the message says so instead.
 
 **Possible causes and solutions:**
 
 1. **Recipient's AP is unavailable**
 
    - This is usually temporary; implement retry logic
-   - Check Peppol network status
+   - Configure [email delivery](/reference/sending/send-document) as a fallback so the document still reaches the recipient
+   - If it persists, contact support with the recipient identifier and the time of the attempt
 
 2. **Document size limits**
    - Reduce attachment sizes or split into multiple documents
@@ -324,11 +338,11 @@ app.post("/peppol-webhook", (req, res) => {
 
 | Error Code | Description                 | Solution                                     |
 | ---------- | --------------------------- | -------------------------------------------- |
-| 400        | Bad Request - Invalid input | Check request payload for errors             |
+| 400        | Bad Request - Invalid input or document validation failed | Check `errors` in the response body |
 | 401        | Unauthorized                | Verify API key and secret                    |
 | 403        | Forbidden                   | Check permissions for the API key            |
 | 404        | Not Found                   | Verify endpoint path and resource IDs        |
-| 422        | Unprocessable Entity        | Fix validation errors in request payload     |
+| 422        | Recipient could not be reached | Retry later; check the recipient's registration; configure email fallback |
 | 429        | Too Many Requests           | Implement rate limiting and backoff strategy |
 | 500        | Server Error                | Contact support if persistent                |
 
