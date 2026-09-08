@@ -2,6 +2,11 @@ import { generateFiles } from "fumadocs-openapi";
 import { createOpenAPI } from "fumadocs-openapi/server";
 import fs from "fs";
 import path from "path";
+import {
+  referenceGroupDescriptions,
+  referenceGroupNames,
+  referenceGroupOrder,
+} from "../src/lib/reference-groups";
 
 // ──────────────────────────────────────────────
 // Shared constants
@@ -11,58 +16,9 @@ const SPEC_URL = "https://app.recommand.eu/openapi";
 const REFERENCE_DIR = "./content/reference";
 const REFERENCE_MD_DIR = "./content/reference-md";
 
-const tagOrder = [
-  "authentication",
-  "sending",
-  "reporting",
-  "recipients",
-  "documents",
-  "companies",
-  "company-identifiers",
-  "company-document-types",
-  "company-notification-email-addresses",
-  "playgrounds",
-  "labels",
-  "suppliers",
-  "customers",
-  "webhooks",
-];
-
-const tagDisplayNames: Record<string, string> = {
-  authentication: "Authentication",
-  sending: "Sending",
-  reporting: "Reporting",
-  recipients: "Recipients",
-  documents: "Documents",
-  companies: "Companies",
-  "company-identifiers": "Company Identifiers",
-  "company-document-types": "Company Document Types",
-  "company-notification-email-addresses": "Notification Emails",
-  playgrounds: "Playgrounds",
-  labels: "Labels",
-  suppliers: "Suppliers",
-  customers: "Customers",
-  webhooks: "Webhooks",
-};
-
-const tagDescriptions: Record<string, string> = {
-  authentication: "Verify authentication and manage API credentials.",
-  sending: "Send Peppol documents such as invoices and credit notes.",
-  reporting:
-    "Register companies for French e-reporting and submit their B2C and cross-border reports.",
-  recipients: "Verify recipient presence on the Peppol network.",
-  documents: "Retrieve, list, and manage sent and received documents.",
-  companies: "Create and manage company profiles.",
-  "company-identifiers": "Manage Peppol identifiers for your companies.",
-  "company-document-types": "Configure supported document types per company.",
-  "company-notification-email-addresses":
-    "Manage notification email addresses for companies.",
-  playgrounds: "Create and manage sandbox environments for testing.",
-  labels: "Organize documents with labels.",
-  suppliers: "Manage supplier records.",
-  customers: "Manage customer records.",
-  webhooks: "Configure webhook endpoints for real-time event notifications.",
-};
+const tagOrder: string[] = [...referenceGroupOrder];
+const tagDisplayNames = referenceGroupNames;
+const tagDescriptions = referenceGroupDescriptions;
 
 function toKebabCase(operationId: string): string {
   return operationId.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
