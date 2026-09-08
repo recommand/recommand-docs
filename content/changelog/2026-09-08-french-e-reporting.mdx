@@ -12,6 +12,7 @@ French companies must report the operations that never travel as an e-invoice: s
 - **B2C reports**: Daily totals of sales to private individuals, one report per day, category and currency, through `POST /:companyId/reporting/fr/b2c`. Companies whose VAT becomes due on payment also report the payments they receive.
 - **Cross-border reports**: Every invoice or credit note to a business outside France, and the payments received on it, through `POST /:companyId/reporting/fr/b2bi`. Buyers in the European Union are identified by their VAT number, buyers elsewhere by their country and name.
 - **Status until filed**: A report is accepted first and filed later, at the end of its reporting period. The `reporting` block on every report in the [documents API](/reference/documents/get-document) shows where it stands, from `accepted` to `filed` or `rejected`, and a `document.reporting_status_changed` webhook event fires on every change.
+- **Lifecycle statuses and your quota**: French transmission statuses (`200` to `203`, `213`, `501`) no longer count towards your document quota, in either direction. Processing statuses such as approved, refused or collected count as one document each, like any business document.
 - **Safe retries, explicit corrections**: Retrying a report with the same `reference` returns the report filed the first time. Corrections and cancellations carry a new reference and an `action`, and act on the day or document they name.
 
 ### Why this matters
