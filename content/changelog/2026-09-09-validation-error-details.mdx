@@ -1,0 +1,20 @@
+---
+title: Clearer validation errors and an aligned reference
+description: Request validation errors now carry success false and every issue per field, the reference describes what each response field means, and the docs were checked against the live API.
+date: 2026-09-09
+---
+
+The API reference and the guides were checked line by line against the API. Most of the work is documentation, but a few responses changed in ways worth knowing.
+
+### What changed
+
+- **Validation errors carry `success: false`.** A request that fails schema validation returns `400` with `success: false`, `errors` keyed by the full field path (for example `document.buyer.vatNumber`) and `invalidInputDetails`, a structured list of the same issues. `success` was missing from these responses before; `errors` and `invalidInputDetails` are unchanged.
+- **Every issue on a field is reported.** When a field fails more than one rule, `errors` now lists each message instead of only the last one.
+- **Unknown type values name the accepted ones.** An unrecognised `documentType`, report `type` or country now produces a message that lists the accepted values. Match on the `errors` key rather than on message text, which is not a contract.
+- **Recipient verification fields are documented as optional.** `verifyRecipient` and `verifyDocumentSupport` return only `isValid: false` when a lookup fails; the reference now says so instead of marking the other fields as always present. The response itself has not changed, but a client generated from the specification will see those fields become optional.
+- **Field descriptions everywhere.** Responses of the companies, documents, webhooks, identifiers and labels endpoints, the invoice model, and the send response now describe every field. The `Reporting` group appears in the reference navigation.
+- **Guides corrected.** Endpoint paths in samples, the validation error and document validation shapes, the attachment examples, the document type list, and the webhook event list (`document.sent` and `document.reporting_status_changed`) now match the API. The FAQ answers what counts towards the document quota.
+
+### What you need to do
+
+Nothing, unless your integration parses validation error messages by their wording, or your client is generated from the OpenAPI specification and assumes the recipient verification fields are always present. Regenerate the client and handle the `isValid: false` case on its own.
