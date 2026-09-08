@@ -62,7 +62,7 @@ To create a new company using the [create company endpoint](/reference/companies
 When creating a new company, it is automatically registered in the Peppol network.
 
 If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents.
-If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to regiter the company even if it is already registered through another Peppol provider for receiving documents.
+If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to register the company even if it is already registered through another Peppol provider for receiving documents.
 
 ```javascript
 async function createCompany(companyData) {
@@ -233,7 +233,7 @@ async function deleteCompany(companyId) {
 }
 
 // Example usage
-const deleteResult = await deleteCompany("your_team_id", "company_id");
+const deleteResult = await deleteCompany("company_id");
 if (deleteResult.success) {
   console.log("Company deleted successfully");
 } else {

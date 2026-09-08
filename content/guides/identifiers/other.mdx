@@ -60,7 +60,7 @@ one](/reference/company-identifiers/delete-company-identifier). Every identifier
 you add is registered in the SMP as another address the company can be reached on.
 
 ```bash
-curl -X POST https://app.recommand.eu/api/v1/{companyId}/identifiers \
+curl -X POST https://app.recommand.eu/api/v1/companies/{companyId}/identifiers \
   -u key_xxx:secret_xxx \
   -H "Content-Type: application/json" \
   -d '{"scheme":"0007","identifier":"5567321707"}'

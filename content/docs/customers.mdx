@@ -1,0 +1,234 @@
+---
+title: Customers
+description: Keep your customer master data in Recommand, upsert it by your own external ID, and look it up when composing outgoing documents with the Recommand API.
+---
+
+This guide explains how to keep customer master data in Recommand: creating and
+updating customers, syncing them by your own identifier, listing and searching
+them, and removing them. Customers are the counterpart of
+[Suppliers](/docs/suppliers-and-labels): suppliers describe who sends you
+documents, customers describe who you send documents to.
+
+## Overview
+
+- **Customers** are supporting data scoped to your team. They hold a name, tax
+  identifiers, one or more Peppol addresses, a postal address and contact
+  details.
+- **`externalId`** lets you carry your own identifier, so you can sync customers
+  from your ERP or accounting system without changing the IDs you already use.
+- **Upsert** means one endpoint creates and updates, so a sync job does not have
+  to know in advance whether a customer already exists.
+
+Customers are a place to keep this data in one shape, next to the documents you
+exchange with them. Sending a document does not read from them: a
+[send](/reference/sending/send-document) call carries the full buyer block. Look
+the customer up first, and build the buyer from what you get back.
+
+### Using customers in the dashboard
+
+You can also view and edit customers from `Supporting data > Customers` in the
+Recommand dashboard. The dashboard and the API work on the same team-scoped
+customers, so changes made either way stay in sync.
+
+## Prerequisites
+
+- A Recommand account with API access
+- Your API key and secret
+
+```javascript
+// Shared auth setup used in examples
+const API_KEY = "your_api_key";
+const API_SECRET = "your_api_secret";
+export const AUTH =
+  "Basic " + Buffer.from(`${API_KEY}:${API_SECRET}`).toString("base64");
+export const BASE_URL = "https://app.recommand.eu/api/v1";
+```
+
+## Customer Fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `id` | No | The internal Recommand ID. Present on every response; send it to update a specific customer |
+| `externalId` | No | Your own identifier for the customer |
+| `name` | Yes | The customer's name |
+| `vatNumber` | No | The VAT number, including its country prefix |
+| `enterpriseNumber` | No | The national registration number, without a country prefix |
+| `peppolAddresses` | No | An array of Peppol addresses. A customer can be reachable on more than one, so this is a list rather than a single value |
+| `address` | Yes | Street address |
+| `city` | Yes | City |
+| `postalCode` | Yes | Postal code |
+| `country` | Yes | Country code, ISO 3166-1 alpha-2 |
+| `email` | No | Contact email address |
+| `phone` | No | Contact phone number |
+
+Responses also carry `teamId`, `createdAt` and `updatedAt`.
+
+## Upsert a Customer
+
+Use the [upsert customer endpoint](/reference/customers/upsert-customer). One
+endpoint covers both creating and updating, and which one happens depends on
+what you send:
+
+- With `id`, the customer with that internal ID is updated.
+- Without `id` but with `externalId`, the customer with that external ID is
+  updated, or created if there is none yet.
+- With neither, a new customer is created.
+
+That third case creates a duplicate every time you run it, so a sync job should
+always send one of the two identifiers.
+
+```javascript
+async function upsertCustomer(data) {
+  const res = await fetch(`${BASE_URL}/customers`, {
+    method: "POST",
+    headers: { Authorization: AUTH, "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+// Sync from your own system, keyed on your identifier
+await upsertCustomer({
+  externalId: "cust_12345",
+  name: "Fabrikam NV",
+  vatNumber: "BE0987654321",
+  peppolAddresses: ["0208:0987654321"],
+  address: "Nieuwstraat 12",
+  city: "Antwerpen",
+  postalCode: "2000",
+  country: "BE",
+  email: "invoicing@fabrikam.example",
+});
+
+// Update a customer you already know the internal ID of
+await upsertCustomer({
+  id: "internal_customer_id",
+  name: "Fabrikam BV",
+  address: "Nieuwstraat 12",
+  city: "Antwerpen",
+  postalCode: "2000",
+  country: "BE",
+});
+```
+
+An upsert replaces the fields you send, so send the whole customer rather than
+just the field that changed.
+
+## Get a Customer
+
+Use the [get customer endpoint](/reference/customers/get-customer). The
+`customerId` in the path accepts either the internal ID or your `externalId`, so
+you can look a customer up with whichever one your system holds.
+
+```javascript
+async function getCustomer(customerIdOrExternalId) {
+  const res = await fetch(
+    `${BASE_URL}/customers/${customerIdOrExternalId}`,
+    { headers: { Authorization: AUTH } }
+  );
+  return res.json();
+}
+
+const { customer } = await getCustomer("cust_12345");
+```
+
+The endpoint returns 404 when nothing matches either ID.
+
+## List and Search Customers
+
+Use the [list customers endpoint](/reference/customers/get-customers). It is
+paginated: `page` starts at 1, `limit` defaults to 10 and accepts up to 100.
+`search` filters on the customer's details.
+
+```javascript
+async function listCustomers({ page = 1, limit = 10, search = "" } = {}) {
+  const url = new URL(`${BASE_URL}/customers`);
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("limit", String(limit));
+  if (search) url.searchParams.set("search", search);
+
+  const res = await fetch(url, { headers: { Authorization: AUTH } });
+  return res.json();
+}
+
+const result = await listCustomers({ search: "Fabrikam" });
+console.log(result.pagination.total, "customers matched");
+```
+
+The response carries `customers` and a `pagination` object with `total`, `page`,
+`limit` and `totalPages`.
+
+## Delete a Customer
+
+Use the [delete customer endpoint](/reference/customers/delete-customer). This
+removes the master data record. Documents you already exchanged with that
+customer are untouched: they carry their own copy of the buyer details.
+
+```javascript
+async function deleteCustomer(customerId) {
+  const res = await fetch(`${BASE_URL}/customers/${customerId}`, {
+    method: "DELETE",
+    headers: { Authorization: AUTH },
+  });
+  return res.json();
+}
+```
+
+## Using a Customer When Sending
+
+Look the customer up and build the buyer block from what comes back:
+
+```javascript
+const { customer } = await getCustomer("cust_12345");
+
+await sendDocument({
+  recipient: customer.peppolAddresses[0],
+  documentType: "invoice",
+  document: {
+    invoiceNumber: "INV-2026-001",
+    issueDate: "2026-09-09",
+    dueDate: "2026-10-09",
+    seller: { /* your company */ },
+    buyer: {
+      name: customer.name,
+      vatNumber: customer.vatNumber,
+      street: customer.address,
+      city: customer.city,
+      postalZone: customer.postalCode,
+      country: customer.country,
+    },
+    lines: [ /* ... */ ],
+  },
+});
+```
+
+A customer can hold several Peppol addresses. If you are not sure which one is
+live, run it past [verify recipient](/docs/verifying-recipients) before you send.
+
+## Best Practices
+
+1. Sync with `externalId` so your own identifiers stay the source of truth and a
+   re-run of your sync updates rather than duplicates.
+2. Send the complete customer on every upsert, because an upsert replaces the
+   fields it receives.
+3. Keep `peppolAddresses` current. An address that was valid when you first
+   stored the customer can move to another provider later.
+4. Look the customer up at send time rather than caching the buyer block, so a
+   corrected VAT number or address takes effect on the next document.
+
+## Next Steps
+
+<Cards>
+  <Card href="/docs/suppliers-and-labels" title="Suppliers and Labels">
+    Keep supplier master data and route incoming documents with labels.
+  </Card>
+  <Card href="/docs/sending-invoices" title="Sending Invoices">
+    Send an invoice to a customer over Peppol.
+  </Card>
+  <Card href="/docs/verifying-recipients" title="Verifying Recipients">
+    Check whether a Peppol address can receive your document.
+  </Card>
+  <Card href="/reference/customers/get-customers" title="Customers API">
+    Upsert, get, list and delete customers.
+  </Card>
+</Cards>

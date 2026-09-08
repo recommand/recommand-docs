@@ -11,7 +11,8 @@
     "lint:fix": "biome check --fix .",
     "format": "biome format --write .",
     "lint:links": "bun run scripts/lint-links.ts",
-    "lint:guides": "bun run scripts/lint-guides.ts"
+    "lint:guides": "bun run scripts/lint-guides.ts",
+    "lint:api-paths": "bun run scripts/lint-api-paths.ts"
   },
   "dependencies": {
     "ajv": "^8.18.0",

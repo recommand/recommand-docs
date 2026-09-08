@@ -28,8 +28,11 @@ What is specific to France:
 - **Mandatory content.** French invoices carry a billing mode and three
   statements (recovery costs, late-payment penalties, early-payment discount)
   that plain EN 16931 does not require. They go in a `countrySpecific` block.
-- **Lifecycle statuses and e-reporting.** Inside the perimeter, receivers report
-  back on the invoices they receive, and B2C or international B2B transactions have to be reported.
+- **Lifecycle statuses.** Inside the perimeter, receivers report back on the
+  invoices they receive with an invoice lifecycle status.
+- **E-reporting.** What falls outside the e-invoicing perimeter is reported
+  instead: B2C sales as daily totals, and invoices to businesses abroad one by
+  one. Recommand files both report types on the company's behalf.
 - **Identifiers are SIREN-based.** French companies are published under scheme
   `0225`.
 

@@ -102,7 +102,6 @@ const invoice = {
 | --------------- | ------------------------------ | ----------------------------------------------------------- |
 | `invoiceNumber` | Your unique invoice identifier | `"INV-2025-001"`                                            |
 | `buyer`         | Recipient company details      | See [Party model](/reference/sending/send-document)               |
-| `paymentMeans`  | Payment instructions           | See [PaymentMeans model](/reference/sending/send-document) |
 | `lines`         | Invoice line items             | See [Line model](/reference/sending/send-document)                 |
 
 #### Optional Fields
@@ -114,6 +113,7 @@ const invoice = {
 | `note`           | General invoice note                          | `"Thank you for your business"`                         |
 | `buyerReference` | Customer's reference number                   | `"PO-2024-001"`                                         |
 | `seller`         | Your company details (auto-filled if omitted) | See [Party model](/reference/sending/send-document)           |
+| `paymentMeans`   | Payment instructions. Optional, but give them on any invoice you expect to be paid; leave them off for a prepaid invoice | See [PaymentMeans model](/reference/sending/send-document) |
 | `paymentTerms`   | Textual payment terms                         | `{ note: "Net 30" }`                                    |
 | `totals`         | Invoice total amounts                         | See [Totals model](/reference/sending/send-document)         |
 | `vat`            | VAT breakdown                                 | See [VatTotals model](/reference/sending/send-document)   |
@@ -123,7 +123,7 @@ const invoice = {
 
 ```javascript
 {
-  vatNumber: "BE0123456789",      // Required
+  vatNumber: "BE0123456789",      // Optional, but needed on most VAT invoices
   name: "Company Name",           // Required
   street: "Street Address",       // Required
   street2: "Building B",          // Optional
@@ -221,12 +221,22 @@ Along with a proper HTTP status code, the API will return a structured response 
   "sentOverPeppol": true,
   "sentOverEmail": true,
   "emailRecipients": [],
+  "peppolMessageId": "3f6b1c48-92a7-4f1d-9a1e-0c7f5b2d84e3",
+  "envelopeId": "7c2e5a19-64bd-4c73-8f05-91ab3de60f27",
   "teamId": "team_01JSH...",
   "companyId": "c_01JSG..."
 }
 ```
 
-The `sentOverEmail` and `emailRecipients` fields indicate whether the document was also delivered via email. For more on email delivery — including sending to non-Peppol recipients and fallback options — see the [Email Delivery and Notifications](/docs/email-delivery-and-notifications) guide.
+Store `id`: it is the Recommand document ID you pass to the documents endpoints
+to fetch, render or track the invoice later.
+
+`peppolMessageId` is the AS4 message ID and `envelopeId` is the SBDH instance
+identifier. Both are `null` when the document did not go over Peppol. Keep them
+if you ever need to trace one transmission, with support or with the recipient's
+provider.
+
+The `sentOverEmail` and `emailRecipients` fields indicate whether the document was also delivered via email. For more on email delivery, including sending to non-Peppol recipients and fallback options, see the [Email Delivery and Notifications](/docs/email-delivery-and-notifications) guide.
 
 ### Error Response
 
@@ -234,23 +244,36 @@ The `sentOverEmail` and `emailRecipients` fields indicate whether the document w
 {
   "success": false,
   "errors": {
-    "invoiceNumber": ["Invoice number is required"],
-    "buyer.vatNumber": ["Invalid VAT number format"]
-  }
+    "document.buyer.vatNumber": ["document.buyer.vatNumber: Required"]
+  },
+  "invalidInputDetails": [
+    { "path": "document.buyer.vatNumber", "message": "Required" }
+  ]
 }
 ```
+
+The keys of `errors` are full paths from the root of the request body. The
+invoice you are sending sits under `document`, so a missing buyer VAT number
+reads as `document.buyer.vatNumber`. Each value is a list of messages that
+repeat the path, so you can show them to a user as they are.
+
+`errors` is what you display. `invalidInputDetails` is the same information as a
+structured list, which is easier to walk in code when you want to map problems
+back onto your own form fields. If the body matched none of the document types,
+each entry also carries a `unionErrors` array with the errors every document
+type reported, so you can see why the one you meant was rejected.
 
 Implement proper error handling to address validation issues:
 
 ```javascript
 if (!result.success && result.errors) {
   // Display errors to the user
-  Object.entries(result.errors).forEach((field, errors) => {
-    console.error(`${field}: ${errors.join(", ")}`);
+  Object.entries(result.errors).forEach(([path, messages]) => {
+    console.error(`${path}: ${messages.join(", ")}`);
   });
 
   // Attempt to fix the issues
-  if (result.errors["buyer.vatNumber"]) {
+  if (result.errors["document.buyer.vatNumber"]) {
     // Prompt user to correct VAT number
   }
 }
@@ -391,6 +414,30 @@ types and processes per country, and
 [verifying recipients](/docs/verifying-recipients) covers how to check a
 combination before you rely on it.
 
+### Sending Your Own XML
+
+If your system already produces a complete Peppol UBL or CII document, you do not
+have to take it apart and rebuild it as an invoice object. Send it as it is with
+`documentType: "xml"`:
+
+```json
+{
+  "recipient": "0208:0123456789",
+  "documentType": "xml",
+  "doctypeId": "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1",
+  "document": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>..."
+}
+```
+
+The `document` is the XML as a string. Set `doctypeId` yourself when it cannot be
+detected from the XML. Everything else about the call, including email fallback
+and the response fields, works the same way.
+
+You are responsible for the contents in this mode: Recommand transports the
+document rather than building it, so a document that fails Peppol validation is
+your document to fix. See [can I send an XML document directly via the
+API](/faq/api-and-development/can-i-send-an-xml-document-directly-via-the-api).
+
 ### Adding Attachments
 
 You can include attachments with your invoice:
@@ -402,7 +449,6 @@ const invoice = {
   attachments: [
     {
       id: "ATT-001",
-      documentType: "130", // Supporting document
       mimeCode: "application/pdf",
       filename: "contract.pdf",
       description: "Service contract",
@@ -417,7 +463,6 @@ If you want to try this out, you can use the following attachment object as an e
 ```json
 {
   "id": "LOGO",
-  "documentType": "130", // Supporting document
   "mimeCode": "image/png",
   "filename": "recommand.png",
   "description": "Recommand Logo",

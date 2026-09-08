@@ -67,6 +67,47 @@ console.log("SMP URL:", result.smpUrl);
 
 - `isValid`: Boolean indicating if the recipient exists in the Peppol network
 - `smpUrl`: The Service Metadata Publisher URL for the recipient
+- `serviceMetadataReferences`: The SMP references published for the participant
+- `smpHostnames`: The hostnames the SMP was resolved on
+- `supportedDocuments`: The document types the participant is registered to receive, each with a readable `name` and a full `docTypeId`
+
+A lookup that fails is not an error. An address that is not registered, or that
+cannot be resolved for any other reason, comes back as `{ "success": true,
+"isValid": false }` with none of the other fields. Check `isValid` rather than
+the HTTP status.
+
+### Asking for More Detail
+
+Two options widen the response:
+
+| Option | What it adds |
+| --- | --- |
+| `includeEndpointDetails` | Fetches the endpoint metadata for every supported document type, so each entry in `supportedDocuments` also carries `serviceProvider`, `serviceEndpoint`, `technicalContact` and `certificateExpiry` |
+| `includeBusinessCard` | Fetches the participant's business card from the SMP, adding `companyName` and `countryCode` at the top level |
+
+```javascript
+const result = await fetch("https://app.recommand.eu/api/v1/verify", {
+  method: "POST",
+  headers: {
+    Authorization:
+      "Basic " + Buffer.from("key_xxx:secret_xxx").toString("base64"),
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    peppolAddress: "0208:0123456789",
+    includeEndpointDetails: true,
+    includeBusinessCard: true,
+  }),
+}).then((r) => r.json());
+
+console.log(result.companyName, result.countryCode);
+for (const doc of result.supportedDocuments) {
+  console.log(doc.name, doc.serviceEndpoint, doc.certificateExpiry);
+}
+```
+
+Both options cost extra SMP lookups, so leave them off when all you need to know
+is whether the address resolves.
 
 ## Verifying Document Type Support
 
@@ -118,6 +159,37 @@ console.log("Document type supported:", result.isValid);
 
 - `isValid`: Boolean indicating if the recipient supports the document type
 - `smpUrl`: The Service Metadata Publisher URL for the recipient
+- `serviceProvider`: The service description published on the endpoint
+- `serviceEndpoint`: The endpoint URL the document would be delivered to
+- `technicalContact`: The technical contact URL published by the receiving access point
+- `certificateExpiry`: When the receiving access point's certificate expires, ISO 8601
+
+As with verifying a recipient, a failed lookup is not an error. An address that
+is registered but not for this document type comes back as `{ "success": true,
+"isValid": false }` with none of the other fields.
+
+### Narrowing to One Process
+
+A document type can be published under more than one Peppol process. Pass
+`processId` to check the combination you are actually going to send, with or
+without its scheme prefix:
+
+```javascript
+body: JSON.stringify({
+  peppolAddress: "0208:0123456789",
+  documentType: "invoice",
+  processId: "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
+});
+```
+
+When you leave `processId` out, any process published for the document type is
+accepted. Name it when the process matters, for example for French recipients
+inside the e-invoicing perimeter, who are published under
+`urn:peppol:france:billing:regulated` rather than the standard billing process.
+
+`documentType` also accepts the short names as well as a full document type ID,
+so `"invoice"`, `"creditNote"`, `"selfBillingInvoice"` and
+`"selfBillingCreditNote"` all work.
 
 ## Searching the Peppol Directory
 

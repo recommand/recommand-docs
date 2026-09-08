@@ -290,13 +290,24 @@ The API returns structured error responses:
 {
   "success": false,
   "errors": {
-    "invoiceNumber": ["Invoice number is required"],
-    "buyer.vatNumber": ["Invalid VAT number format"]
-  }
+    "document.buyer.vatNumber": ["document.buyer.vatNumber: Required"]
+  },
+  "invalidInputDetails": [
+    { "path": "document.buyer.vatNumber", "message": "Required" }
+  ]
 }
 ```
 
 Before processing results, always check the HTTP status code or the `success` property.
+
+The keys of `errors` are full paths from the root of the request body, so a
+field inside the document you are sending reads as `document.buyer.vatNumber`
+rather than `buyer.vatNumber`. Each value is a list of messages that repeat the
+path, which makes them safe to show to a user as they are. `errors` is what you
+display; `invalidInputDetails` is the same information as a structured list you
+can walk in code. When the body matched none of the document types, each entry
+in `invalidInputDetails` also carries a `unionErrors` array holding the errors
+each document type reported.
 
 ## Complete Invoice Example
 
@@ -359,7 +370,6 @@ const invoice = {
   attachments: [
     {
       id: "ATT-001",
-      documentType: "130",
       mimeCode: "application/pdf",
       filename: "contract.pdf",
       embeddedDocument: "base64encodeddocument...",

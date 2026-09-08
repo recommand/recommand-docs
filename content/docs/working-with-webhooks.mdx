@@ -367,6 +367,62 @@ async function markDocumentAsRead(documentId) {
 }
 ```
 
+### Document Sent Event
+
+Fired when a company sends a document, whether it went out over the Peppol
+network or by email. Use it to record in your own system that the document left
+the platform, without polling the documents endpoint after every send.
+
+```json
+{
+  "eventType": "document.sent",
+  "documentId": "doc_xxx",
+  "teamId": "team_xxx",
+  "companyId": "c_xxx"
+}
+```
+
+The send call itself already tells you whether delivery succeeded, so this event
+is most useful when documents are also sent from the dashboard or by another
+system in your team, and you want one place that sees all of them.
+
+### Report Status Changed Event
+
+Fired when a French e-reporting report moves on with the tax administration. A
+report is filed on a period, and the outcome comes back later, so this event is
+how you learn where a report ended up without polling the document.
+
+```json
+{
+  "eventType": "document.reporting_status_changed",
+  "documentId": "doc_xxx",
+  "teamId": "team_xxx",
+  "companyId": "c_xxx",
+  "reportingStatus": "filed",
+  "previousReportingStatus": "accepted",
+  "periodEnd": "2026-09-30",
+  "submissionId": "sub_xxx",
+  "outcomeCode": null
+}
+```
+
+- `reportingStatus` and `previousReportingStatus`: one of
+  - `accepted`: on file, inside its reporting period
+  - `pending_rectificative`: arrived after the period was filed, so a corrective filing will carry it
+  - `filed`: reported to the tax administration
+  - `filed_rectificative`: reported by a corrective filing
+  - `superseded`: replaced by a correction, or cancelled
+  - `rejected`: refused by the tax administration; `outcomeCode` says why
+- `periodEnd`: the last day of the reporting period the report belongs to
+- `submissionId`: the period filing the report was carried on
+- `outcomeCode`: the tax administration's outcome code
+
+`periodEnd`, `submissionId` and `outcomeCode` are `null` until they are known,
+so an early status change carries less detail than a later one.
+
+For what these statuses mean in the French reporting flow, see the
+[France getting started guide](/getting-started/france).
+
 ### Company Verification Event
 
 Fired when a company's verification is completed — either successfully or rejected. Use this event to update your system's record of a company's verified status without polling.
