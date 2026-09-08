@@ -14,6 +14,7 @@ const REFERENCE_MD_DIR = "./content/reference-md";
 const tagOrder = [
   "authentication",
   "sending",
+  "reporting",
   "recipients",
   "documents",
   "companies",
@@ -30,6 +31,7 @@ const tagOrder = [
 const tagDisplayNames: Record<string, string> = {
   authentication: "Authentication",
   sending: "Sending",
+  reporting: "Reporting",
   recipients: "Recipients",
   documents: "Documents",
   companies: "Companies",
@@ -46,6 +48,8 @@ const tagDisplayNames: Record<string, string> = {
 const tagDescriptions: Record<string, string> = {
   authentication: "Verify authentication and manage API credentials.",
   sending: "Send Peppol documents such as invoices and credit notes.",
+  reporting:
+    "Register companies for French e-reporting and submit their B2C and cross-border reports.",
   recipients: "Verify recipient presence on the Peppol network.",
   documents: "Retrieve, list, and manage sent and received documents.",
   companies: "Create and manage company profiles.",
