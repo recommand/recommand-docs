@@ -11,32 +11,13 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Item, Node } from "fumadocs-core/page-tree";
 import type { ReactNode } from "react";
+import { referenceGroupDescriptions } from "@/lib/reference-groups";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
 const hairline = "border-darkslate/10 dark:border-sheet/15";
 
-/*
- * Short descriptions per endpoint group, keyed by the group's URL segment.
- * Mirrors `tagDescriptions` in scripts/generate-openapi.mts; groups without
- * an entry simply render title + endpoint count.
- */
-const groupDescriptions: Record<string, string> = {
-  authentication: "Verify authentication and manage API credentials.",
-  sending: "Send Peppol documents such as invoices and credit notes.",
-  recipients: "Verify recipient presence on the Peppol network.",
-  documents: "Retrieve, list, and manage sent and received documents.",
-  companies: "Create and manage company profiles.",
-  "company-identifiers": "Manage Peppol identifiers for your companies.",
-  "company-document-types": "Configure supported document types per company.",
-  "company-notification-email-addresses":
-    "Manage notification email addresses for companies.",
-  playgrounds: "Create and manage sandbox environments for testing.",
-  labels: "Organize documents with labels.",
-  suppliers: "Manage supplier records.",
-  customers: "Manage customer records.",
-  webhooks: "Configure webhook endpoints for real-time event notifications.",
-  models: "Data models shared across requests and responses.",
-};
+/* One list with the generator, so a new endpoint group shows up on both. */
+const groupDescriptions = referenceGroupDescriptions;
 
 interface EndpointGroup {
   key: string;
