@@ -279,7 +279,7 @@ const API_SECRET = "your_api_secret";
 const TEAM_ID = "your_team_id";
 const auth =
   "Basic " + Buffer.from(`${API_KEY}:${API_SECRET}`).toString("base64");
-const baseUrl = "https://app.recommand.eu/api/peppol";
+const baseUrl = "https://app.recommand.eu/api/v1";
 
 // Create a new company
 async function createCompany() {
