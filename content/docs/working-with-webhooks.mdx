@@ -273,7 +273,7 @@ When a document is received or other events occur, your webhook endpoint will re
 
 ### Document Received Event
 
-For a complete guide on processing incoming documents — including fetching details, accessing parsed content, and polling as an alternative to webhooks — see the [Receiving Documents](/docs/receiving-documents) guide.
+For a complete guide on processing incoming documents (including fetching details, accessing parsed content, and polling as an alternative to webhooks), see the [Receiving Documents](/docs/receiving-documents) guide.
 
 ```json
 {
@@ -425,7 +425,7 @@ For what these statuses mean in the French reporting flow, see the
 
 ### Company Verification Event
 
-Fired when a company's verification is completed — either successfully or rejected. Use this event to update your system's record of a company's verified status without polling.
+Fired when a company's verification is completed, either successfully or rejected. Use this event to update your system's record of a company's verified status without polling.
 
 For a full walkthrough of the verification process, see the [Company Verification](/docs/company-verification) guide.
 
@@ -439,9 +439,9 @@ For a full walkthrough of the verification process, see the [Company Verificatio
 ```
 
 - `status`: One of `"verified"`, `"rejected"`, or `"error"`
-  - `"verified"` — identity check passed and the company is active on the Peppol network
-  - `"rejected"` — identity check failed
-  - `"error"` — identity check completed, but a subsequent Peppol network operation failed; the company is not yet active
+  - `"verified"`: identity check passed and the company is active on the Peppol network
+  - `"rejected"`: identity check failed
+  - `"error"`: identity check completed, but a subsequent Peppol network operation failed; the company is not yet active
 - `errorMessage`: Only present when `status` is `"error"`. Contains a description of what went wrong.
 
 ```javascript

@@ -24,14 +24,14 @@ Three fields decide how the company is published on the network:
 }
 ```
 
-A VAT number whose country code does not match `country` is rejected — that is
+A VAT number whose country code does not match `country` is rejected. That is
 the one identifier rule enforced for every country. National format checks (the
 modulo-97 check digit for Belgium, the KVK length for the Netherlands, the CVR
 length for Denmark) only exist for the countries that have them; elsewhere the
 number is taken as given, so check it before you send it.
 
 There is also an optional `enterpriseNumberScheme`. It does not decide which
-Peppol identifier is registered — the country does, as the next section shows —
+Peppol identifier is registered (the country does, as the next section shows),
 but it is written into the documents the company sends, as the scheme of the
 seller's legal identifier. Leave it out unless the country expects a specific
 one.

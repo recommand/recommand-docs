@@ -3,14 +3,14 @@ title: Receiving Documents
 description: Process incoming Peppol documents using webhooks or polling. Covers real-time webhook delivery, inbox polling, fetching document details, and marking documents as read.
 ---
 
-This guide explains how to receive and process incoming Peppol documents using the [Recommand API](/reference/documents/get-documents). It covers the two main approaches — webhooks (push) and inbox polling (pull) — and how to retrieve and process document details.
+This guide explains how to receive and process incoming Peppol documents using the [Recommand API](/reference/documents/get-documents). It covers the two main approaches, webhooks (push) and inbox polling (pull). It also explains how to retrieve and process document details.
 
 ## Overview
 
 When a business partner sends you a document through the Peppol network, Recommand automatically receives, validates, and stores it. To consume these documents in your system, you have two options:
 
-1. **Webhooks (recommended)** — receive real-time notifications as documents arrive
-2. **Polling the Inbox** — periodically check for new unread documents
+1. **Webhooks (recommended)**: receive real-time notifications as documents arrive
+2. **Polling the Inbox**: periodically check for new unread documents
 
 Both approaches follow the same processing flow:
 
@@ -241,7 +241,7 @@ you what your counterparty sent, it does not reject the document.
 
 ### Accessing the Parsed Content
 
-The `parsed` field contains the structured representation of the document. For an invoice, this includes all the fields you would find when [sending an invoice](/docs/sending-invoices) — parties, lines, amounts, VAT, payment information, and so on.
+The `parsed` field contains the structured representation of the document. For an invoice, this includes all the fields you would find when [sending an invoice](/docs/sending-invoices): parties, lines, amounts, VAT, payment information, and so on.
 
 ```javascript
 const document = await fetchDocument("doc_xxx");

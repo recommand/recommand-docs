@@ -1,7 +1,7 @@
 ---
 title: Why do companies register only as recipients?
 category: Addressing & delivery
-excerpt: Because Peppol only needs to register recipients — senders operate via their Access Point.
+excerpt: Because Peppol only needs to register recipients. Senders operate via their Access Point.
 updatedAt: 2025-10-13
 ---
 

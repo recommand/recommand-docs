@@ -29,7 +29,7 @@ Worth wiring up while you are here:
 
 - **Validation errors.** Outgoing documents are always validated. A `success:
   false` response with `errors` keyed by field path is a document the recipient
-  would have rejected — surface it wherever the data was typed.
+  would have rejected. Surface it wherever the data was typed.
 - **Email fallback.** Pass `email.to` with `when: "on_peppol_failure"` to fall
   back to email when a recipient turns out not to be reachable over Peppol, or
   send with `recipient: null` for email-only delivery. See [email delivery and
