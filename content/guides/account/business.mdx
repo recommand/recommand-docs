@@ -13,6 +13,9 @@ title: Account setup for a single company
 
 <include cwd lang="bash">content/samples/verify-credentials.sh</include>
 
+It answers `{"success": true}` when the key and secret are accepted, and 401
+when they are not, so it tells you about your credentials and nothing else.
+
 All endpoints in this guide live under `https://app.recommand.eu/api/v1` and
 accept HTTP Basic authentication with the key as username and the secret as
 password. If you would rather not store a long-lived secret, JWT API keys and

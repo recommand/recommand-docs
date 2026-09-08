@@ -1,2 +1,2 @@
-curl -X GET https://app.recommand.eu/api/v1/companies \
+curl -X GET https://app.recommand.eu/api/core/auth/verify \
   -u key_xxx:secret_xxx

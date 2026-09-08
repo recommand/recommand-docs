@@ -10,7 +10,7 @@ This guide explains how to create, update, and manage company profiles in Recomm
 A company in Recommand represents a business entity that can send or receive Peppol documents. Each company must be registered before it can participate in document exchange.
 
 <Callout type="warn" title="Only add companies you operate">
-  Only add companies that you are responsible for — typically your own organization or entities you manage. Do not add companies that you send documents to (customers) or receive documents from (suppliers). Those companies manage their own Peppol registration independently. Trying to add them to your account will cause registration conflicts.
+  Only add companies that you are responsible for, typically your own organization or entities you manage. Do not add companies that you send documents to (customers) or receive documents from (suppliers). Those companies manage their own Peppol registration independently. Trying to add them to your account will cause registration conflicts.
 </Callout>
 
 ## Prerequisites
@@ -62,7 +62,7 @@ To create a new company using the [create company endpoint](/reference/companies
 When creating a new company, it is automatically registered in the Peppol network.
 
 If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents.
-If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to regiter the company even if it is already registered through another Peppol provider for receiving documents.
+If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to register the company even if it is already registered through another Peppol provider for receiving documents.
 
 ```javascript
 async function createCompany(companyData) {
@@ -127,7 +127,7 @@ country.
 | `phone`            | Contact phone number             | No       | `"+32 3 123 45 67"`  |
 | `isSmpRecipient`   | Register the company to receive documents (defaults to `true`) | No | `true` |
 | `skipDefaultCompanySetup` | Skip the automatic identifiers and document types, and create them yourself | No | `false` |
-| `isVerified`       | Whether the company has been verified (read-only) | — | `false`         |
+| `isVerified`       | Whether the company has been verified (read-only) | n/a | `false`         |
 
 Which identifiers a company needs, and which Peppol identifiers and document
 types are registered from them, depends on its country. The
@@ -233,7 +233,7 @@ async function deleteCompany(companyId) {
 }
 
 // Example usage
-const deleteResult = await deleteCompany("your_team_id", "company_id");
+const deleteResult = await deleteCompany("company_id");
 if (deleteResult.success) {
   console.log("Company deleted successfully");
 } else {
@@ -245,7 +245,7 @@ if (deleteResult.success) {
 
 After creating a company, an authorised representative must complete an identity check before the company can send or receive documents on the Peppol network. The `isVerified` field on a company object reflects whether this step has been completed.
 
-The create company response already includes a `verificationUrl` — present it to your user straight away. The verification page lets them forward the link to the right person within their organisation. If you need a fresh URL later (e.g. the link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company):
+The create company response already includes a `verificationUrl`. Present it to your user straight away. The verification page lets them forward the link to the right person within their organisation. If you need a fresh URL later (e.g. the link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company):
 
 ```javascript
 const result = await fetch(
@@ -279,7 +279,7 @@ const API_SECRET = "your_api_secret";
 const TEAM_ID = "your_team_id";
 const auth =
   "Basic " + Buffer.from(`${API_KEY}:${API_SECRET}`).toString("base64");
-const baseUrl = "https://app.recommand.eu/api/peppol";
+const baseUrl = "https://app.recommand.eu/api/v1";
 
 // Create a new company
 async function createCompany() {

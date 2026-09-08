@@ -20,9 +20,11 @@ document arrive.
 
 Three things worth knowing before you start:
 
-- **`POST /:companyId/generate`** takes the same body as the send endpoint and
+- **`POST /:companyId/generate`** takes the same body as the send endpoint minus
+  the email delivery options, which have no meaning when nothing is delivered, and
   returns the exact XML that sending would produce, fully validated, without
-  transmitting, storing or billing it. It also returns the resolved
+  transmitting, storing or billing it. Raw XML is not accepted here: there is
+  nothing to generate from a document you already have. It also returns the resolved
   `documentType`, `doctypeId` and `processId`, which is the quickest way to check
   that your country-specific fields map to the format and process you expect.
 - **Failure addresses.** In a playground that is not connected to the Peppol Test

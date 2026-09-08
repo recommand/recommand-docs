@@ -1,7 +1,7 @@
 ---
 title: How can I see feedback when a document is rejected by the recipient?
 category: API & development
-excerpt: Not always — this depends on the receiving software.
+excerpt: Not always. This depends on the receiving software.
 updatedAt: 2025-10-13
 ---
 

@@ -273,7 +273,7 @@ When a document is received or other events occur, your webhook endpoint will re
 
 ### Document Received Event
 
-For a complete guide on processing incoming documents — including fetching details, accessing parsed content, and polling as an alternative to webhooks — see the [Receiving Documents](/docs/receiving-documents) guide.
+For a complete guide on processing incoming documents (including fetching details, accessing parsed content, and polling as an alternative to webhooks), see the [Receiving Documents](/docs/receiving-documents) guide.
 
 ```json
 {
@@ -367,9 +367,65 @@ async function markDocumentAsRead(documentId) {
 }
 ```
 
+### Document Sent Event
+
+Fired when a company sends a document, whether it went out over the Peppol
+network or by email. Use it to record in your own system that the document left
+the platform, without polling the documents endpoint after every send.
+
+```json
+{
+  "eventType": "document.sent",
+  "documentId": "doc_xxx",
+  "teamId": "team_xxx",
+  "companyId": "c_xxx"
+}
+```
+
+The send call itself already tells you whether delivery succeeded, so this event
+is most useful when documents are also sent from the dashboard or by another
+system in your team, and you want one place that sees all of them.
+
+### Report Status Changed Event
+
+Fired when a French e-reporting report moves on with the tax administration. A
+report is filed on a period, and the outcome comes back later, so this event is
+how you learn where a report ended up without polling the document.
+
+```json
+{
+  "eventType": "document.reporting_status_changed",
+  "documentId": "doc_xxx",
+  "teamId": "team_xxx",
+  "companyId": "c_xxx",
+  "reportingStatus": "filed",
+  "previousReportingStatus": "accepted",
+  "periodEnd": "2026-09-30",
+  "submissionId": "sub_xxx",
+  "outcomeCode": null
+}
+```
+
+- `reportingStatus` and `previousReportingStatus`: one of
+  - `accepted`: on file, inside its reporting period
+  - `pending_rectificative`: arrived after the period was filed, so a corrective filing will carry it
+  - `filed`: reported to the tax administration
+  - `filed_rectificative`: reported by a corrective filing
+  - `superseded`: replaced by a correction, or cancelled
+  - `rejected`: refused by the tax administration; `outcomeCode` says why
+- `periodEnd`: the last day of the reporting period the report belongs to
+- `submissionId`: the period filing the report was carried on
+- `outcomeCode`: the tax administration's outcome code
+
+`periodEnd`, `submissionId` and `outcomeCode` are `null` until they are known,
+so an early status change carries less detail than a later one.
+
+For what these statuses mean in the French reporting flow, see the
+[France getting started guide](/getting-started/france).
+
 ### Company Verification Event
 
-Fired when a company's verification is completed — either successfully or rejected. Use this event to update your system's record of a company's verified status without polling.
+Fired when a company's verification is completed, either successfully or rejected. Use this event to update your system's record of a company's verified status without polling.
 
 For a full walkthrough of the verification process, see the [Company Verification](/docs/company-verification) guide.
 
@@ -383,9 +439,9 @@ For a full walkthrough of the verification process, see the [Company Verificatio
 ```
 
 - `status`: One of `"verified"`, `"rejected"`, or `"error"`
-  - `"verified"` — identity check passed and the company is active on the Peppol network
-  - `"rejected"` — identity check failed
-  - `"error"` — identity check completed, but a subsequent Peppol network operation failed; the company is not yet active
+  - `"verified"`: identity check passed and the company is active on the Peppol network
+  - `"rejected"`: identity check failed
+  - `"error"`: identity check completed, but a subsequent Peppol network operation failed; the company is not yet active
 - `errorMessage`: Only present when `status` is `"error"`. Contains a description of what went wrong.
 
 ```javascript
@@ -513,7 +569,7 @@ const API_KEY = "your_api_key";
 const API_SECRET = "your_api_secret";
 const AUTH =
   "Basic " + Buffer.from(`${API_KEY}:${API_SECRET}`).toString("base64");
-const BASE_URL = "https://app.recommand.eu/api/peppol";
+const BASE_URL = "https://app.recommand.eu/api/v1";
 const WEBHOOK_SECRET = process.env.RECOMMAND_WEBHOOK_SECRET;
 
 // Create a webhook

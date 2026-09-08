@@ -3,7 +3,7 @@ title: Company Verification
 description: Verify that a company representative is authorised to act on behalf of a company before it can participate on the Peppol network.
 ---
 
-This guide explains how company verification works and how to complete it — either directly from the [Recommand dashboard](https://app.recommand.eu) or via the API.
+This guide explains how company verification works and how to complete it, either directly from the [Recommand dashboard](https://app.recommand.eu) or via the API.
 
 ## Overview
 
@@ -23,7 +23,7 @@ Each company has an `isVerified` field. As long as this field is `false`, the co
 
 ## Initiating Verification
 
-When you create a company, the response already includes a `verificationUrl` — present it to your user immediately without any additional API call. The verification page itself lets them forward the link to an authorised representative if needed. If you need a fresh URL later (e.g. the original link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company) to generate a new verification session.
+When you create a company, the response already includes a `verificationUrl`. Present it to your user immediately without any additional API call. The verification page itself lets them forward the link to an authorised representative if needed. If you need a fresh URL later (e.g. the original link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company) to generate a new verification session.
 
 ```javascript
 async function initiateVerification(companyId) {
@@ -65,7 +65,7 @@ if (result.success) {
 
 ## Presenting the Verification URL
 
-Present the `verificationUrl` to your user — for example, display it in your UI or redirect them to it directly. The verification page is self-contained and works in any browser; no Recommand account is required. From there, the user can forward the link to whoever in their organisation is authorised to complete the identity check.
+Present the `verificationUrl` to your user, for example by displaying it in your UI or redirecting them to it directly. The verification page is self-contained and works in any browser; no Recommand account is required. From there, the user can forward the link to whoever in their organisation is authorised to complete the identity check.
 
 You can also kick off verification directly from the [Recommand dashboard](https://app.recommand.eu) without using the API.
 
@@ -96,15 +96,15 @@ if (result.success) {
 }
 ```
 
-`isVerified` becomes `true` once the identity check is successfully completed. It is automatically reset to `false` if the company's `vatNumber` or `enterpriseNumber` is changed — in that case the company must go through verification again before it can participate on the Peppol network.
+`isVerified` becomes `true` once the identity check is successfully completed. It is automatically reset to `false` if the company's `vatNumber` or `enterpriseNumber` is changed. In that case the company must go through verification again before it can participate on the Peppol network.
 
 ## Webhook Notification
 
 Rather than polling, you can listen for the `company.verification` webhook event, which fires when verification reaches a final state. The payload includes a `status` field:
 
-- `"verified"` — identity check passed and the company is active on the Peppol network
-- `"rejected"` — identity check failed
-- `"error"` — identity check completed, but a subsequent Peppol network operation failed; the company is not yet active. An `errorMessage` field is included with details. Contact [support@recommand.eu](mailto:support@recommand.eu) if this occurs and you are not sure what to do.
+- `"verified"`: identity check passed and the company is active on the Peppol network
+- `"rejected"`: identity check failed
+- `"error"`: identity check completed, but a subsequent Peppol network operation failed; the company is not yet active. An `errorMessage` field is included with details. Contact [support@recommand.eu](mailto:support@recommand.eu) if this occurs and you are not sure what to do.
 
 ```json
 {

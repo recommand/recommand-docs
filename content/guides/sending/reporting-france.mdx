@@ -28,8 +28,8 @@ E-reporting has to be switched on per company, because the tax administration
 needs to know two things about the taxpayer before its first report: its VAT
 regime, which sets how often reports are filed, and whether its VAT becomes due
 on invoicing or on payment. Register the company once through
-`PUT /:companyId/reporting/fr/declarant`, or from the company page in the
-dashboard.
+[`PUT /:companyId/reporting/fr/declarant`](/reference/reporting/register-french-reporting-declarant),
+or from the company page in the dashboard.
 
 ```json
 {
@@ -43,13 +43,21 @@ dashboard.
 | `vatRegime` | `REEL_NORMAL_MENSUEL` (régime réel normal), `REEL_SIMPLIFIE` (régime réel simplifié), `FRANCHISE_EN_BASE` (franchise en base de TVA) |
 | `vatExigibility` | `DEBITS` (VAT due on invoicing, typical for goods), `ENCAISSEMENTS` (VAT due on payment, typical for services) |
 
-The company must be registered in France with a valid SIREN or SIRET, and must
-be verified: the mandate signed during verification is what allows Recommand
-to report for it. The response carries a `state`. Reports are accepted once it
-is `registered`; `pending` means the registration is still being completed in
-the background, and `blocked` means support has to intervene, for example
-because the company is already registered for e-reporting through another
-platform.
+The company must be registered in France with a valid SIREN or SIRET, and it
+must be verified with a signed French mandate whose annex covers e-reporting.
+That annex is what entitles Recommand to report for the SIREN. A company that
+was verified without one is refused with a 400; contact
+[support@recommand.eu](mailto:support@recommand.eu) to have e-reporting enabled
+for it.
+
+The response carries a `state`. Reports are accepted once it is `registered`;
+`pending` means the registration is still being completed in the background, and
+`blocked` means support has to intervene, for example because the company is
+already registered for e-reporting through another platform.
+
+It also carries `enabled`. A suspended registration keeps its `registered`
+state but refuses every report with a 400 until support switches it back on, so
+check both fields when reports start being refused.
 
 <Callout type="warn" title="Registration starts the clock">
   Registering makes the company's reporting periods due. Only register companies
@@ -61,7 +69,8 @@ platform.
 ## Report B2C sales
 
 Submit one sales report per day, per category and per currency through
-`POST /:companyId/reporting/fr/b2c`, regardless of when customers pay.
+[`POST /:companyId/reporting/fr/b2c`](/reference/reporting/submit-french-b2creport),
+regardless of when customers pay.
 
 ```json
 {
@@ -80,21 +89,37 @@ Submit one sales report per day, per category and per currency through
 ```
 
 - `category` is `goods` or `services`; use a separate report when both were
-  sold on the same day.
+  sold on the same day. Only taxable goods and taxable services are supported
+  today, so exempt B2C sales have no report type yet.
 - Amounts are strings with two decimals and are never negative. VAT amounts are
   always in EUR, even when the sales currency is different.
-- `transactionCount` is the number of individual sales in the total.
+- `transactionCount` is the number of individual sales in the total. It is at
+  least 1: a day without sales is not reported at all.
 
 Companies registered with VAT due on payment additionally submit a **payment
-report** (`type: "payments"`) for the day a payment is received, with the
-amounts including VAT grouped by VAT rate. Payment reports are refused for
-companies registered with VAT due on invoicing.
+report** for the day a payment is received, with the amounts including VAT
+grouped by VAT rate. Payment reports are refused for companies registered with
+VAT due on invoicing.
+
+Watch the spelling of the two payment types, because they differ between the
+endpoints: a B2C payment report is `type: "payments"`, a cross-border payment
+report is `type: "payment"`.
 
 ## Report cross-border invoices
 
 Submit every invoice or credit note issued to a business outside France
-through `POST /:companyId/reporting/fr/b2bi`. An invoice to a French buyer is
-exchanged over the e-invoicing network instead and is refused here.
+through
+[`POST /:companyId/reporting/fr/b2bi`](/reference/reporting/submit-french-b2bi-report).
+An invoice to a French buyer is exchanged over the e-invoicing network instead
+and is refused here.
+
+Set `documentType` to `invoice` or `creditNote` to say which of the two you are
+reporting. It defaults to `invoice`, so you only have to name it for credit
+notes.
+
+The reporting company must carry its own French VAT number as well as its
+SIREN: a cross-border report identifies the seller by both. Add the VAT number
+to the company before its first cross-border report.
 
 ```json
 {
@@ -132,6 +157,11 @@ businesses:
 - **In Nouvelle-Calédonie or Polynésie française**: by its local registration
   number (RIDET or TAHITI), in `enterpriseNumber`.
 
+Cross-border operations are usually exempt or reverse charged rather than
+taxed. When a VAT breakdown entry uses an exempt category, name why: give
+`exemptionReason`, `exemptionReasonCode`, or both. A breakdown that leaves both
+off on an exempt category is refused.
+
 A **payment report** (`type: "payment"`) records a payment received on an
 invoice reported earlier, referring back to it by `invoiceNumber`. As with B2C
 payments, it is only accepted for companies registered with VAT due on payment.
@@ -148,12 +178,30 @@ reference** and the `action` field:
 
 - `action: "correct"` replaces the earlier report. It is matched on the data
   that identifies the report: the day, category and currency of a B2C sales
-  report, the day and currency of a B2C payment report, or the document number
-  of a cross-border invoice.
+  report, the day of a B2C payment report, or the document number of a
+  cross-border invoice.
 - `action: "cancel"` withdraws it, matched the same way.
 
 Reusing the original reference for a correction would be treated as a retry of
 the original report, and nothing would change.
+
+## When a report is refused
+
+Submitting a report can fail for reasons that have nothing to do with the
+figures, so handle each status separately rather than treating any non-200 as
+bad data.
+
+| Status | What happened | What to do |
+| --- | --- | --- |
+| 400 | The company is not registered for e-reporting, its registration is still `pending` or `blocked`, or it is suspended (`enabled: false`) | Register it, or wait for the state to become `registered`. A `blocked` or suspended registration needs support |
+| 400 | The reporting service refused the report; the reason is in the message | Fix what the message names and submit again under a new reference |
+| 400 | A payment report was sent for a company whose VAT is due on invoicing (`DEBITS`), or a cross-border report named a French buyer | Neither is reportable. A French buyer is invoiced over the e-invoicing network instead |
+| 409 | The report conflicts with what was already filed, for example a correction of something that was never reported | Look at what is on file before resubmitting |
+| 502 | The reporting service could not be reached | Retry later with the **same** reference. The reference is the idempotency key, so a retry cannot file the report twice |
+
+The 502 case is the one worth building for: it is the only status where reusing
+the reference is right. Every other failure needs a fresh reference once you
+have fixed the cause.
 
 ## Follow the report until it is filed
 
@@ -182,4 +230,11 @@ event, so you can route rejections to whoever handles them.
   recorded and shown exactly like real ones, but they are never filed with the
   tax administration. Their status stays `accepted` and is marked as simulated.
   Use them to build the integration; use a production team to file.
+
+  Registration is immediate there: it comes back `registered` straight away
+  rather than going through `pending`, so you can submit reports as soon as you
+  have registered. Registrations are also kept per environment. A team on the
+  test network registers in `TEST`, a production team in `PROD`, and the two are
+  separate registrations for the same company. The `environment` field on the
+  registration response says which one you are looking at.
 </Callout>

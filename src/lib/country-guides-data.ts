@@ -359,6 +359,9 @@ export function guideDescription({
         ? "send French UBL, CII or Factur-X invoices"
         : "send Peppol invoices and credit notes",
     );
+    if (country.id === "france") {
+      steps.push("report B2C and cross-border sales");
+    }
   }
   if (direction.receives) {
     steps.push(

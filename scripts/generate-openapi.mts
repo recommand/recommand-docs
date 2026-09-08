@@ -89,6 +89,20 @@ for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
   }
 }
 
+// A tag the spec carries but the group list does not still gets its pages
+// generated, and then nothing links to them: the sidebar, the root meta.json and
+// the index cards are all built from `tagOrder`. That is silent, so fail here
+// instead and name the tag that has to be added to src/lib/reference-groups.ts.
+const knownTags = new Set(tagOrder);
+const unlistedTags = Object.keys(tagOperations)
+  .filter((tag) => !knownTags.has(tag))
+  .sort();
+if (unlistedTags.length > 0) {
+  throw new Error(
+    `The API spec carries ${unlistedTags.length === 1 ? "a tag that is" : "tags that are"} missing from referenceGroupOrder in src/lib/reference-groups.ts: ${unlistedTags.join(", ")}. Pages for ${unlistedTags.length === 1 ? "it" : "them"} would be generated but unreachable. Add ${unlistedTags.length === 1 ? "it" : "them"} to referenceGroupOrder, referenceGroupNames and referenceGroupDescriptions.`,
+  );
+}
+
 // fumadocs' generateFiles puts the operation description in the body and in
 // _openapi.structuredData, but never in a `description` frontmatter field. The
 // reference page reads page.data.description for its meta tag, so without this

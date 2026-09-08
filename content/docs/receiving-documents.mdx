@@ -3,14 +3,14 @@ title: Receiving Documents
 description: Process incoming Peppol documents using webhooks or polling. Covers real-time webhook delivery, inbox polling, fetching document details, and marking documents as read.
 ---
 
-This guide explains how to receive and process incoming Peppol documents using the [Recommand API](/reference/documents/get-documents). It covers the two main approaches — webhooks (push) and inbox polling (pull) — and how to retrieve and process document details.
+This guide explains how to receive and process incoming Peppol documents using the [Recommand API](/reference/documents/get-documents). It covers the two main approaches, webhooks (push) and inbox polling (pull). It also explains how to retrieve and process document details.
 
 ## Overview
 
 When a business partner sends you a document through the Peppol network, Recommand automatically receives, validates, and stores it. To consume these documents in your system, you have two options:
 
-1. **Webhooks (recommended)** — receive real-time notifications as documents arrive
-2. **Polling the Inbox** — periodically check for new unread documents
+1. **Webhooks (recommended)**: receive real-time notifications as documents arrive
+2. **Polling the Inbox**: periodically check for new unread documents
 
 Both approaches follow the same processing flow:
 
@@ -82,6 +82,11 @@ If you cannot expose a public endpoint for webhooks, you can poll the inbox at r
 ### How It Works
 
 The [inbox endpoint](/reference/documents/get-inbox) returns all incoming documents that have not been marked as read. Once you process a document, mark it as read so it no longer appears in the inbox on the next poll.
+
+The inbox is not paginated. Every unread document comes back in one response, so
+marking documents as read is what keeps the response a sensible size. If you want
+a paged view of unread documents instead, use the [list documents
+endpoint](/reference/documents/get-documents) with `isUnread=true`.
 
 ```javascript
 async function pollInbox() {
@@ -186,22 +191,57 @@ The document object contains the following key fields:
 | `id` | Unique document ID | `"doc_xxx"` |
 | `companyId` | The company that received the document | `"c_xxx"` |
 | `direction` | Always `"incoming"` for received documents | `"incoming"` |
-| `type` | Document type: `invoice`, `creditNote`, `selfBillingInvoice`, `selfBillingCreditNote`, `messageLevelResponse`, or `unknown` | `"invoice"` |
+| `type` | Document type: `invoice`, `creditNote`, `selfBillingInvoice`, `selfBillingCreditNote`, `messageLevelResponse`, `frenchInvoicingCdar`, `frenchB2CSalesReport`, `frenchB2CPaymentReport`, `frenchB2BiInvoiceReport`, `frenchB2BiPaymentReport`, or `unknown` | `"invoice"` |
 | `senderId` | Peppol address of the sender | `"0208:0123456789"` |
 | `receiverId` | Peppol address of the receiver (your company) | `"0208:9876543210"` |
 | `parsed` | The structured document content (invoice, credit note, etc.) | See below |
 | `xml` | The raw UBL XML | `"<?xml ..."` |
-| `validation` | Validation results against EN16931 and Peppol BIS 3.0 | `{ "valid": true }` |
+| `validation` | Validation results against EN16931 and Peppol BIS 3.0, or `null` when the document was not validated | `{ "result": "valid", "errors": [] }` |
 | `labels` | Labels assigned to this document | `[{ "id": "lab_xxx", "name": "ERP" }]` |
 | `readAt` | Timestamp when marked as read, or `null` | `"2025-01-15T10:00:00Z"` |
 | `createdAt` | When the document was received | `"2025-01-15T09:30:00Z"` |
-| `peppolMessageId` | Peppol AS4 message ID | `"msg_xxx"` |
-| `peppolConversationId` | Peppol conversation ID | `"conv_xxx"` |
-| `envelopeId` | SBDH instance identifier | `"env_xxx"` |
+| `peppolMessageId` | Peppol AS4 message ID | `"3f6b1c48-92a7-4f1d-9a1e-0c7f5b2d84e3"` |
+| `peppolConversationId` | Peppol conversation ID | `"a1d94e7c-5b30-4f89-b6c2-27e0f8149ab5"` |
+| `envelopeId` | SBDH instance identifier | `"7c2e5a19-64bd-4c73-8f05-91ab3de60f27"` |
+
+### Validation Results
+
+`validation` reports what Recommand's validator made of the document. It is
+`null` when the document was never validated.
+
+```json
+{
+  "result": "valid",
+  "errors": []
+}
+```
+
+`result` is one of:
+
+| Value | Meaning |
+| --- | --- |
+| `valid` | The document passed every rule that applies to it |
+| `invalid` | At least one rule failed; see `errors` |
+| `not_supported` | No ruleset is available for this document type, so nothing was checked |
+| `error` | The validation service could not be reached, or its answer could not be read |
+
+`errors` is empty when the document is valid, and also when the result is
+`not_supported` or `error`. Each entry has the shape:
+
+| Field | Description |
+| --- | --- |
+| `ruleCode` | The identifier of the rule that was violated, for example `PEPPOL-EN16931-R010`. Null for findings that do not come from a coded rule, such as a schema error |
+| `errorMessage` | What the rule expected, in the words of the ruleset that raised it |
+| `errorLevel` | How serious the finding is, for example `ERROR`. Only findings the ruleset treats as errors make a document invalid |
+| `fieldName` | Where in the document the finding applies, usually as an XPath. Null when it is not tied to one place |
+| `source` | Which ruleset produced the finding |
+
+A document that fails validation is still received and stored. Validation tells
+you what your counterparty sent, it does not reject the document.
 
 ### Accessing the Parsed Content
 
-The `parsed` field contains the structured representation of the document. For an invoice, this includes all the fields you would find when [sending an invoice](/docs/sending-invoices) — parties, lines, amounts, VAT, payment information, and so on.
+The `parsed` field contains the structured representation of the document. For an invoice, this includes all the fields you would find when [sending an invoice](/docs/sending-invoices): parties, lines, amounts, VAT, payment information, and so on.
 
 ```javascript
 const document = await fetchDocument("doc_xxx");
@@ -244,6 +284,38 @@ const response = await fetch(
 const xml = await response.text(); // Raw UBL XML
 ```
 
+## Previewing a Document
+
+If you want to show a person the document rather than process it, use the
+[render document endpoint](/reference/documents/render-document). It turns a
+stored document into something readable:
+
+```
+GET https://app.recommand.eu/api/v1/documents/{documentId}/render/{type}
+```
+
+`type` is either `html` or `pdf`. HTML is handy for embedding a preview in your
+own interface; PDF is what you hand a user to download or attach to an email.
+
+```javascript
+const response = await fetch(
+  `https://app.recommand.eu/api/v1/documents/${documentId}/render/pdf`,
+  {
+    headers: {
+      Authorization:
+        "Basic " +
+        Buffer.from("your_api_key:your_api_secret").toString("base64"),
+    },
+  }
+);
+
+const pdf = await response.arrayBuffer();
+```
+
+The rendering is generated from the document, so it works for documents you
+received as well as documents you sent, and you do not need to keep a copy of
+your own.
+
 ## Marking Documents as Read
 
 After processing a document, mark it as read using the [mark as read endpoint](/reference/documents/mark-as-read). This removes it from the inbox and signals that your system has consumed it.
@@ -270,6 +342,44 @@ async function markAsRead(documentId) {
 
 You can also mark a document as unread again by passing `{ "read": false }`.
 
+## Message Level Responses
+
+A message level response is the formal answer to a document you received. It
+tells the sender that their document arrived and whether you accepted it. Send
+one when the sender needs that answer inside Peppol rather than by email or
+phone, for example because your counterparty tracks acknowledgements, or because
+you are rejecting a document and want the rejection on the record.
+
+It is not a substitute for a credit note. A message level response says something
+about the message; a credit note corrects the invoice.
+
+Send it with the [send document endpoint](/reference/sending/send-document) using
+`documentType: "messageLevelResponse"`:
+
+```json
+{
+  "recipient": "0208:0123456789",
+  "documentType": "messageLevelResponse",
+  "document": {
+    "envelopeId": "7c2e5a19-64bd-4c73-8f05-91ab3de60f27",
+    "responseCode": "AP",
+    "issueDate": "2025-01-15"
+  }
+}
+```
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `envelopeId` | Yes | The `envelopeId` of the document you are answering. This is what ties the response to the original |
+| `responseCode` | Yes | `AB` to acknowledge receipt, `AP` to accept the document, `RE` to reject it |
+| `id` | No | Your own identifier for the response. One is generated when you leave it out |
+| `issueDate` | No | The date of the response. Defaults to today |
+
+Message level responses never count towards your document quota, in either
+direction. Sending one is free, and one that arrives for a document you sent is
+free too. They are transport receipts, not business documents, so you can
+acknowledge everything you receive without watching your usage.
+
 ## Listing Past Documents
 
 To query documents beyond the inbox (including already-read documents), use the [list documents endpoint](/reference/documents/get-documents) with a direction filter:
@@ -290,7 +400,21 @@ const result = await response.json();
 console.log(`Total incoming documents: ${result.pagination.total}`);
 ```
 
-You can further filter by `companyId`, `type`, date range (`from`, `to`), `search`, and `isUnread`.
+`limit` defaults to 10 and accepts up to 200 documents per page.
+
+You can further filter with:
+
+| Parameter | Description |
+| --- | --- |
+| `companyId` | One company ID, or several to cover more than one company |
+| `labelId` | One or more label IDs, so you can list only the documents a routing rule tagged |
+| `direction` | `incoming` or `outgoing` |
+| `type` | A document type, for example `invoice` |
+| `from`, `to` | Creation timestamp range, ISO 8601, `from` inclusive and `to` exclusive |
+| `search` | Free text search across the document |
+| `isUnread` | `true` for documents you have not marked as read, `false` for the ones you have |
+| `envelopeId` | The SBDH instance identifier, useful when you are tracing one transmission |
+| `excludeAttachments` | Leaves attachments out of `parsed`, which keeps the response small when documents carry large PDFs. It works as a bare flag: `?excludeAttachments` |
 
 ## Best Practices
 

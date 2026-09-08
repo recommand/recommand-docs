@@ -3,7 +3,7 @@ title: Financial Discount
 description: Model a conditional early-payment discount (korting contant) on a Peppol document using a matching allowance and charge so that the payable amount stays the full amount due.
 ---
 
-This guide shows how to apply a **financial discount** — also called an early-payment discount, or *korting contant* in Dutch — on a Peppol document sent through the [Recommand JSON API](/reference/sending/send-document).
+This guide shows how to apply a **financial discount** (also called an early-payment discount, or *korting contant* in Dutch) on a Peppol document sent through the [Recommand JSON API](/reference/sending/send-document).
 
 A financial discount differs from a regular [document-level discount](/docs/discounts-and-surcharges) because it is **conditional**: it only applies when the customer pays within an agreed period. The invoice must still show the full amount due when the discount is not taken.
 
@@ -20,7 +20,7 @@ A financial discount differs from a regular [document-level discount](/docs/disc
 - As the balancing charge uses VAT category `E` (exempt), include `document.vat.exemptionReason` or `document.vat.exemptionReasonCode`.
 
 <Callout type="info" title="Why two entries?">
-  The allowance reduces the VAT base (so VAT is calculated on the discounted amount), while the matching charge (at VAT category `E` — exempt) keeps the payable total equal to the full amount due. This way, the customer pays the reduced amount only when they pay within the discount period, and the full amount otherwise.
+  The allowance reduces the VAT base (so VAT is calculated on the discounted amount), while the matching charge (at VAT category `E`, exempt) keeps the payable total equal to the full amount due. This way, the customer pays the reduced amount only when they pay within the discount period, and the full amount otherwise.
 </Callout>
 
 ## Example

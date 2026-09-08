@@ -20,7 +20,7 @@ Below are some of the most common documents that can be sent over the Peppol net
 | **Receipt Advice (BIS Despatch Advice 3.0)**  | Message confirming the goods have been received                     | `BIS Despatch Advice 3.0`                | Receipt confirmation after delivery                  |
 | **Catalogue (BIS Catalogue 3.0)**             | Product catalogue with prices, references and descriptions          | `BIS Catalogue 3.0`                      | Synchronizing product information between systems    |
 | **Self-Billing Invoice**                      | Invoice created by the customer on behalf of the supplier           | `BIS Billing 3.0 (Self Billing variant)` | Common in agriculture, retail and platform economy   |
-| **Reminder / Statement** _(in development)_   | Overview or reminder of outstanding documents                       | —                                        | Expected in future Peppol extensions                 |
+| **Reminder / Statement** _(in development)_   | Overview or reminder of outstanding documents                       | Not yet defined                          | Expected in future Peppol extensions                 |
 
 **In short:**
 Peppol is evolving from an invoicing network into a **fully interoperable business communication network**.

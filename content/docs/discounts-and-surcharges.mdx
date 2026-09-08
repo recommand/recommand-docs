@@ -9,8 +9,8 @@ This guide explains how to apply discounts and surcharges to Peppol documents se
 
 The Peppol standard supports two levels of discounts and surcharges:
 
-- **Document-level** — applied to the entire document (e.g. a 5% volume discount on the total)
-- **Line-level** — applied to a specific line item (e.g. a promotional discount on one product)
+- **Document-level**: applied to the entire document (e.g. a 5% volume discount on the total)
+- **Line-level**: applied to a specific line item (e.g. a promotional discount on one product)
 
 Both levels support multiple entries, meaning you can add several discounts and surcharges to a single document or line.
 
@@ -22,10 +22,10 @@ Document-level discounts and surcharges are defined in the top-level `discounts`
 
 | Field        | Required | Description                                                                      | Example       |
 | ------------ | -------- | -------------------------------------------------------------------------------- | ------------- |
-| `reasonCode` | One of*  | Reason code — [UNCL5189](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL5189/) for discounts, [UNCL7161](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL7161/) for surcharges | `"95"`        |
+| `reasonCode` | One of*  | Reason code: [UNCL5189](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL5189/) for discounts, [UNCL7161](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL7161/) for surcharges | `"95"`        |
 | `reason`     | One of*  | Free-text reason                                                                 | `"Discount"`  |
 | `amount`     | Yes      | Amount as a decimal string                                                       | `"10.00"`     |
-| `vat`        | Yes      | VAT category and percentage — see [VatInfo model](/reference/sending/send-document) | See below     |
+| `vat`        | Yes      | VAT category and percentage. See [VatInfo model](/reference/sending/send-document) | See below     |
 
 \* At least one of `reasonCode` or `reason` must be provided. You can provide both.
 
@@ -86,14 +86,14 @@ In this example, the invoice has a line total of 1000.00 EUR (10 x 100.00), minu
 Line-level discounts and surcharges are defined in the `discounts` and `surcharges` arrays on each line item. Unlike document-level entries, line-level entries do **not** include VAT information - they inherit the VAT category from the line they belong to.
 
 <Callout type="warn" title="Important">
-  Line discounts are **not** informational — they actively affect the line net amount. Set `netPriceAmount` to the unit price **before** any discounts. The API subtracts the discount `amount` from `quantity × netPriceAmount` to calculate the line `netAmount`.
+  Line discounts are **not** informational. They actively affect the line net amount. Set `netPriceAmount` to the unit price **before** any discounts. The API subtracts the discount `amount` from `quantity × netPriceAmount` to calculate the line `netAmount`.
 </Callout>
 
 ### Structure
 
 | Field        | Required | Description                                                                   | Example      |
 | ------------ | -------- | ----------------------------------------------------------------------------- | ------------ |
-| `reasonCode` | One of*  | Reason code — [UNCL5189](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL5189/) for discounts, [UNCL7161](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL7161/) for surcharges | `"95"`       |
+| `reasonCode` | One of*  | Reason code: [UNCL5189](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL5189/) for discounts, [UNCL7161](https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL7161/) for surcharges | `"95"`       |
 | `reason`     | One of*  | Free-text reason                                                              | `"Promo"`    |
 | `amount`     | Yes      | Amount as a decimal string                                                    | `"5.00"`     |
 
@@ -180,6 +180,6 @@ Line-level discounts and surcharges are factored into their line's net amount, w
 
 ## Advanced: Financial Discounts
 
-A **financial discount** (early-payment discount, or *korting contant* in Dutch) is conditional — it only applies when the customer pays within an agreed period. Because the invoice must still show the full amount due when the discount is not taken, it is modeled with a document-level allowance and a matching document-level charge rather than a plain discount.
+A **financial discount** (early-payment discount, or *korting contant* in Dutch) is conditional: it only applies when the customer pays within an agreed period. Because the invoice must still show the full amount due when the discount is not taken, it is modeled with a document-level allowance and a matching document-level charge rather than a plain discount.
 
 See the [Financial Discounts](/docs/financial-discounts) guide for the rules, a worked example, and a minimal request payload.

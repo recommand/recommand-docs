@@ -32,6 +32,14 @@ Authorization: Basic <base64(apiKeyId:secret)>
 2. Create a new API key with type `basic`
 3. Store the returned `secret` securely (it's only shown once)
 
+The examples below call the list companies endpoint, because it needs no input of
+its own and shows you real data back. If you only want to know whether your
+credentials work, call the [verify authentication
+endpoint](/reference/authentication/verify-auth) instead: it answers
+`{"success": true}` or 401 and nothing else.
+
+<include cwd lang="bash">content/samples/verify-credentials.sh</include>
+
 **Examples**
 
 Use the tabs to view your preferred language.
