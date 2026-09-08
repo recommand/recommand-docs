@@ -1,0 +1,185 @@
+---
+title: French e-reporting
+---
+
+## French e-reporting
+
+French e-invoicing covers invoices between businesses established in France.
+Everything else a French company sells still has to reach the tax
+administration: sales to private individuals, and invoices to businesses
+outside France. That is e-reporting. You send Recommand the figures, and
+Recommand files them on the company's behalf. You never build a regulatory
+file yourself.
+
+There are two kinds of reports:
+
+- **B2C reports** carry the daily totals of sales to private individuals, and,
+  for companies whose VAT becomes due on payment, the payments received.
+- **Cross-border reports** carry one invoice or credit note to a business
+  outside France each, and the payments received on those invoices.
+
+Both are submitted per company, through the API only. Every accepted report is
+stored with the company's other documents and counts towards the document
+quota.
+
+## Register the company first
+
+E-reporting has to be switched on per company, because the tax administration
+needs to know two things about the taxpayer before its first report: its VAT
+regime, which sets how often reports are filed, and whether its VAT becomes due
+on invoicing or on payment. Register the company once through
+`PUT /:companyId/reporting/fr/declarant`, or from the company page in the
+dashboard.
+
+```json
+{
+  "vatRegime": "REEL_NORMAL_MENSUEL",
+  "vatExigibility": "DEBITS"
+}
+```
+
+| Field | Values |
+| --- | --- |
+| `vatRegime` | `REEL_NORMAL_MENSUEL` (régime réel normal), `REEL_SIMPLIFIE` (régime réel simplifié), `FRANCHISE_EN_BASE` (franchise en base de TVA) |
+| `vatExigibility` | `DEBITS` (VAT due on invoicing, typical for goods), `ENCAISSEMENTS` (VAT due on payment, typical for services) |
+
+The company must be registered in France with a valid SIREN or SIRET, and must
+be verified: the mandate signed during verification is what allows Recommand
+to report for it. The response carries a `state`. Reports are accepted once it
+is `registered`; `pending` means the registration is still being completed in
+the background, and `blocked` means support has to intervene, for example
+because the company is already registered for e-reporting through another
+platform.
+
+<Callout type="warn" title="Registration starts the clock">
+  Registering makes the company's reporting periods due. Only register companies
+  that will submit reports, and submit each day's figures promptly rather than at
+  month end. Changing the VAT regime later can leave the open period unfiled, so
+  coordinate such a change with support.
+</Callout>
+
+## Report B2C sales
+
+Submit one sales report per day, per category and per currency through
+`POST /:companyId/reporting/fr/b2c`, regardless of when customers pay.
+
+```json
+{
+  "reference": "B2C-SALES-2026-08-17-GOODS",
+  "type": "sales",
+  "date": "2026-08-17",
+  "category": "goods",
+  "currency": "EUR",
+  "taxExclusiveAmount": "10000.00",
+  "taxAmount": "2000.00",
+  "transactionCount": 42,
+  "vatBreakdown": [
+    { "percentage": "20.00", "taxableAmount": "10000.00", "taxAmount": "2000.00" }
+  ]
+}
+```
+
+- `category` is `goods` or `services`; use a separate report when both were
+  sold on the same day.
+- Amounts are strings with two decimals and are never negative. VAT amounts are
+  always in EUR, even when the sales currency is different.
+- `transactionCount` is the number of individual sales in the total.
+
+Companies registered with VAT due on payment additionally submit a **payment
+report** (`type: "payments"`) for the day a payment is received, with the
+amounts including VAT grouped by VAT rate. Payment reports are refused for
+companies registered with VAT due on invoicing.
+
+## Report cross-border invoices
+
+Submit every invoice or credit note issued to a business outside France
+through `POST /:companyId/reporting/fr/b2bi`. An invoice to a French buyer is
+exchanged over the e-invoicing network instead and is refused here.
+
+```json
+{
+  "reference": "EREPORT-INV-2026-000431",
+  "type": "invoice",
+  "documentNumber": "INV-2026-000431",
+  "issueDate": "2026-01-15",
+  "currency": "EUR",
+  "buyer": {
+    "name": "Rossi Forniture S.r.l.",
+    "country": "IT",
+    "vatNumber": "IT00987654321"
+  },
+  "taxExclusiveAmount": "10000.00",
+  "taxAmount": "0.00",
+  "vatBreakdown": [
+    {
+      "percentage": "0.00",
+      "taxableAmount": "10000.00",
+      "taxAmount": "0.00",
+      "category": "K",
+      "exemptionReasonCode": "VATEX-EU-IC"
+    }
+  ]
+}
+```
+
+The buyer is identified the way the tax administration identifies foreign
+businesses:
+
+- **In the European Union**: by its intra-community VAT number, which is
+  required.
+- **Outside the European Union**: by its country and name; no VAT number is
+  needed.
+- **In Nouvelle-Calédonie or Polynésie française**: by its local registration
+  number (RIDET or TAHITI), in `enterpriseNumber`.
+
+A **payment report** (`type: "payment"`) records a payment received on an
+invoice reported earlier, referring back to it by `invoiceNumber`. As with B2C
+payments, it is only accepted for companies registered with VAT due on payment.
+
+## References, retries, corrections
+
+Every report needs its own `reference`, at most 128 characters. It is your
+idempotency key: retrying the exact same request with the same reference
+returns the report filed the first time, with `duplicate: true`, and files
+nothing again. Use this after a timeout or a `502`.
+
+To change a report you already filed, send a new report with a **new
+reference** and the `action` field:
+
+- `action: "correct"` replaces the earlier report. It is matched on the data
+  that identifies the report: the day, category and currency of a B2C sales
+  report, the day and currency of a B2C payment report, or the document number
+  of a cross-border invoice.
+- `action: "cancel"` withdraws it, matched the same way.
+
+Reusing the original reference for a correction would be treated as a retry of
+the original report, and nothing would change.
+
+## Follow the report until it is filed
+
+Accepting a report is not filing it. The tax administration receives a filing
+per reporting period, assembled after the period ends, and can still reject
+it. Every report you submit therefore carries a `reporting` block in the
+[documents API](/reference/documents/get-document), which Recommand keeps up
+to date:
+
+| `reportingStatus` | Meaning |
+| --- | --- |
+| `accepted` | On file, inside its reporting period. Not yet filed. |
+| `pending_rectificative` | Arrived after its period was already filed; it will be carried by a corrective filing. |
+| `filed` | Reported to the tax administration within its own period. |
+| `filed_rectificative` | Reported by a corrective filing, because it arrived late. |
+| `superseded` | Replaced by a later correction, or cancelled. |
+| `rejected` | The tax administration rejected the filing carrying it; see `outcomeCode`. |
+
+The block also names the reporting period (`periodStart`, `periodEnd`), the
+filing the report was carried on (`submissionId`) and when the status was last
+checked. Every change fires a `document.reporting_status_changed` webhook
+event, so you can route rejections to whoever handles them.
+
+<Callout type="info" title="Playground and test network">
+  Reports from playground teams and teams on the test network are validated,
+  recorded and shown exactly like real ones, but they are never filed with the
+  tax administration. Their status stays `accepted` and is marked as simulated.
+  Use them to build the integration; use a production team to file.
+</Callout>

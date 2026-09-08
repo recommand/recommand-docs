@@ -1,0 +1,24 @@
+---
+title: French e-reporting for B2C and cross-border sales
+description: Register a French company for e-reporting, submit its daily B2C totals and cross-border invoices, and follow each report until the tax administration has filed it.
+date: 2026-09-08
+---
+
+French companies must report the operations that never travel as an e-invoice: sales to private individuals and invoices to businesses outside France. Recommand now files these reports with the French tax administration on the company's behalf.
+
+### What changed
+
+- **Registration endpoint**: A company is registered for e-reporting once, with its VAT regime and when its VAT becomes due, through `PUT /:companyId/reporting/fr/declarant`. The dashboard offers the same registration on the company page.
+- **B2C reports**: Daily totals of sales to private individuals, one report per day, category and currency, through `POST /:companyId/reporting/fr/b2c`. Companies whose VAT becomes due on payment also report the payments they receive.
+- **Cross-border reports**: Every invoice or credit note to a business outside France, and the payments received on it, through `POST /:companyId/reporting/fr/b2bi`. Buyers in the European Union are identified by their VAT number, buyers elsewhere by their country and name.
+- **Status until filed**: A report is accepted first and filed later, at the end of its reporting period. The `reporting` block on every report in the [documents API](/reference/documents/get-document) shows where it stands, from `accepted` to `filed` or `rejected`, and a `document.reporting_status_changed` webhook event fires on every change.
+- **Lifecycle statuses and your quota**: French transmission statuses (`200` to `203`, `213`, `501`) no longer count towards your document quota, in either direction. Processing statuses such as approved, refused or collected count as one document each, like any business document.
+- **Safe retries, explicit corrections**: Retrying a report with the same `reference` returns the report filed the first time. Corrections and cancellations carry a new reference and an `action`, and act on the day or document they name.
+
+### Why this matters
+
+E-reporting is mandatory for French companies from the same dates as e-invoicing. The reports are aggregates and identifiers, not invoices, so there is no XML to build: you send the figures and Recommand handles the regulatory filing and its follow-up.
+
+### What you need to do
+
+Register each French company that sells to consumers or abroad, then submit its reports as the sales happen rather than at the end of the month. Playground and test-network teams can exercise the full flow; their reports are recorded but never filed. The e-reporting section of the [French getting started guides](/getting-started/france) walks through registration, the two report types, corrections and the status lifecycle; the endpoint details are in the Reporting section of the [API reference](/reference).

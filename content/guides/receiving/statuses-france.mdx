@@ -75,3 +75,12 @@ Incoming CDAR messages are parsed, stored and shown next to your other documents
 and delivered through your existing webhooks and notifications — so this is also
 how you learn what your customers did with the invoices you sent them, including
 the `202` and `203` their access point sent when they received yours.
+
+## What counts towards your document quota
+
+You pay for documents and for the business answers to them, not for the
+messages platforms exchange to move them. Transmission statuses (`200`, `201`,
+`202`, `203`, `213` and `501`) never count, whether you receive them or
+Recommand sends them for you. Processing statuses (`204` to `212` and `214`)
+count as one document each, in both directions, exactly like an invoice: the
+party sending the decision and the party receiving it are treated alike.
