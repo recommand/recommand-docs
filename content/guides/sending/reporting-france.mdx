@@ -11,14 +11,17 @@ outside France. That is e-reporting. You send Recommand the figures, and
 Recommand files them on the company's behalf. You never build a regulatory
 file yourself.
 
-There are two kinds of reports:
+B2C reports contain daily totals. Cross-border reports describe an individual
+invoice or credit note, or a payment received on an invoice.
 
-- **B2C reports** carry the daily totals of sales to private individuals, and,
-  for companies whose VAT becomes due on payment, the payments received.
-- **Cross-border reports** carry one invoice or credit note to a business
-  outside France each, and the payments received on those invoices.
+| Report | Endpoint (under `/api/v1`) | `type` | Scope |
+| --- | --- | --- | --- |
+| B2C sales | `POST /:companyId/reporting/fr/b2c` | `sales` | Sales for one day, category and currency |
+| B2C payments | `POST /:companyId/reporting/fr/b2c` | `payments` | Payments received for one day and currency, grouped by VAT rate |
+| Cross-border invoice | `POST /:companyId/reporting/fr/b2bi` | `invoice` | One invoice or credit note issued to a business outside France |
+| Cross-border payment | `POST /:companyId/reporting/fr/b2bi` | `payment` | A payment received on a previously reported invoice |
 
-Both are submitted per company, through the API only. Every accepted report is
+All reports are submitted per company, through the API only. Every accepted report is
 stored with the company's other documents and counts towards the document
 quota.
 
@@ -96,14 +99,26 @@ regardless of when customers pay.
 - `transactionCount` is the number of individual sales in the total. It is at
   least 1: a day without sales is not reported at all.
 
-Companies registered with VAT due on payment additionally submit a **payment
-report** for the day a payment is received, with the amounts including VAT
-grouped by VAT rate. Payment reports are refused for companies registered with
-VAT due on invoicing.
+### Report B2C payments
 
-Watch the spelling of the two payment types, because they differ between the
-endpoints: a B2C payment report is `type: "payments"`, a cross-border payment
-report is `type: "payment"`.
+For service payments where VAT becomes due on payment, submit the daily amounts
+received through the same B2C endpoint with `type: "payments"`. Group the amounts
+including VAT by VAT rate. Submit the sales report as usual as well.
+
+```json
+{
+  "reference": "B2C-PAYMENTS-2026-08-17-EUR",
+  "type": "payments",
+  "date": "2026-08-17",
+  "currency": "EUR",
+  "vatBreakdown": [
+    { "percentage": "20.00", "amount": "1200.00" }
+  ]
+}
+```
+
+Payment reports are only accepted for companies registered with VAT due on
+payment (`ENCAISSEMENTS`).
 
 ## Report cross-border invoices
 
@@ -162,9 +177,32 @@ taxed. When a VAT breakdown entry uses an exempt category, name why: give
 `exemptionReason`, `exemptionReasonCode`, or both. A breakdown that leaves both
 off on an exempt category is refused.
 
-A **payment report** (`type: "payment"`) records a payment received on an
-invoice reported earlier, referring back to it by `invoiceNumber`. As with B2C
-payments, it is only accepted for companies registered with VAT due on payment.
+### Report a cross-border payment
+
+Submit a payment received on a previously reported invoice through the same
+cross-border endpoint with `type: "payment"`. Set `invoiceNumber` to the original
+report's `documentNumber` and `issueDate` to the invoice date. The `date` field
+is the day the payment was received.
+
+For a payment of EUR 10,000 on the invoice above:
+
+```json
+{
+  "reference": "EREPORT-PAYMENT-2026-000431-1",
+  "type": "payment",
+  "invoiceNumber": "INV-2026-000431",
+  "issueDate": "2026-01-15",
+  "date": "2026-02-10",
+  "currency": "EUR",
+  "vatBreakdown": [
+    { "percentage": "0.00", "amount": "10000.00" }
+  ]
+}
+```
+
+Amounts include VAT and are grouped by VAT rate. As with B2C payments, payment
+reports are only accepted for companies registered with VAT due on payment
+(`ENCAISSEMENTS`).
 
 ## References, retries, corrections
 
