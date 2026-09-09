@@ -1,0 +1,55 @@
+---
+title: Cross-border e-reporting now requires the invoicing framework
+description: A French cross-border invoice report has to name its billingMode, and corrections that reuse an earlier reference now say so in the response.
+date: 2026-09-10
+---
+
+A French cross-border invoice report now has to name the **invoicing framework**
+of the document it reports, in the `billingMode` field. This is a breaking
+change to the request contract of
+`POST /:companyId/reporting/fr/b2bi` for `type: "invoice"`, and it is
+deliberate: the framework decides how the tax administration reads the invoice,
+and it cannot be derived from the figures on a report.
+
+### What changed
+
+- **`billingMode` is required on cross-border invoice reports.** It uses the
+  same codes and the same meaning as the `billingMode` of a French regulated
+  invoice: `B1`, `S1` and `M1` for a goods, services or mixed invoice, `B2`,
+  `S2` and `M2` when the invoice was already paid, and `B4`, `S4` and `M4` for
+  a final invoice after an advance payment. Other codes an invoice can carry
+  are not supported on a report today and are refused with a 400. B2C reports
+  and cross-border payment reports are unchanged.
+- **Reports already on file stay readable.** Reports filed before this change
+  carry no framework. They are returned, rendered and downloaded as before, and
+  no framework is inferred for them.
+- **A reused reference now says what happened.** The reference is the
+  idempotency key, so sending a correction or a cancellation under the
+  reference of the report it means to act on returns that earlier report with
+  `duplicate: true` and files nothing. The response now also carries an
+  optional `warning` describing what was found on file, so a correction that
+  did nothing is visible straight away instead of at the end of the period. A
+  plain retry of an identical request carries no warning.
+- **The guide names the matching rules.** A correction or a cancellation is
+  matched on the operation and never on the reference: a B2C sales report on
+  the day, category and currency, a B2C payment report on the day and currency,
+  a cross-border invoice on its document number, and a cross-border payment on
+  the invoice number it belongs to. Dates are not part of the cross-border
+  match. A correction replaces the report in full, and both a correction and a
+  cancellation are refused once the filing for that period has been assembled,
+  which is later than `periodEnd`.
+- **Outcome codes are documented.** `outcomeCode` answers about the filing
+  rather than about one report, so every report on the same filing shows the
+  same code: `300` déposée, `500` recevable, `501` irrecevable. Unknown codes
+  are passed through unchanged.
+
+### What you need to do
+
+Add `billingMode` to every cross-border invoice report you send, taking it from
+the invoice. If you also send French regulated invoices through Recommand, it
+is the value you already put on the invoice. Nothing changes for B2C reports,
+for cross-border payment reports, or for reports you filed earlier.
+
+The e-reporting section of the [French getting started
+guides](/getting-started/france) lists the frameworks, the matching rules and
+the outcome codes.

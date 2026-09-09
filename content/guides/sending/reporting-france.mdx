@@ -141,6 +141,7 @@ to the company before its first cross-border report.
   "reference": "EREPORT-INV-2026-000431",
   "type": "invoice",
   "documentNumber": "INV-2026-000431",
+  "billingMode": "B1",
   "issueDate": "2026-01-15",
   "currency": "EUR",
   "buyer": {
@@ -161,6 +162,37 @@ to the company before its first cross-border report.
   ]
 }
 ```
+
+### Name the invoicing framework
+
+`billingMode` is required on every cross-border invoice report. It is the
+invoicing framework of the document you are reporting, in the same codes and
+with the same meaning as the `billingMode` of a French regulated invoice, so an
+integration that already sends French invoices has the value at hand.
+
+| Mode | Description |
+| --- | --- |
+| `B1` | Goods invoice. |
+| `S1` | Services invoice. |
+| `M1` | Mixed invoice containing goods and services that are not ancillary to each other. |
+| `B2` | Goods invoice that has already been paid. |
+| `S2` | Services invoice that has already been paid. |
+| `M2` | Mixed invoice that has already been paid. |
+| `B4` | Final goods invoice after an advance payment. |
+| `S4` | Final services invoice after an advance payment. |
+| `M4` | Final mixed invoice after an advance payment. |
+
+These are the frameworks confirmed for cross-border reporting. Other codes an
+invoice can carry are not supported on a report today and are refused with a
+400.
+
+<Callout type="warn" title="The framework is checked after the report is accepted">
+  The framework is checked against the invoice when the filing for the period is
+  assembled, which happens after your report has been accepted. A framework that
+  does not match the invoice can cause that filing to be rejected, and the
+  rejection reaches every report on the same filing. Take the value from the
+  invoice rather than sending a fixed one.
+</Callout>
 
 The buyer is identified the way the tax administration identifies foreign
 businesses:
@@ -214,14 +246,43 @@ nothing again. Use this after a timeout or a `502`.
 To change a report you already filed, send a new report with a **new
 reference** and the `action` field:
 
-- `action: "correct"` replaces the earlier report. It is matched on the data
-  that identifies the report: the day, category and currency of a B2C sales
-  report, the day of a B2C payment report, or the document number of a
-  cross-border invoice.
-- `action: "cancel"` withdraws it, matched the same way.
+- `action: "correct"` replaces the earlier report.
+- `action: "cancel"` withdraws it.
 
-Reusing the original reference for a correction would be treated as a retry of
-the original report, and nothing would change.
+Both are matched on the data that identifies the operation, never on the
+reference:
+
+| Report | Matched on |
+| --- | --- |
+| B2C sales | The day, the category and the currency |
+| B2C payments | The day and the currency |
+| Cross-border invoice | The document number |
+| Cross-border payment | The `invoiceNumber` of the invoice it belongs to |
+
+Dates are not part of how a cross-border report is matched: an invoice report
+is matched on its document number without its issue date, and a payment report
+on the invoice number without its payment date. Every match is scoped to the
+reporting company, so two companies using the same invoice numbers never
+collide.
+
+A correction **replaces** the report it matches rather than merging into it, so
+send the complete report and not only the fields that changed. A cancellation
+carries the complete report as well.
+
+<Callout type="warn" title="Corrections have a deadline">
+  A correction and a cancellation are both refused once the filing for that
+  period has been assembled. That is not the same moment as `periodEnd`: the
+  filing is put together after the period closes, so the window to correct
+  extends past the last day of the period and then ends. Submit corrections as
+  soon as you find them rather than at the end of the period.
+</Callout>
+
+Reusing the original reference for a correction does not correct anything: the
+reference is the idempotency key, so the earlier report comes back with
+`duplicate: true` and nothing is filed. When that happens the response also
+carries a `warning` saying what was found on file, so a correction that quietly
+did nothing can be spotted in the response rather than at the end of the
+period. A plain retry of an identical request has no `warning`.
 
 ## When a report is refused
 
@@ -234,6 +295,7 @@ bad data.
 | 400 | The company is not registered for e-reporting, its registration is still `pending` or `blocked`, or it is suspended (`enabled: false`) | Register it, or wait for the state to become `registered`. A `blocked` or suspended registration needs support |
 | 400 | The reporting service refused the report; the reason is in the message | Fix what the message names and submit again under a new reference |
 | 400 | A payment report was sent for a company whose VAT is due on invoicing (`DEBITS`), or a cross-border report named a French buyer | Neither is reportable. A French buyer is invoiced over the e-invoicing network instead |
+| 400 | A cross-border invoice report left out `billingMode` or used a code that is not supported for reporting | Send the invoicing framework of the invoice, from the table above |
 | 409 | The report conflicts with what was already filed, for example a correction of something that was never reported | Look at what is on file before resubmitting |
 | 502 | The reporting service could not be reached | Retry later with the **same** reference. The reference is the idempotency key, so a retry cannot file the report twice |
 
@@ -262,6 +324,24 @@ The block also names the reporting period (`periodStart`, `periodEnd`), the
 filing the report was carried on (`submissionId`) and when the status was last
 checked. Every change fires a `document.reporting_status_changed` webhook
 event, so you can route rejections to whoever handles them.
+
+### Outcome codes belong to the filing
+
+`outcomeCode` is the tax administration's answer about the **filing**, not
+about the single report you are looking at. Every report carried on the same
+filing therefore shows the same code, and one rejected filing means the whole
+period needs attention rather than one report.
+
+| Code | Meaning |
+| --- | --- |
+| `300` | Déposée: the filing was deposited. |
+| `500` | Recevable: the filing was accepted. |
+| `501` | Irrecevable: the filing was refused. |
+
+The raw code is what the field carries, and it stays as it is. A code that is
+not in this table is passed through unchanged rather than translated or hidden,
+so treat the field as an open set: match on the codes you know and fall back on
+showing the raw value.
 
 <Callout type="info" title="Playground and test network">
   Reports from playground teams and teams on the test network are validated,
