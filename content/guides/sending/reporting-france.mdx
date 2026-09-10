@@ -141,6 +141,7 @@ to the company before its first cross-border report.
   "reference": "EREPORT-INV-2026-000431",
   "type": "invoice",
   "documentNumber": "INV-2026-000431",
+  "billingMode": "B1",
   "issueDate": "2026-01-15",
   "currency": "EUR",
   "buyer": {
@@ -161,6 +162,11 @@ to the company before its first cross-border report.
   ]
 }
 ```
+
+`billingMode` is required and must match the invoice: `B1` / `S1` / `M1`
+for goods / services / mixed invoices, `B2` / `S2` / `M2` for already-paid
+invoices, or `B4` / `S4` / `M4` for final invoices after an advance payment.
+An incorrect code can cause the filing to be rejected after submission.
 
 The buyer is identified the way the tax administration identifies foreign
 businesses:
@@ -214,14 +220,25 @@ nothing again. Use this after a timeout or a `502`.
 To change a report you already filed, send a new report with a **new
 reference** and the `action` field:
 
-- `action: "correct"` replaces the earlier report. It is matched on the data
-  that identifies the report: the day, category and currency of a B2C sales
-  report, the day of a B2C payment report, or the document number of a
-  cross-border invoice.
-- `action: "cancel"` withdraws it, matched the same way.
+- `action: "correct"` replaces the earlier report.
+- `action: "cancel"` withdraws it.
 
-Reusing the original reference for a correction would be treated as a retry of
-the original report, and nothing would change.
+Matching is scoped to the declarant's SIREN:
+
+| Report | Matching fields |
+| --- | --- |
+| B2C sales | Date, category and currency |
+| B2C payments | Date and currency |
+| Cross-border invoice | `documentNumber` |
+| Cross-border payment | `invoiceNumber` |
+
+Send the complete payload for both actions. A correction replaces the earlier
+report in full. Both actions are refused once the period's filing has been
+assembled; `periodEnd` alone does not identify that moment.
+
+Reusing a reference returns the original report with `duplicate: true` and
+files nothing again. Check the optional `warning` for differences from the
+original request or details that could not be verified.
 
 ## When a report is refused
 
@@ -262,6 +279,10 @@ The block also names the reporting period (`periodStart`, `periodEnd`), the
 filing the report was carried on (`submissionId`) and when the status was last
 checked. Every change fires a `document.reporting_status_changed` webhook
 event, so you can route rejections to whoever handles them.
+
+`outcomeCode` applies to the filing identified by `submissionId`, so reports
+in the same filing share it: `300` (Déposée), `500` (Recevable), or `501`
+(Irrecevable). Display unknown codes as returned.
 
 <Callout type="info" title="Playground and test network">
   Reports from playground teams and teams on the test network are validated,
