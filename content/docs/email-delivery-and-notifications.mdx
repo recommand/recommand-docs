@@ -102,19 +102,52 @@ When sending via Peppol, emails also include the UBL XML document as an attachme
 
 ### Response
 
-The send document response records which channels accepted the initial send:
+The send document response includes what the request sent and the delivery outcomes known when it returned. In this example, Peppol delivery is confirmed and email delivery is awaiting confirmation:
 
 ```json
 {
   "success": true,
+  "teamId": "team_xxx",
+  "companyId": "c_xxx",
   "id": "doc_xxx",
+  "peppolMessageId": "message-123@example.com",
+  "envelopeId": "envelope-123",
   "sentOverPeppol": true,
   "sentOverEmail": true,
-  "emailRecipients": ["customer@example.com"]
+  "emailRecipients": [
+    "customer@example.com"
+  ],
+  "deliveryStatus": "delivered",
+  "deliveries": [
+    {
+      "id": "dlv_peppol_123",
+      "channel": "peppol",
+      "address": "0208:0428643097",
+      "status": "delivered",
+      "statusChangedAt": "2026-09-14T20:00:00.000Z",
+      "failure": null,
+      "references": {
+        "peppolMessageId": "message-123@example.com",
+        "peppolConversationId": "conversation-123",
+        "envelopeId": "envelope-123"
+      }
+    },
+    {
+      "id": "dlv_email_123",
+      "channel": "email",
+      "address": "customer@example.com",
+      "status": "pending",
+      "statusChangedAt": "2026-09-14T20:00:00.000Z",
+      "failure": null,
+      "references": {
+        "messageId": "00000000-0000-0000-0000-000000000123"
+      }
+    }
+  ]
 }
 ```
 
-The legacy `sentOverPeppol`, `sentOverEmail` and `emailRecipients` fields describe the initial send. A channel accepting a document does not by itself confirm delivery. Use `deliveries` and `deliveryStatus` in the send response and document endpoints to track the outcome.
+`sentOverPeppol`, `sentOverEmail` and `emailRecipients` describe what the send request sent. `success: true` does not mean every delivery has been confirmed. Use `deliveries` and `deliveryStatus` in the send response and document endpoints to track the outcome. Here, the overall status is `delivered` because the Peppol attempt succeeded, even though the email attempt is still `pending`.
 
 ### Tracking Delivery
 
@@ -126,7 +159,7 @@ Each entry in `deliveries` represents one attempt to one address over `peppol` o
 
 The document-level `deliveryStatus` is `delivered` if any attempt is delivered, `failed` if all attempts failed, and `pending` otherwise. It is `null` when there are no deliveries. Inspect individual attempts to detect a failed channel even when another succeeded. The document list supports `deliveryStatus` and `deliveryFailed` filters.
 
-With `email.when: "on_peppol_failure"`, fallback also runs when the access point reports a failure after the send request returned. The resulting email attempts appear in `deliveries`; the initial send response's legacy fields do not change. A failed Peppol attempt is not automatically resent.
+With `email.when: "on_peppol_failure"`, fallback also runs when the access point reports a failure after the send request returned. The resulting email attempts appear in `deliveries` when you fetch the document; `sentOverEmail` and `emailRecipients` in the original send response describe only what that request sent. A failed Peppol attempt is not automatically resent.
 
 Subscribe to [delivery status webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event) or use a **Delivery status changed** rule to receive later outcomes. `document.sent` reports acceptance and includes the status known at that time.
 
