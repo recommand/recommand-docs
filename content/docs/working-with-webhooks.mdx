@@ -382,9 +382,34 @@ the platform, without polling the documents endpoint after every send.
 }
 ```
 
-The send call itself already tells you whether delivery succeeded, so this event
-is most useful when documents are also sent from the dashboard or by another
-system in your team, and you want one place that sees all of them.
+This event confirms acceptance for sending. It also includes `deliveryStatus`, which can still be `pending`; a later failure is reported separately. Older queued events may have `deliveryStatus: null`.
+
+### Document Delivery Status Changed Event
+
+Fired when an individual delivery is confirmed or fails, or when a deferred email fallback creates a new attempt. Configure a **Delivery status changed** rule under **Webhooks and rules** to send this event to your endpoint.
+
+```json
+{
+  "eventType": "document.delivery_status_changed",
+  "documentId": "doc_xxx",
+  "teamId": "team_xxx",
+  "companyId": "c_xxx",
+  "deliveryId": "dlv_xxx",
+  "channel": "peppol",
+  "address": "0208:987654321",
+  "status": "failed",
+  "previousStatus": "pending",
+  "failure": {
+    "category": "transport",
+    "message": "Delivery could not be completed",
+    "providerCode": null
+  }
+}
+```
+
+`channel` is `peppol` or `email`. Statuses are `pending`, `delivered` and `failed`; `previousStatus` is `null` for a newly created deferred fallback attempt. `failure` is `null` when no failure applies. Failure categories are `recipient_not_found`, `document_not_supported`, `validation`, `transport`, `recipient_rejected`, `duplicate` and `other`.
+
+A document can have several deliveries. Fetch its `deliveries` and `deliveryStatus` to see the combined outcome; one failed channel does not imply every channel failed. Handle webhook retries idempotently. See [Tracking Delivery](/docs/email-delivery-and-notifications#tracking-delivery) for status semantics and fallback behaviour.
 
 ### Report Status Changed Event
 
