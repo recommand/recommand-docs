@@ -1,13 +1,27 @@
 ---
 title: Track delivery outcomes for Peppol and email
-description: Follow each document delivery, receive status webhooks and use email fallback for failures reported after sending.
+description: See whether documents reached their recipients, receive delivery-status webhooks and use email fallback when Peppol delivery fails.
 date: 2026-09-14
 ---
 
-Outgoing documents now expose `deliveries` and a combined `deliveryStatus`. Each Peppol or email attempt is `pending`, `delivered` or `failed`, with a failure category when available. The dashboard shows individual deliveries and flags failed attempts.
+A successful send request confirms that a document was accepted for sending. Delivery can be confirmed—or fail—after that response. Recommand now tracks these outcomes for both Peppol and email.
 
-The new `document.delivery_status_changed` webhook reports later outcomes. `document.sent` still fires when the document is accepted for sending and now includes the status known at that point.
+### What changed
 
-Email fallback with `email.when: "on_peppol_failure"` also handles failures reported after the original send request returned. Existing send-response fields remain compatible.
+- **Delivery status in the API**: The send response and documents API include `deliveries`, with a status of `pending`, `delivered` or `failed` for each recipient and channel. Each delivery includes transport references and failure details when available.
+- **Document status at a glance**: `deliveryStatus` summarises the deliveries: `delivered` when at least one succeeds, `failed` when all fail, and `pending` otherwise.
+- **Dashboard visibility**: Document details show individual deliveries, their statuses and any failure reasons.
+- **Delivery-status webhooks**: The `document.delivery_status_changed` event reports status changes. `document.sent` continues to report acceptance for sending and includes the delivery status known at that moment.
+- **Email fallback after sending**: With `email.when: "on_peppol_failure"`, email fallback also handles Peppol failures reported after the original send request has returned.
 
-See [Tracking Delivery](/docs/email-delivery-and-notifications#tracking-delivery) for status semantics, historical records and fallback behaviour, and [Working with Webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event) to subscribe to changes.
+### Why this matters
+
+You can follow a document beyond the initial send response and react when delivery fails. For Peppol, `delivered` means the receiving access point acknowledged delivery. For email, it means the receiving mail server accepted the message. Neither confirms that someone read the document or processed it in their accounting software.
+
+### What you need to do
+
+Use `deliveryStatus` and `deliveries` to track outcomes, and subscribe to `document.delivery_status_changed` for updates. The `sentOverPeppol` and `sentOverEmail` fields continue to describe what happened during the send request; they do not confirm final delivery.
+
+If you already use `email.when: "on_peppol_failure"`, no request changes are needed to cover later Peppol failures.
+
+See [Tracking Delivery](/docs/email-delivery-and-notifications#tracking-delivery) for status semantics and historical records, and [Working with Webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event) for event setup and payloads.
