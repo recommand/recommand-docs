@@ -147,7 +147,7 @@ If document validation fails when using the [send document endpoint](/reference/
 
 Validation is about structure and rules, not content: a wrong price or a mistyped address passes validation.
 
-HTTP 422 is different: the document was valid but could not be delivered (see [delivery errors](#delivery-errors) below).
+HTTP 422 is different: sending failed during the request and no email fallback succeeded (see [delivery errors](#delivery-errors) below).
 
 **Possible causes and solutions:**
 
@@ -227,25 +227,33 @@ function validateInvoice(invoice) {
 
 ### Delivery Errors
 
-If the document is valid but cannot be delivered, the response is **HTTP 422**. The document is not sent and the attempt does not count toward your usage:
+If sending fails during the request and no email fallback succeeds, the response is **HTTP 422**. No document is stored and the failed attempt does not count toward your usage:
 
 ```json
 {
   "success": false,
   "errors": {
     "root": ["Failed to send document over Peppol network. No additional context available, please contact support@recommand.eu if you could use our help."]
+  },
+  "deliveryFailure": {
+    "channel": "peppol",
+    "category": "transport"
   }
 }
 ```
 
-A 422 means Recommand did not get a delivery confirmation from the recipient's access point. The body does not carry the other side's status code: an outage, a timeout or an error response on their side all arrive as the same 422. When the recipient is not registered for the document type you sent, the message says so instead.
+`deliveryFailure` identifies a Peppol failure's channel and category, such as `transport`, `recipient_not_found` or `document_not_supported`. Read `errors.root` for the accompanying message.
+
+A failure reported after the send request succeeded does not produce a new HTTP error response. It changes the stored delivery to `failed` and emits `document.delivery_status_changed`. Fetch the document's `deliveries` for the failure category, message and provider code. A document can be `delivered` overall while another channel failed.
+
+If you configured `email.when: "on_peppol_failure"`, a later Peppol failure can trigger the requested email fallback. Inspect the attempts before resending; `pending` means the outcome is still unknown. See [Tracking Delivery](/docs/email-delivery-and-notifications#tracking-delivery).
 
 **Possible causes and solutions:**
 
 1. **Recipient's AP is unavailable**
 
    - This is usually temporary; implement retry logic
-   - Configure [email delivery](/reference/sending/send-document) as a fallback so the document still reaches the recipient
+   - Configure [email delivery](/reference/sending/send-document) as a fallback and track the email attempt separately
    - If it persists, contact support with the recipient identifier and the time of the attempt
 
 2. **Document size limits**

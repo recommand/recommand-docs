@@ -30,8 +30,12 @@ Worth wiring up while you are here:
 - **Validation errors.** Outgoing documents are always validated. A `success:
   false` response with `errors` keyed by field path is a document the recipient
   would have rejected. Surface it wherever the data was typed.
+- **Delivery outcomes.** `success: true` confirms the send request succeeded. Check
+  `deliveryStatus` and `deliveries`, and subscribe to [delivery status
+  webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event)
+  for outcomes reported later.
 - **Email fallback.** Pass `email.to` with `when: "on_peppol_failure"` to fall
-  back to email when a recipient turns out not to be reachable over Peppol, or
+  back to email on Peppol failure, including one reported after the send returns, or
   send with `recipient: null` for email-only delivery. See [email delivery and
   notifications](/docs/email-delivery-and-notifications).
 - **PDFs.** `pdfGeneration.enabled` attaches a generated PDF of the document.
@@ -57,8 +61,8 @@ The same send is available two other ways, and they mix freely with the API:
 
 <Callout type="info" title="Every outgoing document is validated">
   Whichever route you use, Recommand validates a document before it leaves. If a
-  field is missing or malformed you get a clear error instead of a rejection from
-  the recipient days later. See the [troubleshooting
+  field is missing or malformed, the send request returns a validation error.
+  Track delivery separately for failures reported after sending. See the [troubleshooting
   guide](/docs/troubleshooting-guide) for the errors you are most likely to run
   into.
 </Callout>

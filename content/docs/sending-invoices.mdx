@@ -219,12 +219,28 @@ Along with a proper HTTP status code, the API will return a structured response 
   "success": true,
   "id": "doc_01KA...",
   "sentOverPeppol": true,
-  "sentOverEmail": true,
+  "sentOverEmail": false,
   "emailRecipients": [],
-  "peppolMessageId": "3f6b1c48-92a7-4f1d-9a1e-0c7f5b2d84e3",
+  "peppolMessageId": null,
   "envelopeId": "7c2e5a19-64bd-4c73-8f05-91ab3de60f27",
   "teamId": "team_01JSH...",
-  "companyId": "c_01JSG..."
+  "companyId": "c_01JSG...",
+  "deliveryStatus": "pending",
+  "deliveries": [
+    {
+      "id": "dlv_01KA...",
+      "channel": "peppol",
+      "address": "0208:0428643097",
+      "status": "pending",
+      "statusChangedAt": "2026-09-14T20:00:00.000Z",
+      "failure": null,
+      "references": {
+        "peppolMessageId": null,
+        "peppolConversationId": null,
+        "envelopeId": "7c2e5a19-64bd-4c73-8f05-91ab3de60f27"
+      }
+    }
+  ]
 }
 ```
 
@@ -232,11 +248,12 @@ Store `id`: it is the Recommand document ID you pass to the documents endpoints
 to fetch, render or track the invoice later.
 
 `peppolMessageId` is the AS4 message ID and `envelopeId` is the SBDH instance
-identifier. Both are `null` when the document did not go over Peppol. Keep them
-if you ever need to trace one transmission, with support or with the recipient's
-provider.
+identifier. These references can be `null` when unavailable, including when no
+Peppol transmission took place. Keep available references to trace a transmission.
 
-The `sentOverEmail` and `emailRecipients` fields indicate whether the document was also delivered via email. For more on email delivery, including sending to non-Peppol recipients and fallback options, see the [Email Delivery and Notifications](/docs/email-delivery-and-notifications) guide.
+`success: true` means the send request succeeded; the receiving channel may still need to confirm delivery. In this example, the Peppol attempt is `pending`. Use `deliveries` for each attempt and `deliveryStatus` for the combined outcome. Follow later changes through [delivery status webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event) or by fetching the document.
+
+`sentOverEmail` and `emailRecipients` describe email sent during this request, not confirmation by the recipient's mail server. See [Tracking Delivery](/docs/email-delivery-and-notifications#tracking-delivery) for status meanings, email delivery and fallback after a later Peppol failure.
 
 ### Error Response
 

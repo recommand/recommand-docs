@@ -37,6 +37,7 @@ At the moment, rules can react to these Peppol events:
 
 - **Document received**
 - **Document sent**
+- **Delivery status changed**
 - **Document label assigned**
 - **Document label unassigned**
 - **Report status changed**
@@ -51,6 +52,7 @@ The exact filter options depend on the event you choose. Common examples include
 - label
 - verification status
 - reporting status
+- delivery channel, delivery status and failure category
 - outcome code
 
 The dashboard rule builder only shows filters that are supported for the selected event type.
@@ -87,7 +89,7 @@ This option is limited to webhook delivery only. It does not support conditions 
 
 ## Delivery and Monitoring
 
-Rules run asynchronously.
+Rules run asynchronously. Deliveries in this view are attempts to execute a rule action, such as posting a webhook or sending a notification email. Document deliveries over Peppol or email are shown on the document itself; use the **Delivery status changed** trigger to react to their outcomes.
 In the dashboard you can review deliveries per rule, including:
 
 - current status
@@ -95,7 +97,7 @@ In the dashboard you can review deliveries per rule, including:
 - processed time
 - last error
 
-If a delivery fails, Recommand retries it automatically for a limited number of times. You can also manually retry failed deliveries from the dashboard.
+If a rule action delivery fails, Recommand retries it automatically for a limited number of times. You can also manually retry failed deliveries from the dashboard.
 After the final attempt, the delivery is marked as failed permanently.
 
 In the deliveries view, you may also see statuses such as pending, in progress, succeeded, failed, and giving up.
@@ -158,6 +160,7 @@ For the currently available public endpoints, see the [API reference](/reference
 ## Typical Examples
 
 - Send a webhook when a new invoice is received
+- Notify your team when a document delivery fails, optionally filtered by channel or failure category
 - Forward incoming invoices with a specific label or from a specific supplier to an external accounting system
 - Email your operations team when a company verification finishes
 - Notify your team when a specific label is assigned to a document

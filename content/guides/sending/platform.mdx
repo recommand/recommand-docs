@@ -55,8 +55,12 @@ Things worth wiring up while you are here:
 - **Validation errors.** Outgoing documents are always validated. A `success:
   false` response with `errors` keyed by field path is a document your recipient
   would have rejected, so surface it to the user who typed the data.
+- **Delivery outcomes.** `success: true` confirms the send request succeeded. Check
+  `deliveryStatus` and `deliveries`, and subscribe to [delivery status
+  webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event)
+  for outcomes reported later.
 - **Email fallback.** Pass `email.to` with `when: "on_peppol_failure"` to fall
-  back to email when a recipient turns out not to be reachable over Peppol, or
+  back to email on Peppol failure, including one reported after the send returns, or
   send with `recipient: null` for email-only delivery. See [email delivery and
   notifications](/docs/email-delivery-and-notifications).
 - **PDFs.** `pdfGeneration.enabled` attaches a generated PDF of the document.
