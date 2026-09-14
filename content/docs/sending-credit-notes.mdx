@@ -139,6 +139,8 @@ if (result.success) {
 }
 ```
 
+The response uses the same [delivery fields as sending an invoice](/docs/sending-invoices#success-response). `success: true` confirms the request succeeded; check `deliveryStatus` and `deliveries` for confirmation or failure, including outcomes reported after the send returns.
+
 ## Common Credit Note Scenarios
 
 ### 1. Full Invoice Cancellation
