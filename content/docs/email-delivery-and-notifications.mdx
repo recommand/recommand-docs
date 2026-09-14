@@ -102,7 +102,7 @@ When sending via Peppol, emails also include the UBL XML document as an attachme
 
 ### Response
 
-The send document response tells you how the document was delivered:
+The send document response records which channels accepted the initial send:
 
 ```json
 {
@@ -114,7 +114,25 @@ The send document response tells you how the document was delivered:
 }
 ```
 
-Each email sent counts toward your document quota.
+The legacy `sentOverPeppol`, `sentOverEmail` and `emailRecipients` fields describe the initial send. A channel accepting a document does not by itself confirm delivery. Use `deliveries` and `deliveryStatus` in the send response and document endpoints to track the outcome.
+
+### Tracking Delivery
+
+Each entry in `deliveries` represents one attempt to one address over `peppol` or `email`:
+
+- `pending`: accepted for sending, awaiting an outcome.
+- `delivered`: the receiving Peppol access point or recipient's mail server accepted the document. This does not establish that a person read or approved it.
+- `failed`: the attempt failed. The `failure` object contains a category, message and provider code when available.
+
+The document-level `deliveryStatus` is `delivered` if any attempt is delivered, `failed` if all attempts failed, and `pending` otherwise. It is `null` when there are no deliveries. Inspect individual attempts to detect a failed channel even when another succeeded. The document list supports `deliveryStatus` and `deliveryFailed` filters.
+
+With `email.when: "on_peppol_failure"`, fallback also runs when the access point reports a failure after the send request returned. The resulting email attempts appear in `deliveries`; the initial send response's legacy fields do not change. A failed Peppol attempt is not automatically resent.
+
+Subscribe to [delivery status webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event) or use a **Delivery status changed** rule to receive later outcomes. `document.sent` reports acceptance and includes the status known at that time.
+
+Emails sent before delivery tracking was introduced are backfilled as `delivered` from the historical send record. They have no message correlation for obtaining a later delivery confirmation.
+
+Each email sent counts toward your document quota, including a fallback sent after a later Peppol failure. Status updates do not add another charge.
 
 ## Email Notifications
 
