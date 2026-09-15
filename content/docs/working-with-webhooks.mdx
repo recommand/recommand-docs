@@ -414,9 +414,9 @@ A document can have several deliveries. Fetch its `deliveries` and `deliveryStat
 
 ### Report Status Changed Event
 
-Fired when a French e-reporting report moves on with the tax administration. A
-report is filed on a period, and the outcome comes back later, so this event is
-how you learn where a report ended up without polling the document.
+Fired when a French e-reporting report's `reportingStatus` or `outcomeCode`
+changes. A report can become `filed` before its final outcome arrives. Further
+events can therefore have the same reporting status and a different outcome.
 
 ```json
 {
@@ -428,7 +428,9 @@ how you learn where a report ended up without polling the document.
   "previousReportingStatus": "accepted",
   "periodEnd": "2026-09-30",
   "submissionId": "sub_xxx",
-  "outcomeCode": null
+  "outcomeCode": null,
+  "previousOutcomeCode": null,
+  "final": false
 }
 ```
 
@@ -442,9 +444,23 @@ how you learn where a report ended up without polling the document.
 - `periodEnd`: the last day of the reporting period the report belongs to
 - `submissionId`: the period filing the report was carried on
 - `outcomeCode`: the tax administration's outcome code
+- `previousOutcomeCode`: the outcome before this change, or `null` when none was known
+- `final`: true for `filed` or `filed_rectificative` with outcome `300`, or for `superseded` or `rejected`
 
 `periodEnd`, `submissionId` and `outcomeCode` are `null` until they are known,
 so an early status change carries less detail than a later one.
+
+A filed report normally moves from an empty outcome through `500` to `300`.
+For an outcome-only change, `previousReportingStatus` equals `reportingStatus`.
+For example, the final event can carry `reportingStatus: "filed"`,
+`previousReportingStatus: "filed"`, `previousOutcomeCode: "500"`,
+`outcomeCode: "300"` and `final: true`.
+
+For successful completion, require a filed status and outcome `300`.
+`final: true` alone also covers rejection and cancellation or replacement.
+Route outcome `501` to support with the report reference and period. Handle
+webhook retries idempotently and avoid repeating completion actions when several
+events have status `filed`.
 
 For what these statuses mean in the French reporting flow, see the
 [France getting started guide](/getting-started/france).
