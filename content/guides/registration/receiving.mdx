@@ -19,7 +19,55 @@ What that means:
   and deliver to it via the Peppol network.
 - Recipient registration is **exclusive**. If the company is already registered
   for receiving through another Peppol provider, registration fails until it is
-  deregistered there.
+  deregistered there, or until you hand us a migration key from that provider
+  (see below).
 - The document types the company accepts are registered along with it, based on
   its country. Which ones those are is covered further down.
 - The company is only published once it is verified.
+
+### Moving from another provider with a migration key
+
+Deregistering at the previous provider and registering with Recommand leaves a
+gap during which nobody can deliver to the company. The Peppol network has a
+way around that: the current provider asks the network to prepare the move and
+receives a one-time **migration key**, which the company passes on to its new
+provider. The new provider claims the registration with that key, and the
+network switches the company over in one step.
+
+Ask the previous provider for a migration key for the exact identifier that is
+registered with them, for example `0208:1012081766`. Then submit it with the
+[migrate company identifier endpoint](/reference/company-identifiers/migrate-company-identifier):
+
+```json
+POST /api/v1/companies/{companyId}/identifiers/{identifierId}/migration
+{
+  "migrationKey": "Ab12$#xyZ9!kLm"
+}
+```
+
+If the identifier does not exist on the company yet, add it with the
+[create company identifier endpoint](/reference/company-identifiers/create-company-identifier)
+and pass the `migrationKey` in the same request.
+
+What happens next depends on whether the company can be published already:
+
+- A company that is verified is taken over immediately. The response has
+  status `completed`, and the network routes to Recommand within minutes.
+- A company whose identity check is still open keeps the key with status
+  `pending`. The moment the company is verified and registered, the key is used.
+  Check the outcome with the
+  [list company identifier migrations endpoint](/reference/company-identifiers/get-company-identifier-migrations).
+- A key the network refuses ends in status `failed` with the reason. The usual
+  causes are a key issued for a different identifier, a copy error, or a
+  previous provider that cancelled the migration. Ask them for a fresh key and
+  submit it again; a newer key replaces a pending one.
+
+Migration keys are not available for companies published through a partner
+SMP, which today means companies registered in France.
+
+<Callout type="info" title="Leaving Recommand">
+  The same mechanism works the other way. Mail
+  [support@recommand.eu](mailto:support@recommand.eu) with the company and the
+  identifier to move, and we issue a migration key for your new provider. The
+  company keeps receiving through Recommand until that provider claims it.
+</Callout>
