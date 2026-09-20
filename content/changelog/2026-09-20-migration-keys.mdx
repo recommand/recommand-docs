@@ -1,0 +1,22 @@
+---
+title: Move a recipient registration to Recommand with a migration key
+description: Bring a company over from another Peppol provider without a gap in reception by submitting the migration key that provider issues.
+date: 2026-09-20
+---
+
+Recipient registration on Peppol is exclusive: one identifier is published by one provider at a time. Until now a company that already received through another provider had to be deregistered there before it could be registered with Recommand, and nobody could deliver to it in between. The Peppol network has a mechanism to move without that gap, and Recommand now supports it.
+
+### What changed
+
+- **Migration keys on identifiers**: Ask the current provider for a migration key for the identifier they publish, and submit it with the new [migrate company identifier endpoint](/reference/company-identifiers/migrate-company-identifier). The network switches the identifier to Recommand in one step.
+- **Keys when adding an identifier**: The [create company identifier endpoint](/reference/company-identifiers/create-company-identifier) accepts an optional `migrationKey`, so a new identifier can be taken over in the same request.
+- **Keys that wait for verification**: A company whose identity check is still open keeps the key with status `pending`. It is used the moment the company is verified and registered. The [list company identifier migrations endpoint](/reference/company-identifiers/get-company-identifier-migrations) shows whether a key completed, is pending or was refused, and why.
+- **Dashboard**: The identifier list on a company page has a migration key field when adding an identifier, and a "Migrate to Recommand" action while the company is not published yet.
+
+### Why this matters
+
+A company that moves to Recommand keeps receiving invoices throughout. There is no window in which senders get a delivery failure, and no coordination needed on the day of the switch beyond obtaining the key.
+
+### What you need to do
+
+Nothing changes for existing integrations. When onboarding a company that receives elsewhere, ask its current provider for a migration key per identifier and submit it instead of waiting for a deregistration. See [Moving from another provider with a migration key](/guides/registration/receiving#moving-from-another-provider-with-a-migration-key) for the flow and its outcomes.
