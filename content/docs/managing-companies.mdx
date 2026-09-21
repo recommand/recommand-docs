@@ -61,7 +61,7 @@ companies.forEach((company) => {
 To create a new company using the [create company endpoint](/reference/companies/create-company).
 When creating a new company, it is automatically registered in the Peppol network.
 
-If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents. A migration key from that provider moves the registration over instead; see [Moving from another provider with a migration key](/guides/registration/receiving#moving-from-another-provider-with-a-migration-key).
+If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents. A migration key from that provider moves the registration over instead; see [Moving from another provider with a migration key](/docs/managing-companies#moving-from-another-provider-with-a-migration-key).
 If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to register the company even if it is already registered through another Peppol provider for receiving documents.
 
 ```javascript
@@ -135,6 +135,50 @@ types are registered from them, depends on its country. The
 per country: [Belgium](/getting-started/belgium), [France](/getting-started/france),
 the [Netherlands](/getting-started/netherlands) and
 [every other supported country](/getting-started/other).
+
+## Moving from another provider with a migration key
+
+Deregistering at the previous provider and registering with Recommand leaves a
+gap during which nobody can deliver to the company. The Peppol network has a
+way around that: the current provider asks the network to prepare the move and
+receives a one-time **migration key**, which the company passes on to its new
+provider. The new provider claims the registration with that key, and the
+network switches the company over in one step.
+
+Ask the previous provider for a migration key for the exact identifier that is
+registered with them, for example `0208:1012081766`. Then submit it with the
+[migrate company identifier endpoint](/reference/company-identifiers/migrate-company-identifier):
+
+```json
+POST /api/v1/companies/{companyId}/identifiers/{identifierId}/migration
+{
+  "migrationKey": "Ab12$#xyZ9!kLm"
+}
+```
+
+If the identifier does not exist on the company yet, add it with the
+[create company identifier endpoint](/reference/company-identifiers/create-company-identifier)
+and pass the `migrationKey` in the same request.
+
+What happens next depends on whether the company can be published already:
+
+- A company that is verified is taken over immediately. The response has
+  status `completed`, and the network routes to Recommand within minutes.
+- A company whose identity check is still open keeps the key with status
+  `pending`. The moment the company is verified and registered, the key is used.
+  Check the outcome with the
+  [list company identifier migrations endpoint](/reference/company-identifiers/get-company-identifier-migrations).
+- A key the network refuses ends in status `failed` with the reason. The usual
+  causes are a key issued for a different identifier, a copy error, or a
+  previous provider that cancelled the migration. Ask them for a fresh key and
+  submit it again; a newer key replaces a pending one.
+
+A key covers one identifier. A company that was published under two
+identifiers at the previous provider, for example both its enterprise number
+and its VAT number, needs a key for each. After the move the company receives
+the document types Recommand registers for it, not the ones the previous
+provider had published.
+
 
 ## Retrieving a Company
 

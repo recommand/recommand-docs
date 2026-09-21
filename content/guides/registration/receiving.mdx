@@ -27,43 +27,8 @@ What that means:
 
 ### Moving from another provider with a migration key
 
-Deregistering at the previous provider and registering with Recommand leaves a
-gap during which nobody can deliver to the company. The Peppol network has a
-way around that: the current provider asks the network to prepare the move and
-receives a one-time **migration key**, which the company passes on to its new
-provider. The new provider claims the registration with that key, and the
-network switches the company over in one step.
-
-Ask the previous provider for a migration key for the exact identifier that is
-registered with them, for example `0208:1012081766`. Then submit it with the
-[migrate company identifier endpoint](/reference/company-identifiers/migrate-company-identifier):
-
-```json
-POST /api/v1/companies/{companyId}/identifiers/{identifierId}/migration
-{
-  "migrationKey": "Ab12$#xyZ9!kLm"
-}
-```
-
-If the identifier does not exist on the company yet, add it with the
-[create company identifier endpoint](/reference/company-identifiers/create-company-identifier)
-and pass the `migrationKey` in the same request.
-
-What happens next depends on whether the company can be published already:
-
-- A company that is verified is taken over immediately. The response has
-  status `completed`, and the network routes to Recommand within minutes.
-- A company whose identity check is still open keeps the key with status
-  `pending`. The moment the company is verified and registered, the key is used.
-  Check the outcome with the
-  [list company identifier migrations endpoint](/reference/company-identifiers/get-company-identifier-migrations).
-- A key the network refuses ends in status `failed` with the reason. The usual
-  causes are a key issued for a different identifier, a copy error, or a
-  previous provider that cancelled the migration. Ask them for a fresh key and
-  submit it again; a newer key replaces a pending one.
-
-A key covers one identifier. A company that was published under two
-identifiers at the previous provider, for example both its enterprise number
-and its VAT number, needs a key for each. After the move the company receives
-the document types Recommand registers for it, not the ones the previous
-provider had published.
+If the company already receives through another Peppol provider, ask that provider
+for a migration key for each identifier you want to move. Submit the key when
+adding the identifier, or use the migration endpoint for an existing identifier.
+See [Moving from another provider with a migration key](/docs/managing-companies#moving-from-another-provider-with-a-migration-key)
+for the requests, verification requirements and possible outcomes.
