@@ -1,4 +1,5 @@
 import { docsSource, referenceSource, faqSource, integrationsSource, changelogSource } from "@/lib/source";
+import { markdownToPlainText } from "@/lib/markdown-text";
 import { createSearchAPI } from "fumadocs-core/search/server";
 import {
   allAnswers,
@@ -48,7 +49,9 @@ export const { GET } = createSearchAPI("advanced", {
     })),
     referenceSource.getPages().map((page) => ({
       title: page.data.title,
-      description: page.data.description,
+      description: page.data.description
+        ? markdownToPlainText(page.data.description)
+        : undefined,
       url: page.url,
       id: page.url,
       structuredData: page.data.structuredData,

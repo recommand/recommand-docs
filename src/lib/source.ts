@@ -3,6 +3,7 @@ import { docs, reference, integrations, changelog, faq } from "@/.source/server"
 import { toFumadocsSource } from "fumadocs-mdx/runtime/server";
 import { openapiPlugin } from "fumadocs-openapi/server";
 import { createElement } from "react";
+import { markdownToPlainText } from "@/lib/markdown-text";
 
 export const docsSource = loader({
   baseUrl: "/docs",
@@ -13,6 +14,21 @@ export const referenceSource = loader({
   baseUrl: "/reference",
   source: reference.toFumadocsSource(),
   plugins: [openapiPlugin()],
+  // Footer and sidebar print descriptions as text. The page itself renders
+  // the markdown, so the tree keeps a plain-text copy.
+  pageTree: {
+    transformers: [
+      {
+        file(node) {
+          if (typeof node.description !== "string") return node;
+          return {
+            ...node,
+            description: markdownToPlainText(node.description),
+          };
+        },
+      },
+    ],
+  },
 });
 
 const integrationIcons: Record<string, string> = {

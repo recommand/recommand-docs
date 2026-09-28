@@ -2,11 +2,12 @@ import { referenceSource } from "@/lib/source";
 import {
   DocsPage,
   DocsBody,
-  DocsDescription,
   DocsTitle,
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx-components";
+import { renderMarkdown } from "@/lib/markdown";
+import { markdownToPlainText } from "@/lib/markdown-text";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Item, Node } from "fumadocs-core/page-tree";
@@ -15,6 +16,11 @@ import { referenceGroupDescriptions } from "@/lib/reference-groups";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
 const hairline = "border-darkslate/10 dark:border-sheet/15";
+
+/* OpenAPI descriptions are markdown. Paragraphs stay in the muted intro style;
+ * blockquotes read as the callout they are in the body. */
+const descriptionClass =
+  "prose mb-8 max-w-none text-lg text-fd-muted-foreground [&_blockquote]:my-0 [&_blockquote]:text-base [&_blockquote]:text-fd-foreground [&_p]:my-0 [&_p]:leading-relaxed";
 
 /* One list with the generator, so a new endpoint group shows up on both. */
 const groupDescriptions = referenceGroupDescriptions;
@@ -170,7 +176,11 @@ export default async function Page(props: {
       <DocsTitle className="display font-normal text-3xl sm:text-4xl">
         {page.data.title}
       </DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
+      {page.data.description && (
+        <div className={descriptionClass}>
+          {await renderMarkdown(page.data.description)}
+        </div>
+      )}
       <DocsBody>
         <MDX components={getMDXComponents()} />
       </DocsBody>
@@ -191,6 +201,8 @@ export async function generateMetadata(props: {
 
   return {
     title: page.data.title,
-    description: page.data.description,
+    description: page.data.description
+      ? markdownToPlainText(page.data.description)
+      : undefined,
   };
 }
