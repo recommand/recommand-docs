@@ -58,11 +58,11 @@ companies.forEach((company) => {
 
 ## Creating a Company
 
-To create a new company using the [create company endpoint](/reference/companies/create-company).
-When creating a new company, it is automatically registered in the Peppol network.
+Create a company using the [create company endpoint](/reference/companies/create-company). This creates its profile in Recommand and, unless `skipDefaultCompanySetup` is set, its default identifiers and document types. The company must complete [verification](/docs/company-verification) before it can send or receive documents.
 
-If you choose to register the company as SMP recipient (via `isSmpRecipient: true`), which means they will be able to receive documents on top of sending documents, this will fail if the company is already registered through another provider for receiving documents. A migration key from that provider moves the registration over instead; see [Moving from another provider with a migration key](/docs/managing-companies#moving-from-another-provider-with-a-migration-key).
-If you only want to send documents, you can simply omit the `isSmpRecipient` field or set it to `false` and then you will be able to register the company even if it is already registered through another Peppol provider for receiving documents.
+`isSmpRecipient` defaults to `true`: after successful verification, Recommand registers the company on Peppol to receive documents. Set it to `false` for sending only; verification is still required, but Recommand does not register the company for receiving.
+
+If the company is not yet registered on Peppol, no migration key is needed. You can also create a company that is already registered with another provider. When onboarding such a company for receiving, we recommend submitting its migration keys before completing verification, so Recommand can take over the identifiers when registering them. You can also migrate identifiers after verification; see [below](/docs/managing-companies#moving-from-another-provider-with-a-migration-key).
 
 ```javascript
 async function createCompany(companyData) {
@@ -125,7 +125,7 @@ country.
 | `vatNumber`        | VAT registration number          | No       | `"BE0123456789"`     |
 | `email`            | Contact email                    | No       | `"billing@acme.be"`  |
 | `phone`            | Contact phone number             | No       | `"+32 3 123 45 67"`  |
-| `isSmpRecipient`   | Register the company to receive documents (defaults to `true`) | No | `true` |
+| `isSmpRecipient`   | Register the company to receive documents after verification (defaults to `true`) | No | `true` |
 | `skipDefaultCompanySetup` | Skip the automatic identifiers and document types, and create them yourself | No | `false` |
 | `isVerified`       | Whether the company has been verified (read-only) | n/a | `false`         |
 
@@ -145,8 +145,10 @@ receives a one-time **migration key**, which the company passes on to its new
 provider. The new provider claims the registration with that key, and the
 network switches the company over in one step.
 
+First create the company with receiving enabled (`isSmpRecipient: true`, the default), even if it is still registered with the previous provider. Use the returned `company.id` to [list its identifiers](/reference/company-identifiers/get-company-identifiers) and find each `identifierId`.
+
 Ask the previous provider for a migration key for the exact identifier that is
-registered with them, for example `0208:1012081766`. Then submit it with the
+registered with them, for example `0208:1012081766`. Submit it with the
 [migrate company identifier endpoint](/reference/company-identifiers/migrate-company-identifier):
 
 ```json
@@ -159,6 +161,10 @@ POST /api/v1/companies/{companyId}/identifiers/{identifierId}/migration
 If the identifier does not exist on the company yet, add it with the
 [create company identifier endpoint](/reference/company-identifiers/create-company-identifier)
 and pass the `migrationKey` in the same request.
+
+For a company that has not yet been verified, we recommend submitting all required keys before completing verification using the `verificationUrl` returned when creating the company. This avoids trying to register identifiers that are still held by the previous provider. For an already verified company with receiving enabled, you can submit a key at any time; the migration is attempted immediately.
+
+If the previous provider cannot supply migration keys, ask them to fully deregister the identifiers before registering them with Recommand. For an unverified company, do this before completing verification. Recommand can then register them normally, but there will be a gap in receiving between deregistration and the new registration.
 
 What happens next depends on whether the company can be published already:
 
