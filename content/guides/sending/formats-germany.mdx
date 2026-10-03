@@ -1,0 +1,65 @@
+---
+title: Document formats for Germany
+---
+
+## Pick the document format
+
+Send **Peppol BIS 3 UBL** unless the recipient asks for XRechnung. When a
+recipient is only registered for XRechnung, Recommand picks it automatically;
+to ask for it explicitly, name its document type on the send request:
+
+| What you send                        | `doctypeId`                                                                                                                                       |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invoice or credit note (default)     | not needed, defaults to Peppol BIS 3 UBL                                                                                                          |
+| XRechnung 3.0 UBL invoice            | `urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0::2.1`       |
+| XRechnung 3.0 UBL credit note        | `urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0::2.1` |
+| XRechnung 3.0 CII invoice or credit note | `urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100::CrossIndustryInvoice##urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0::D16B` |
+
+The document you post is the same for every format. XRechnung does require a few
+fields that are optional elsewhere, and a send that misses one is refused with
+the full list before anything is transmitted:
+
+- `buyerReference` (BT-10), unless it is filled in from a Leitweg-ID (see below)
+- `paymentMeans`, at least one payment instruction
+- the seller's `phone` and `email`, and the seller's and buyer's city and postal code
+- for a CII credit note, `paymentTerms`
+
+Peppol BIS 3 applies the same payment instruction and seller contact rules to
+every German seller, so fill them in whichever format you send.
+
+Raw XRechnung XML can be sent as it is with `documentType: "xml"`: the document
+type and process are read from the document, for UBL and CII alike. XRechnung
+3.0 extension documents and earlier XRechnung versions are sent under the
+identifier the document declares, but are not read.
+
+### Invoicing a public authority
+
+Address the authority by its Leitweg-ID, as `0204:` followed by the Leitweg-ID.
+German public authorities require XRechnung, so a document to a Leitweg-ID is
+written as XRechnung by default, also when the authority is registered for
+Peppol BIS 3 as well. The XRechnung fields listed above are therefore required.
+The same Leitweg-ID has to be the invoice's buyer reference (BT-10), so leave
+`buyerReference` out and Recommand fills it in. A different `buyerReference` is
+refused, because the authority would reject the invoice; put order numbers in
+`purchaseOrderReference` instead.
+
+```json title="invoice to a public authority"
+{
+  "recipient": "0204:991-33333TEST-33",
+  "documentType": "invoice",
+  "document": {
+    "invoiceNumber": "RE-2026-001",
+    "purchaseOrderReference": "4500012345",
+    "buyer": { "name": "Bundesamt für Beispiele", "street": "Amtsweg 2", "city": "Bonn", "postalZone": "53113", "country": "DE" },
+    "paymentMeans": [{ "paymentMethod": "credit_transfer", "iban": "DE89370400440532013000", "reference": "RE-2026-001" }],
+    "lines": [{ "name": "Beratung", "quantity": "1", "netPriceAmount": "100.00", "vat": { "category": "S", "percentage": "19.00" } }]
+  }
+}
+```
+
+<Callout type="info" title="Before a first invoice to a federal authority">
+  Each authority and portal sets its own acceptance terms. Confirm the format
+  the authority accepts, and check that the recipient is reachable with the
+  [verify document support endpoint](/reference/recipients/verify-document-support)
+  before the first send.
+</Callout>

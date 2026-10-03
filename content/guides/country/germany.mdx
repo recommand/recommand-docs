@@ -1,0 +1,29 @@
+---
+title: Country context - Germany
+---
+
+## Peppol in Germany
+
+Germany has no central platform: e-invoices travel directly between the parties,
+over Peppol, email or EDI. What the law prescribes is the content, a structured
+invoice following EN 16931, not the channel.
+
+What is specific to Germany:
+
+- **A B2B mandate in phases.** Every German business has had to be able to
+  receive structured e-invoices since 1 January 2025. Issuing them becomes
+  mandatory from 1 January 2027 for businesses with a prior-year turnover above
+  EUR 800,000, and from 1 January 2028 for the rest, with statutory exemptions.
+- **XRechnung alongside Peppol BIS 3.** XRechnung is the German specialisation
+  (CIUS) of EN 16931, in UBL and in CII. German companies registered through
+  Recommand receive both Peppol BIS 3 and XRechnung, and Recommand can write and
+  read both.
+- **The VAT number is the Peppol address.** German businesses are published
+  under scheme `9930` with their VAT number (USt-IdNr.), so a German Peppol
+  address looks like `9930:DE123456788`.
+- **Public authorities are addressed by their Leitweg-ID.** Invoices to German
+  public authorities go to scheme `0204`, and the same Leitweg-ID has to appear
+  in the invoice as buyer reference (BT-10).
+- **German sellers have extra mandatory fields.** Peppol BIS 3 and XRechnung both
+  require a German seller to state payment instructions and a contact phone
+  number and email address.
