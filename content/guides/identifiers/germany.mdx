@@ -1,0 +1,66 @@
+---
+title: German identifiers
+---
+
+### Three identifiers that are easy to mix up
+
+A German invoice involves three different identifiers. Only the first one is a
+Peppol address:
+
+| Identifier                   | What it is for                                                   | Where it goes                                  |
+| ---------------------------- | ---------------------------------------------------------------- | ---------------------------------------------- |
+| Participant identifier       | The company's address on the Peppol network                      | A company identifier, e.g. `9930:DE123456788`  |
+| Legal registration identifier | The register entry, e.g. `HRB 12345 B`, shown on the invoice (BT-30) | `enterpriseNumber`, with an optional `enterpriseNumberScheme` |
+| Buyer reference (BT-10)      | The buyer's routing reference; for an authority, its Leitweg-ID   | `buyerReference` on the document               |
+
+### German identifiers and Peppol address
+
+| Field                    | German value                                          |
+| ------------------------ | ----------------------------------------------------- |
+| `country`                | `"DE"`                                                |
+| `vatNumber`              | `DE` + 9 digits, e.g. `DE123456788`                   |
+| `enterpriseNumber`       | Optional: the commercial register number              |
+| `enterpriseNumberScheme` | Optional: leave it out unless the buyer expects one   |
+
+```json title="company.json"
+{
+  "name": "Beispiel GmbH",
+  "address": "Musterstraße 1",
+  "postalCode": "10115",
+  "city": "Berlin",
+  "country": "DE",
+  "enterpriseNumber": "HRB 12345 B",
+  "vatNumber": "DE123456788"
+}
+```
+
+The VAT number is checked against the German format and its check digit, and
+registered as the company's Peppol identifier: **`9930:` followed by the VAT
+number**. The register number is never registered as a Peppol identifier.
+
+### Without a VAT number
+
+A company without a VAT number gets no identifier by default. Following the
+German identifier guideline, add one of these yourself with the [create
+identifier endpoint](/reference/company-identifiers/create-company-identifier)
+or in the dashboard:
+
+- `0088`: the company's GS1 Global Location Number (GLN), 13 digits
+- `9918`: the company's IBAN
+
+Both are checked for their check digits.
+
+### Public authorities: the Leitweg-ID
+
+A German public authority receives invoices under scheme `0204` with its
+Leitweg-ID, for example `0204:991-33333TEST-33`. Only add a `0204` identifier
+for a public authority that receives through Recommand, using the exact
+Leitweg-ID it was assigned; its check digits are verified. The older Leitweg-ID
+scheme `9958` is deprecated on Peppol and is refused.
+
+### Which identifier you send from
+
+A company sends from the identifier with the lowest scheme, but never from a
+Leitweg-ID: that one only names an authority's invoice reception. An invoice to
+a Leitweg-ID always goes out under the company's VAT number (`9930`) or, without
+one, its GLN (`0088`), the sender identifiers the federal invoice portals list.

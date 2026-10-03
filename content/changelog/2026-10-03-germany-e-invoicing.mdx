@@ -1,0 +1,22 @@
+---
+title: E-invoicing in Germany, including invoices to public authorities
+description: Send and receive XRechnung in UBL and CII, address German companies by their VAT number, and invoice German public authorities through their Leitweg-ID.
+date: 2026-10-03
+---
+
+Every German business must already be able to receive structured e-invoices. From 1 January 2027, companies with a prior-year turnover above EUR 800,000 also have to issue them, and the rest follow in 2028. Public authorities have required XRechnung for years. Recommand now covers both: German business-to-business invoicing over Peppol, and invoicing German public authorities.
+
+### What changed
+
+- **XRechnung 3.0**: Send XRechnung in UBL and CII from the same JSON you already use, or as raw XML, and receive it parsed as an invoice or credit note. Documents are validated against the official XRechnung rules. New German companies are registered to receive both Peppol BIS 3 and XRechnung.
+- **German Peppol addresses**: A German company is addressed by its VAT number, `9930:DE…`, which is registered by default. The commercial register number is no longer registered as a Peppol address. A company without a VAT number can add its GLN (`0088`) or IBAN (`9918`) instead. Identifiers are checked for their check digits, and the deprecated scheme `9958` is refused.
+- **Invoices to public authorities**: Address the authority by its Leitweg-ID, `0204:` followed by the Leitweg-ID. The document is written as XRechnung and the Leitweg-ID is filled in as buyer reference (BT-10). A different `buyerReference` is refused, since the authority would reject the invoice. This flow has been validated end to end with the German federal invoice portal.
+- **Missing fields reported up front**: XRechnung requires some fields that are optional elsewhere, such as the seller's phone number and email address and the payment instructions. A document that misses them is refused with a `400` that lists every missing field, before anything is sent.
+
+### Why this matters
+
+German invoices can now go over Peppol in the formats German buyers and authorities expect, through the same API as every other country. Invoices to public authorities carry the Leitweg-ID where the federal portal requires it, so they are not rejected for addressing.
+
+### What you need to do
+
+Nothing changes between businesses: Peppol BIS 3 stays the default, and XRechnung is used when you request it or when the recipient only accepts XRechnung. Make sure German companies have a phone number and email address set, since both XRechnung and Peppol BIS 3 require them for German sellers. Existing German companies can add the XRechnung document types with the [create company document type endpoint](/reference/company-document-types/create-company-document-type). The [German getting started guides](/getting-started/germany) cover identifiers, formats and invoicing public authorities.

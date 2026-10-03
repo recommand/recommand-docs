@@ -20,7 +20,7 @@ export const SITE_URL = "https://docs.recommand.eu";
 export const GUIDE_BASE_URL = "/getting-started";
 
 export type AudienceId = "platform" | "business";
-export type CountryId = "belgium" | "france" | "netherlands" | "other";
+export type CountryId = "belgium" | "france" | "germany" | "netherlands" | "other";
 export type DirectionId = "sending" | "receiving" | "sending-and-receiving";
 
 export type Audience = {
@@ -118,6 +118,18 @@ export const countries: readonly Country[] = [
     hint: "French UBL, CII and Factur-X on a French-accredited access point, with a signed mandate and its own regulated process.",
   },
   {
+    id: "germany",
+    code: "DE",
+    label: "Germany",
+    prose: "Germany",
+    registeredIn: "Germany",
+    company: "German company",
+    companies: "German companies",
+    flag: "🇩🇪",
+    short: "9930 · BIS 3 + XRechnung",
+    hint: "VAT numbers under scheme 9930, XRechnung in UBL and CII alongside Peppol BIS 3, and Leitweg-IDs for public authorities.",
+  },
+  {
     id: "netherlands",
     code: "NL",
     label: "Netherlands",
@@ -134,7 +146,7 @@ export const countries: readonly Country[] = [
     code: null,
     label: "Another country",
     prose: "other countries",
-    registeredIn: "a country other than Belgium, France or the Netherlands",
+    registeredIn: "a country other than Belgium, France, Germany or the Netherlands",
     company: "company in another country",
     companies: "companies in other countries",
     flag: "🌍",
