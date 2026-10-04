@@ -1,8 +1,6 @@
 "use client";
 
 import { useDocsSearch } from "fumadocs-core/search/client";
-import { useI18n } from "fumadocs-ui/contexts/i18n";
-import type { SharedProps } from "fumadocs-ui/contexts/search";
 import {
   SearchDialog,
   SearchDialogClose,
@@ -15,6 +13,8 @@ import {
   SearchDialogOverlay,
   type SearchItemType,
 } from "fumadocs-ui/components/dialog/search";
+import { useI18n } from "fumadocs-ui/contexts/i18n";
+import type { SharedProps } from "fumadocs-ui/contexts/search";
 
 type ResultSection = {
   key: string;

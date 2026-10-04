@@ -21,7 +21,9 @@ export async function generateMetadata(props: {
   };
 }
 
-export default async function FaqCategoryPage(props: { params: Promise<{ category: string }> }) {
+export default async function FaqCategoryPage(props: {
+  params: Promise<{ category: string }>;
+}) {
   const { category } = await props.params;
   const items = getCategoryItems(category);
   if (!items) notFound();
@@ -31,7 +33,9 @@ export default async function FaqCategoryPage(props: { params: Promise<{ categor
   return (
     <>
       {/* Letterhead */}
-      <header className={`grain relative w-full overflow-hidden border-b ${hairline}`}>
+      <header
+        className={`grain relative w-full overflow-hidden border-b ${hairline}`}
+      >
         <div
           aria-hidden="true"
           className="absolute -top-24 right-[8%] h-56 w-48 rotate-12 rounded-[2.5rem] bg-folder/15 blur-3xl"
@@ -41,7 +45,9 @@ export default async function FaqCategoryPage(props: { params: Promise<{ categor
           <div className="mt-8 grid items-end gap-x-16 gap-y-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             <div>
               <Eyebrow>FAQ</Eyebrow>
-              <h1 className="display mt-4 text-4xl text-fd-foreground sm:text-5xl">{label}</h1>
+              <h1 className="display mt-4 text-4xl text-fd-foreground sm:text-5xl">
+                {label}
+              </h1>
             </div>
             <div className="lg:justify-self-end lg:pb-1">
               <p className="max-w-md text-lg leading-relaxed text-fd-muted-foreground">

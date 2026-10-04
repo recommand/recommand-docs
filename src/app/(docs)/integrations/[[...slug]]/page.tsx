@@ -1,15 +1,15 @@
-import { integrationsSource } from "@/lib/source";
 import {
-  DocsPage,
   DocsBody,
   DocsDescription,
+  DocsPage,
   DocsTitle,
 } from "fumadocs-ui/page";
-import { notFound } from "next/navigation";
-import { getMDXComponents } from "@/components/mdx-components";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { getMDXComponents } from "@/components/mdx-components";
+import { integrationsSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
 const hairline = "border-darkslate/10 dark:border-sheet/15";
@@ -43,6 +43,7 @@ function LogoChip({ src, size }: { src: string; size: number }) {
         size >= 24 ? "size-11" : "size-10"
       }`}
     >
+      {/* biome-ignore lint/performance/noImgElement: a small decorative logo; next/image would add an optimizer round trip for it */}
       <img src={src} alt="" width={size} height={size} />
     </span>
   );

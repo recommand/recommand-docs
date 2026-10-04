@@ -1,6 +1,8 @@
 export default function RecommandLogo({ className }: { className?: string }) {
   return (
     <svg
+      role="img"
+      aria-label="Recommand"
       viewBox="0 -7.2 224 50.2"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

@@ -29,6 +29,7 @@ export function SearchTrigger() {
         <div className="ms-auto inline-flex gap-1">
           {hotKey.map((k, i) => (
             <kbd
+              // biome-ignore lint/suspicious/noArrayIndexKey: a fixed shortcut, its keys never reorder
               key={i}
               className="rounded-[4px] border border-shadow/60 bg-sheet px-1.5 py-0.5 font-mono text-xs text-fd-muted-foreground dark:border-sheet/20 dark:bg-slate"
             >

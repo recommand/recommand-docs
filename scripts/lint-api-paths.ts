@@ -51,7 +51,10 @@ function contentFiles(dir: string): string[] {
  * `.sh` and `.json` samples under `content/samples/` are code all the way down
  * and are included into fences elsewhere, so they count in full.
  */
-function codeLines(file: string, content: string): { line: number; text: string }[] {
+function codeLines(
+  file: string,
+  content: string,
+): { line: number; text: string }[] {
   const lines = content.split("\n");
   if (!/\.mdx?$/.test(file)) {
     return lines.map((text, index) => ({ line: index + 1, text }));
@@ -73,8 +76,7 @@ function codeLines(file: string, content: string): { line: number; text: string 
 function extractPaths(text: string): string[] {
   const found: string[] = [];
   const pattern = /(?:https?:\/\/[^\s"'`)]*)?(\/api\/v1(?:\/[^\s"'`)>,;]*)*)/g;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(text)) !== null) {
+  for (const match of text.matchAll(pattern)) {
     const raw = match[1]
       // A query string is not part of the path.
       .replace(/\?.*$/, "")
@@ -158,9 +160,7 @@ async function main() {
   const errors: string[] = [];
   for (const [raw, uses] of [...references].sort()) {
     if (apiPaths.some((specPath) => matches(raw, specPath))) continue;
-    const where = uses
-      .map((use) => `${use.file}:${use.line}`)
-      .join(", ");
+    const where = uses.map((use) => `${use.file}:${use.line}`).join(", ");
     errors.push(`${raw} is not a path the API serves (${where})`);
   }
 

@@ -1,20 +1,16 @@
-import { referenceSource } from "@/lib/source";
-import {
-  DocsPage,
-  DocsBody,
-  DocsTitle,
-} from "fumadocs-ui/page";
+import type { Item, Node } from "fumadocs-core/page-tree";
+import { DocsBody, DocsPage, DocsTitle } from "fumadocs-ui/page";
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMDXComponents } from "@/components/mdx-components";
+import type { ComponentProps, ReactNode } from "react";
 import { OpenAPIPage } from "@/components/api-page";
-import { openapi } from "@/lib/openapi";
+import { getMDXComponents } from "@/components/mdx-components";
 import { renderMarkdown } from "@/lib/markdown";
 import { markdownToPlainText } from "@/lib/markdown-text";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import type { Item, Node } from "fumadocs-core/page-tree";
-import type { ComponentProps, ReactNode } from "react";
+import { openapi } from "@/lib/openapi";
 import { referenceGroupDescriptions } from "@/lib/reference-groups";
+import { referenceSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
 const hairline = "border-darkslate/10 dark:border-sheet/15";
@@ -188,7 +184,7 @@ export default async function Page(props: {
           components={getMDXComponents({
             OpenAPIPage: async (props: ComponentProps<typeof OpenAPIPage>) => (
               <OpenAPIPage
-                {...await openapi.preloadOpenAPIPage(page)}
+                {...(await openapi.preloadOpenAPIPage(page))}
                 {...props}
               />
             ),

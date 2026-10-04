@@ -1,0 +1,134 @@
+// Self-contained so Biome also runs in a standalone clone of this repository.
+// The code follows Prettier's defaults (double quotes, 80 columns), and the
+// config matches it.
+//
+// files.includes skips the Fumadocs registry components under
+// src/components/api, src/components/ui and two helpers in src/lib. They are
+// kept as the registry ships them, so updating them stays a clean diff; local
+// changes are listed at the top of src/components/api/schema/client.tsx.
+// css.parser.tailwindDirectives lets Biome parse Tailwind v4 at-rules.
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "includes": [
+      "**",
+      "!**/.agents",
+      "!**/.claude",
+      "!src/components/api",
+      "!src/components/ui",
+      "!src/lib/cn.ts",
+      "!src/lib/merge-refs.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "lineEnding": "lf"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      }
+    },
+    "domains": {
+      "react": "recommended",
+      "next": "recommended"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true
+    },
+    "jsxRuntime": "transparent"
+  },
+  "json": {
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": true
+    },
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      // The generator walks the raw OpenAPI JSON, which has no useful type.
+      "includes": ["scripts/generate-openapi.mts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      // Logo and icon files are served as images, not inline SVG, so the
+      // accessibility rules for inline SVG do not apply.
+      "includes": ["**/*.svg"],
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": ["**/migrations/**"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
+}

@@ -1,19 +1,19 @@
 import type { MetadataRoute } from "next";
 import {
-  docsSource,
-  referenceSource,
-  integrationsSource,
-  changelogSource,
-  faqSource,
-} from "@/lib/source";
-import { getCategories } from "@/lib/faq";
-import {
   allAnswers,
   countries,
   countryUrl,
   GUIDE_BASE_URL,
   guideUrl,
 } from "@/lib/country-guides";
+import { getCategories } from "@/lib/faq";
+import {
+  changelogSource,
+  docsSource,
+  faqSource,
+  integrationsSource,
+  referenceSource,
+} from "@/lib/source";
 
 const BASE_URL = "https://docs.recommand.eu";
 
@@ -26,7 +26,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // Country-specific getting started guides: the hub, one page per country and
   // one page per answer combination, so every variant can be indexed on its own.
-  entries.push({ url: `${BASE_URL}${GUIDE_BASE_URL}`, lastModified: new Date() });
+  entries.push({
+    url: `${BASE_URL}${GUIDE_BASE_URL}`,
+    lastModified: new Date(),
+  });
   for (const country of countries) {
     entries.push({
       url: `${BASE_URL}${countryUrl(country)}`,

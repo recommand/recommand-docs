@@ -1,8 +1,8 @@
-import { docsSource, changelogSource, faqSource } from "@/lib/source";
-import { getLLMText } from "@/lib/get-llm-text";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { allAnswers, guideMarkdown } from "@/lib/country-guides";
-import fs from "fs/promises";
-import path from "path";
+import { getLLMText } from "@/lib/get-llm-text";
+import { changelogSource, docsSource, faqSource } from "@/lib/source";
 
 export const revalidate = false;
 
@@ -39,7 +39,9 @@ async function getModelTexts(): Promise<string[]> {
     for (const file of files.filter((f) => f.endsWith(".mdx"))) {
       const content = await fs.readFile(path.join(modelsDir, file), "utf-8");
       // Extract title from frontmatter
-      const titleMatch = content.match(/^---[\s\S]*?title:\s*"([^"]+)"[\s\S]*?---/);
+      const titleMatch = content.match(
+        /^---[\s\S]*?title:\s*"([^"]+)"[\s\S]*?---/,
+      );
       const title = titleMatch?.[1] ?? file.replace(/\.mdx$/, "");
       // Strip frontmatter
       const body = content.replace(/^---[\s\S]*?---\s*/, "");

@@ -14,7 +14,10 @@ export default function FaqIndex() {
   const data = getAllFaq();
   // Source order follows content/faq/meta.json (editorial), not alphabetical.
   const categories = Object.keys(data);
-  const totalQuestions = categories.reduce((sum, cat) => sum + data[cat].length, 0);
+  const totalQuestions = categories.reduce(
+    (sum, cat) => sum + data[cat].length,
+    0,
+  );
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -36,7 +39,9 @@ export default function FaqIndex() {
       <JsonLd data={faqJsonLd} />
 
       {/* Letterhead */}
-      <header className={`grain relative w-full overflow-hidden border-b ${hairline}`}>
+      <header
+        className={`grain relative w-full overflow-hidden border-b ${hairline}`}
+      >
         <div
           aria-hidden="true"
           className="absolute -top-24 right-[8%] h-56 w-48 rotate-12 rounded-[2.5rem] bg-folder/15 blur-3xl"
@@ -51,7 +56,8 @@ export default function FaqIndex() {
             </div>
             <div className="lg:justify-self-end lg:pb-2">
               <p className="max-w-md text-lg leading-relaxed text-fd-muted-foreground">
-                Straight answers about Peppol, e-invoicing and the Recommand API, sorted by topic.
+                Straight answers about Peppol, e-invoicing and the Recommand
+                API, sorted by topic.
               </p>
               <p className="mt-3 font-mono text-xs uppercase tracking-wide text-stone-dark dark:text-stone">
                 {totalQuestions} questions · {categories.length} topics
@@ -63,7 +69,9 @@ export default function FaqIndex() {
 
       {/* Topics as ruled link rows */}
       <section className="mx-auto w-full max-w-5xl px-6 py-14 md:py-16">
-        <span className="eyebrow text-fd-muted-foreground">Browse by topic</span>
+        <span className="eyebrow text-fd-muted-foreground">
+          Browse by topic
+        </span>
         <div className={`mt-5 border-t ${hairline}`}>
           {categories.map((cat, i) => {
             const items = data[cat];

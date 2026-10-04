@@ -1,5 +1,5 @@
 import { remarkGfm } from "fumadocs-core/mdx-plugins/remark-gfm";
-import { toString } from "mdast-util-to-string";
+import { toString as mdastToString } from "mdast-util-to-string";
 import { remark } from "remark";
 
 const parseMarkdown = remark().use(remarkGfm);
@@ -9,5 +9,7 @@ const parseMarkdown = remark().use(remarkGfm);
  * want the words only.
  */
 export function markdownToPlainText(markdown: string): string {
-  return toString(parseMarkdown.parse(markdown)).replace(/\s+/g, " ").trim();
+  return mdastToString(parseMarkdown.parse(markdown))
+    .replace(/\s+/g, " ")
+    .trim();
 }

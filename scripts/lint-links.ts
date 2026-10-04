@@ -10,17 +10,14 @@ import { allAnswers, countries } from "../src/lib/country-guides-data";
 function extractHeadings(content: string): string[] {
   const headingRegex = /^#{1,6}\s+(.+)$/gm;
   const headings: string[] = [];
-  let match;
-  while ((match = headingRegex.exec(content)) !== null) {
+  for (const match of content.matchAll(headingRegex)) {
     headings.push(match[1].toLowerCase().replace(/\s+/g, "-"));
   }
   return headings;
 }
 
 function toSlugs(basedir: string, filePath: string): string[] {
-  const rel = path
-    .relative(basedir, filePath)
-    .replace(/\.(md|mdx)$/, "");
+  const rel = path.relative(basedir, filePath).replace(/\.(md|mdx)$/, "");
   const parts = rel.split(path.sep);
   // index files map to the parent route (empty slug for [[...slug]])
   if (parts[parts.length - 1] === "index") {
@@ -34,7 +31,7 @@ async function checkLinks() {
   const guideFragmentFiles = await readFiles("content/guides/**/*.{md,mdx}");
   const referenceFiles = await readFiles("content/reference/**/*.{md,mdx}");
   const integrationsFiles = await readFiles(
-    "content/integrations/**/*.{md,mdx}"
+    "content/integrations/**/*.{md,mdx}",
   );
   const changelogFiles = await readFiles("content/changelog/**/*.{md,mdx}");
   const faqFiles = await readFiles("content/faq/**/*.{md,mdx}");
@@ -72,15 +69,14 @@ async function checkLinks() {
       "(docs)/getting-started/[country]": countries.map((country) => ({
         value: { country: country.id },
       })),
-      "(docs)/getting-started/[country]/[audience]/[direction]": allAnswers().map(
-        (answers) => ({
+      "(docs)/getting-started/[country]/[audience]/[direction]":
+        allAnswers().map((answers) => ({
           value: {
             country: answers.country.id,
             audience: answers.audience.id,
             direction: answers.direction.id,
           },
-        }),
-      ),
+        })),
       "(docs)/faq/[category]/[slug]": faqFiles.map((file) => {
         const parts = toSlugs("content/faq", file.path);
         return {

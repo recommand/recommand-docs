@@ -1,8 +1,8 @@
-import defaultMdxComponents from "fumadocs-ui/mdx";
-import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import Link from "fumadocs-core/link";
 import { Callout } from "fumadocs-ui/components/callout";
 import { Heading } from "fumadocs-ui/components/heading";
-import Link from "fumadocs-core/link";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps } from "react";
 
@@ -16,7 +16,9 @@ function cx(...parts: Array<string | undefined>): string {
  */
 function heading(as: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", extra: string) {
   return function MdxHeading(props: ComponentProps<"h2">) {
-    return <Heading as={as} {...props} className={cx(extra, props.className)} />;
+    return (
+      <Heading as={as} {...props} className={cx(extra, props.className)} />
+    );
   };
 }
 

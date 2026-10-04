@@ -1,6 +1,12 @@
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
+import {
+  DocsBody,
+  DocsDescription,
+  DocsPage,
+  DocsTitle,
+} from "fumadocs-ui/page";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/letterhead";
 import { getMDXComponents } from "@/components/mdx-components";
 import { PageActions } from "@/components/page-actions";
 import {
@@ -17,7 +23,6 @@ import {
   resolveAnswers,
   SITE_URL,
 } from "@/lib/country-guides";
-import { JsonLd } from "@/components/letterhead";
 import { GuideSelector } from "../../../guide-selector";
 import { Breadcrumbs, hairline } from "../../../guide-ui";
 
@@ -100,7 +105,9 @@ export default async function Page(props: { params: Promise<PageParams> }) {
         {guideHeading(answers)}
       </DocsTitle>
       <DocsDescription>{guideDescription(answers)}</DocsDescription>
-      <div className={`flex flex-row items-center gap-2 border-b pt-2 pb-6 ${hairline}`}>
+      <div
+        className={`flex flex-row items-center gap-2 border-b pt-2 pb-6 ${hairline}`}
+      >
         <PageActions markdownUrl={`${url}.md`} />
       </div>
 
@@ -112,7 +119,9 @@ export default async function Page(props: { params: Promise<PageParams> }) {
         <p>{guideIntro(answers)}</p>
         {chain.map((fragment) => {
           const MDX = fragment.body;
-          return <MDX key={fragment.info.path} components={getMDXComponents()} />;
+          return (
+            <MDX key={fragment.info.path} components={getMDXComponents()} />
+          );
         })}
 
         <h2 id="other-guides-for-this-country">

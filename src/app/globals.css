@@ -1,8 +1,8 @@
 @import "tailwindcss";
-@custom-variant dark (&:is(.dark *));
 @import "fumadocs-ui/css/shadcn.css";
 @import "fumadocs-ui/css/preset.css";
 @import "fumadocs-openapi/css/preset.css";
+@custom-variant dark (&:is(.dark *));
 
 :root {
   --sheet-light: oklch(98.5% 0.003 78.3);
@@ -223,12 +223,14 @@
 
 /* Override all fumadocs accent/80 hovers to use the full accent color */
 .hover\:bg-fd-accent\/80:hover {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides a fumadocs-ui utility */
   background-color: var(--color-fd-accent) !important;
 }
 
 /* Consistent accent hover color in sidebar */
 #nd-sidebar a:hover,
 #nd-sidebar button:hover {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides a fumadocs-ui utility */
   background-color: var(--color-fd-accent) !important;
 }
 
@@ -241,11 +243,13 @@
 /* API playground: inputs & textareas get transparent bg with existing border */
 form.not-prose input,
 form.not-prose textarea {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides the fumadocs-openapi input background */
   background-color: transparent !important;
 }
 
 /* API playground: select triggers get transparent bg */
 form.not-prose button[role="combobox"] {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides the fumadocs-openapi input background */
   background-color: transparent !important;
 }
 
@@ -254,7 +258,6 @@ form.not-prose button[role="combobox"] {
   --fd-banner-height: 3.5rem;
   --fd-docs-height: calc(100dvh - 3.5rem);
 }
-
 
 /* ——— Recommand visual system: warm paper surfaces, dark green ink, mint accent ——— */
 

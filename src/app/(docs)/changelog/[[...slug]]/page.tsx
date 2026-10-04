@@ -1,11 +1,11 @@
-import { changelogSource } from "@/lib/source";
-import { DocsPage, DocsBody } from "fumadocs-ui/page";
+import { DocsBody, DocsPage } from "fumadocs-ui/page";
+import { ArrowLeft, ArrowUpRight, Rss } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { getMDXComponents } from "@/components/mdx-components";
 import { PageActions } from "@/components/page-actions";
-import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Rss } from "lucide-react";
-import type { ReactNode } from "react";
+import { changelogSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
 const hairline = "border-darkslate/10 dark:border-sheet/15";
@@ -31,7 +31,7 @@ function toIsoDate(date: unknown): string | null {
 }
 
 function groupByMonth(
-  pages: ReturnType<typeof changelogSource.getPages>
+  pages: ReturnType<typeof changelogSource.getPages>,
 ): MonthGroup[] {
   const sorted = [...pages].sort((a, b) => {
     const dateA = a.data.date ? new Date(a.data.date).getTime() : 0;
@@ -97,8 +97,8 @@ function ChangelogIndex() {
           </div>
           <div className="max-w-md lg:justify-self-end lg:pb-2">
             <p className="text-lg leading-relaxed text-fd-muted-foreground">
-              New endpoints, features and fixes across the Recommand Peppol
-              API, recorded as they ship.
+              New endpoints, features and fixes across the Recommand Peppol API,
+              recorded as they ship.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
               <a

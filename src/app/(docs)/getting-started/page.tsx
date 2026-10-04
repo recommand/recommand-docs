@@ -1,6 +1,7 @@
 import { DocsPage } from "fumadocs-ui/page";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/letterhead";
 import {
   allAnswers,
   answersForCountry,
@@ -12,7 +13,6 @@ import {
   guideUrl,
   SITE_URL,
 } from "@/lib/country-guides-data";
-import { JsonLd } from "@/components/letterhead";
 import { GuidePicker } from "./guide-picker";
 import { Eyebrow, hairline } from "./guide-ui";
 

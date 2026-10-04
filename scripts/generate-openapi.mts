@@ -1,7 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { generateFiles } from "fumadocs-openapi";
-import fs from "fs";
-import path from "path";
-import { SPEC_URL, openapi } from "../src/lib/openapi";
+import { openapi, SPEC_URL } from "../src/lib/openapi";
 import {
   referenceGroupDescriptions,
   referenceGroupNames,
@@ -70,7 +70,7 @@ const tagOperations: Record<string, string[]> = {};
 // tag/slug -> the one-line summary used as the page's meta description
 const operationSummaries: Record<string, string> = {};
 for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
-  for (const [method, op] of Object.entries(methods as Record<string, any>)) {
+  for (const [, op] of Object.entries(methods as Record<string, any>)) {
     if (!op?.tags) continue;
     const operationId: string = op.operationId ?? pathStr;
     const slug = toKebabCase(operationId);
@@ -236,8 +236,7 @@ function renderType(schema: any): string {
 
   if (isArrayType(schema)) {
     const itemType = schema.items ? renderType(schema.items) : "any";
-    const nullable =
-      Array.isArray(schema.type) && schema.type.includes("null");
+    const nullable = Array.isArray(schema.type) && schema.type.includes("null");
     return `${itemType}[]${nullable ? " \\| null" : ""}`;
   }
 
@@ -246,15 +245,11 @@ function renderType(schema: any): string {
   }
 
   if (schema.oneOf) {
-    return schema.oneOf
-      .map((s: any) => s.title || renderType(s))
-      .join(" | ");
+    return schema.oneOf.map((s: any) => s.title || renderType(s)).join(" | ");
   }
 
   if (schema.anyOf) {
-    return schema.anyOf
-      .map((s: any) => s.title || renderType(s))
-      .join(" | ");
+    return schema.anyOf.map((s: any) => s.title || renderType(s)).join(" | ");
   }
 
   if (schema.allOf) {
@@ -317,8 +312,7 @@ function renderSchemaTable(schema: any, depth: number = 0): string {
     const lines: string[] = [`**${keyword}:**\n`];
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
-      const label =
-        variant.title || variant.description || `Variant ${i + 1}`;
+      const label = variant.title || variant.description || `Variant ${i + 1}`;
       lines.push(`#### ${label}\n`);
       lines.push(renderSchemaTable(variant, depth));
     }
@@ -607,7 +601,10 @@ for (const tagSlug of tagOrder) {
   indexLines.push("");
 }
 
-fs.writeFileSync(path.join(REFERENCE_MD_DIR, "index.md"), indexLines.join("\n"));
+fs.writeFileSync(
+  path.join(REFERENCE_MD_DIR, "index.md"),
+  indexLines.join("\n"),
+);
 
 console.log(
   `Generated ${allEndpoints.length} endpoint markdown files in ${REFERENCE_MD_DIR}/`,
@@ -637,9 +634,7 @@ function renderModelPropertyRow(
   const typeStr = renderType(prop);
   const req = required ? "Yes" : "No";
   const desc = buildPropertyDescription(prop);
-  const nameCell = anchor
-    ? `[\`${name}\`](#${anchor})`
-    : `\`${name}\``;
+  const nameCell = anchor ? `[\`${name}\`](#${anchor})` : `\`${name}\``;
   return `| ${nameCell} | ${typeStr} | ${req} | ${desc} |`;
 }
 
@@ -727,9 +722,7 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
         if (nested.oneOf || nested.anyOf) {
           const variants = nested.oneOf || nested.anyOf;
           const keyword = nested.oneOf ? "One of" : "Any of";
-          lines.push(
-            `${heading} \`${prefix}${propName}\` (${keyword})`,
-          );
+          lines.push(`${heading} \`${prefix}${propName}\` (${keyword})`);
           lines.push("");
           for (const variant of variants) {
             const label =
@@ -773,9 +766,7 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
           lines.push("| Name | Type | Required | Description |");
           lines.push("|------|------|----------|-------------|");
           const nReq = new Set(nested.required ?? []);
-          for (const [nName, nProp] of Object.entries<any>(
-            nested.properties,
-          )) {
+          for (const [nName, nProp] of Object.entries<any>(nested.properties)) {
             const fullPath = `${prefix}${propName}.${nName}`;
             const nNested = getNestedSchema(nProp);
             lines.push(
@@ -805,8 +796,7 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
     lines.push(`## ${keyword}`);
     lines.push("");
     for (const variant of variants) {
-      const label =
-        variant.title || variant.description || renderType(variant);
+      const label = variant.title || variant.description || renderType(variant);
       lines.push(`### ${label}`);
       lines.push("");
       if (variant.description) {
@@ -831,7 +821,7 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
 
   // Write used-by section (which endpoints reference this schema)
   const usedByEndpoints: { tag: string; slug: string; title: string }[] = [];
-  for (const [pathStr, methods] of Object.entries<any>(spec.paths ?? {})) {
+  for (const [, methods] of Object.entries<any>(spec.paths ?? {})) {
     for (const [, op] of Object.entries<any>(methods)) {
       if (!op?.operationId) continue;
       const opStr = JSON.stringify(op);
@@ -853,9 +843,7 @@ for (const [schemaName, schema] of Object.entries<any>(schemas)) {
     lines.push("## Used by");
     lines.push("");
     for (const ep of usedByEndpoints) {
-      lines.push(
-        `- [${ep.title}](/reference/${ep.tag}/${ep.slug})`,
-      );
+      lines.push(`- [${ep.title}](/reference/${ep.tag}/${ep.slug})`);
     }
     lines.push("");
   }
@@ -882,6 +870,4 @@ if (!rootMeta.pages.includes("models")) {
   );
 }
 
-console.log(
-  `Generated ${modelSlugs.length} model pages in ${MODELS_DIR}/`,
-);
+console.log(`Generated ${modelSlugs.length} model pages in ${MODELS_DIR}/`);

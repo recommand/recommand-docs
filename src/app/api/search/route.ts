@@ -1,5 +1,3 @@
-import { docsSource, referenceSource, faqSource, integrationsSource, changelogSource } from "@/lib/source";
-import { markdownToPlainText } from "@/lib/markdown-text";
 import { createSearchAPI } from "fumadocs-core/search/server";
 import {
   allAnswers,
@@ -8,6 +6,14 @@ import {
   guideHeading,
   guideUrl,
 } from "@/lib/country-guides";
+import { markdownToPlainText } from "@/lib/markdown-text";
+import {
+  changelogSource,
+  docsSource,
+  faqSource,
+  integrationsSource,
+  referenceSource,
+} from "@/lib/source";
 
 function buildIndexTag(url: string): string {
   if (url.startsWith("/reference/models/")) return "model";
