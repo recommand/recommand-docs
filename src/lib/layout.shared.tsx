@@ -2,9 +2,9 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import type { RootProviderProps } from "fumadocs-ui/provider/next";
 import {
   BookOpen,
-  Code2,
+  CircleHelp,
+  CodeXml,
   Compass,
-  HelpCircle,
   History,
   Puzzle,
 } from "lucide-react";
@@ -92,7 +92,7 @@ export function baseOptions(): BaseLayoutProps {
       {
         text: "Reference",
         url: "/reference",
-        icon: <Code2 />,
+        icon: <CodeXml />,
         active: "nested-url",
       },
       {
@@ -110,7 +110,7 @@ export function baseOptions(): BaseLayoutProps {
       {
         text: "FAQ",
         url: "/faq",
-        icon: <HelpCircle />,
+        icon: <CircleHelp />,
         active: "nested-url",
       },
     ],
