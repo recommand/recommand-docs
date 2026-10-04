@@ -2,23 +2,9 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import { Callout } from "fumadocs-ui/components/callout";
 import { Heading } from "fumadocs-ui/components/heading";
-import { createAPIPage } from "fumadocs-openapi/ui";
 import Link from "fumadocs-core/link";
-import {
-  openapi,
-  openapiShikiConfig,
-  openapiShikiOptions,
-} from "@/lib/openapi";
 import type { MDXComponents } from "mdx/types";
 import type { ComponentProps } from "react";
-
-const APIPage = createAPIPage(openapi, {
-  schemaUI: {
-    showExample: true,
-  },
-  shiki: openapiShikiConfig,
-  shikiOptions: openapiShikiOptions,
-});
 
 function cx(...parts: Array<string | undefined>): string {
   return parts.filter(Boolean).join(" ");
@@ -109,7 +95,6 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Callout: MdxCallout,
     Tab,
     Tabs,
-    APIPage,
     ...components,
   };
 }

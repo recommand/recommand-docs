@@ -67,7 +67,7 @@ function StructuredItem({
       <SearchDialogListItem
         item={item}
         onClick={onClick}
-        className="aria-selected:bg-folder/15 aria-selected:text-fd-foreground aria-selected:shadow-[inset_3px_0_0_0_var(--folder)]"
+        className="aria-selected:bg-folder/15 aria-selected:text-fd-foreground"
       />
     </>
   );

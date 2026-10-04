@@ -6,12 +6,14 @@ import {
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx-components";
+import { OpenAPIPage } from "@/components/api-page";
+import { openapi } from "@/lib/openapi";
 import { renderMarkdown } from "@/lib/markdown";
 import { markdownToPlainText } from "@/lib/markdown-text";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Item, Node } from "fumadocs-core/page-tree";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { referenceGroupDescriptions } from "@/lib/reference-groups";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
@@ -182,7 +184,16 @@ export default async function Page(props: {
         </div>
       )}
       <DocsBody>
-        <MDX components={getMDXComponents()} />
+        <MDX
+          components={getMDXComponents({
+            OpenAPIPage: async (props: ComponentProps<typeof OpenAPIPage>) => (
+              <OpenAPIPage
+                {...await openapi.preloadOpenAPIPage(page)}
+                {...props}
+              />
+            ),
+          })}
+        />
       </DocsBody>
     </DocsPage>
   );
