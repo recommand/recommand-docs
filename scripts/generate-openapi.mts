@@ -273,8 +273,14 @@ function buildPropertyDescription(prop: any): string {
   const parts: string[] = [];
   if (prop.description) parts.push(prop.description);
   if (prop.default !== undefined) parts.push(`Default: \`${prop.default}\``);
-  if (prop.example !== undefined)
-    parts.push(`Example: \`${JSON.stringify(prop.example)}\``);
+  // OpenAPI 3.1 schemas carry `examples`, older specs `example`. An example
+  // can be `null`, so test for the list rather than its first value.
+  const example =
+    Array.isArray(prop.examples) && prop.examples.length > 0
+      ? prop.examples[0]
+      : prop.example;
+  if (example !== undefined)
+    parts.push(`Example: \`${JSON.stringify(example)}\``);
   if (prop.const !== undefined) parts.push(`Value: \`${prop.const}\``);
   if (prop.enum) {
     parts.push(`Values: ${prop.enum.map((v: any) => `\`${v}\``).join(", ")}`);
