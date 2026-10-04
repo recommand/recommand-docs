@@ -1,6 +1,6 @@
 import { remarkGfm } from "fumadocs-core/mdx-plugins/remark-gfm";
 import type { Root } from "hast";
-import { toJsxRuntime } from "hast-util-to-jsx-runtime";
+import { type Components, toJsxRuntime } from "hast-util-to-jsx-runtime";
 import type { ReactNode } from "react";
 import * as runtime from "react/jsx-runtime";
 import { remark } from "remark";
@@ -20,7 +20,9 @@ export async function renderMarkdown(markdown: string): Promise<ReactNode> {
         toJsxRuntime(tree as Root, {
           ...runtime,
           development: false,
-          components: getMDXComponents(),
+          // MDX's component map also allows nested namespaces (`<Foo.Bar>`),
+          // which plain HTML from a description never produces.
+          components: getMDXComponents() as Components,
         });
     })
     .process({ value: markdown });
