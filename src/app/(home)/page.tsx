@@ -3,8 +3,8 @@ import {
   ArrowUpRight,
   BookOpen,
   Building2,
-  Code2,
-  HelpCircle,
+  CircleHelp,
+  CodeXml,
   History,
   Inbox,
   KeyRound,
@@ -60,7 +60,7 @@ const entryPoints = [
     title: "API Reference",
     description: "Complete endpoint reference generated from the OpenAPI spec.",
     href: "/reference",
-    icon: Code2,
+    icon: CodeXml,
   },
   {
     title: "Integrations",
@@ -78,7 +78,7 @@ const entryPoints = [
     title: "FAQ",
     description: "Frequently asked questions about the Recommand Peppol API.",
     href: "/faq",
-    icon: HelpCircle,
+    icon: CircleHelp,
   },
 ];
 
