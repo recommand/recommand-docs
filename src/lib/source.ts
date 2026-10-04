@@ -1,8 +1,14 @@
 import { loader } from "fumadocs-core/source";
-import { docs, reference, integrations, changelog, faq } from "@/.source/server";
 import { toFumadocsSource } from "fumadocs-mdx/runtime/server";
 import { openapiPlugin } from "fumadocs-openapi/server";
 import { createElement } from "react";
+import {
+  changelog,
+  docs,
+  faq,
+  integrations,
+  reference,
+} from "@/.source/server";
 import { markdownToPlainText } from "@/lib/markdown-text";
 
 export const docsSource = loader({

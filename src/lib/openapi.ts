@@ -29,7 +29,8 @@ function normalizeSchema(schema: unknown): void {
   }
   for (const key of subschemaMaps) {
     const map = schema[key];
-    if (isObject(map)) for (const sub of Object.values(map)) normalizeSchema(sub);
+    if (isObject(map))
+      for (const sub of Object.values(map)) normalizeSchema(sub);
   }
   for (const key of subschemaLists) {
     const list = schema[key];

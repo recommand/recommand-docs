@@ -32,7 +32,8 @@ export default async function FaqQuestionPage(props: {
   if (!page) notFound();
 
   const items = getCategoryItems(category);
-  const categoryLabel = page.data.category || getCategoryLabel(category, items || undefined);
+  const categoryLabel =
+    page.data.category || getCategoryLabel(category, items || undefined);
   const related = (items || []).filter((q) => q.slug !== slug).slice(0, 5);
   const updatedAt = page.data.updatedAt
     ? new Date(page.data.updatedAt).toISOString().slice(0, 10)
@@ -45,7 +46,9 @@ export default async function FaqQuestionPage(props: {
       {/* Letterhead */}
       <header className={`grain relative w-full border-b ${hairline}`}>
         <div className="relative mx-auto w-full max-w-3xl px-6 pt-10 pb-9 md:pt-12">
-          <BackLink href={`/faq/${encodeURIComponent(category)}`}>{categoryLabel}</BackLink>
+          <BackLink href={`/faq/${encodeURIComponent(category)}`}>
+            {categoryLabel}
+          </BackLink>
           <div className="mt-8">
             <Eyebrow>FAQ · {categoryLabel}</Eyebrow>
             <h1 className="display mt-4 text-3xl text-fd-foreground sm:text-4xl">
@@ -73,7 +76,9 @@ export default async function FaqQuestionPage(props: {
 
         {related.length > 0 && (
           <section className="mt-14">
-            <span className="eyebrow text-fd-muted-foreground">Related questions</span>
+            <span className="eyebrow text-fd-muted-foreground">
+              Related questions
+            </span>
             <div className={`mt-4 border-t ${hairline}`}>
               {related.map((q, i) => (
                 <Link

@@ -1,10 +1,12 @@
+import { DocsPage } from "fumadocs-ui/page";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DocsPage } from "fumadocs-ui/page";
+import { JsonLd } from "@/components/letterhead";
 import {
   answersForCountry,
+  type Country,
   countries,
   countryUrl,
   findCountry,
@@ -13,9 +15,7 @@ import {
   guideHeading,
   guideUrl,
   SITE_URL,
-  type Country,
 } from "@/lib/country-guides-data";
-import { JsonLd } from "@/components/letterhead";
 import { GuidePicker } from "../guide-picker";
 import { Breadcrumbs, Eyebrow, hairline } from "../guide-ui";
 
@@ -119,7 +119,9 @@ export default async function CountryIndex(props: {
       </section>
 
       <section className={`mt-10 border-t pt-6 ${hairline}`}>
-        <span className="eyebrow text-fd-muted-foreground">Other countries</span>
+        <span className="eyebrow text-fd-muted-foreground">
+          Other countries
+        </span>
         <p className="mt-3 leading-relaxed text-fd-muted-foreground">
           {others.map((other, index) => (
             <span key={other.id}>

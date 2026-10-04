@@ -4,7 +4,13 @@ import type { ReactNode } from "react";
 
 export { Eyebrow, hairline } from "@/components/letterhead";
 
-export function BackLink({ href, children }: { href: string; children: ReactNode }) {
+export function BackLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
   return (
     <Link
       href={href}

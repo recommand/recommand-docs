@@ -1,13 +1,18 @@
-import { docsSource, integrationsSource, changelogSource, faqSource } from "@/lib/source";
-import { getLLMText } from "@/lib/get-llm-text";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { notFound } from "next/navigation";
 import {
   allAnswers,
   guideMarkdown,
   resolveAnswers,
 } from "@/lib/country-guides";
-import { notFound } from "next/navigation";
-import fs from "fs/promises";
-import path from "path";
+import { getLLMText } from "@/lib/get-llm-text";
+import {
+  changelogSource,
+  docsSource,
+  faqSource,
+  integrationsSource,
+} from "@/lib/source";
 
 export const revalidate = false;
 
@@ -47,11 +52,7 @@ async function getReferenceMd(slug: string[]): Promise<string | null> {
   if (slug.length < 2) return null;
 
   // Try content/reference-md first (endpoint markdown)
-  const mdPath = path.join(
-    process.cwd(),
-    "content/reference-md",
-    ...slug.slice(1),
-  ) + ".md";
+  const mdPath = `${path.join(process.cwd(), "content/reference-md", ...slug.slice(1))}.md`;
   try {
     return await fs.readFile(mdPath, "utf-8");
   } catch {
@@ -59,11 +60,7 @@ async function getReferenceMd(slug: string[]): Promise<string | null> {
   }
 
   // Fall back to content/reference (model MDX pages are plain markdown)
-  const mdxPath = path.join(
-    process.cwd(),
-    "content/reference",
-    ...slug.slice(1),
-  ) + ".mdx";
+  const mdxPath = `${path.join(process.cwd(), "content/reference", ...slug.slice(1))}.mdx`;
   try {
     return await fs.readFile(mdxPath, "utf-8");
   } catch {

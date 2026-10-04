@@ -61,6 +61,7 @@ export function QuestionColumn({
   children: ReactNode;
 }) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: a group of guide steps, not form controls, so no fieldset
     <div aria-labelledby={id} role="group">
       <div className="flex items-baseline gap-2" id={id}>
         <span className="eyebrow text-folder-dark dark:text-folder">

@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
-import { Rethink_Sans, Geist_Mono } from "next/font/google";
-import localFont from "next/font/local";
 import { RootProvider } from "fumadocs-ui/provider/next";
+import type { Metadata } from "next";
+import { Geist_Mono, Rethink_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { Providers } from "@/components/providers";
 import { searchOptions } from "@/lib/layout.shared";
 import "./globals.css";

@@ -1,5 +1,5 @@
-import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
+import type { NextConfig } from "next";
 
 // Guide pages moved under /docs/ in the July 2026 redesign. External sites
 // still link the old bare paths, so those need to keep resolving. Kept as an

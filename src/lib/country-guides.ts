@@ -23,7 +23,9 @@ export * from "./country-guides-data";
  * chain minus the paths that have no file. See `fragmentCandidates`.
  */
 export function fragmentPaths(answers: GuideAnswers): string[] {
-  return fragmentCandidates(answers).filter((path) => fragmentIndex().has(path));
+  return fragmentCandidates(answers).filter((path) =>
+    fragmentIndex().has(path),
+  );
 }
 
 export type GuideFragment = (typeof guideFragments)[number];
@@ -51,7 +53,9 @@ export function guideChain(answers: GuideAnswers): GuideFragment[] {
   return fragmentPaths(answers).map((path) => {
     const fragment = fragmentIndex().get(path);
     if (!fragment) {
-      throw new Error(`Guide fragment "${path}" does not exist in content/guides`);
+      throw new Error(
+        `Guide fragment "${path}" does not exist in content/guides`,
+      );
     }
     return fragment;
   });
@@ -66,7 +70,8 @@ export async function guideMarkdown(answers: GuideAnswers): Promise<string> {
   const siblings = allAnswers()
     .filter((candidate) => guideUrl(candidate) !== guideUrl(answers))
     .map(
-      (candidate) => `- [${guideHeading(candidate)}](${guideUrl(candidate)}.md)`,
+      (candidate) =>
+        `- [${guideHeading(candidate)}](${guideUrl(candidate)}.md)`,
     );
 
   return [

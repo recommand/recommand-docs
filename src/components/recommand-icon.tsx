@@ -1,6 +1,7 @@
 export default function RecommandIcon({ className }: { className?: string }) {
   return (
     <svg
+      aria-hidden="true"
       viewBox="0 0 38 43"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

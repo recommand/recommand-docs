@@ -1,12 +1,17 @@
-import { docsSource, referenceSource, changelogSource, faqSource } from "@/lib/source";
+import fs from "node:fs/promises";
+import path from "node:path";
 import {
   allAnswers,
   guideDescription,
   guideHeading,
   guideUrl,
 } from "@/lib/country-guides";
-import fs from "fs/promises";
-import path from "path";
+import {
+  changelogSource,
+  docsSource,
+  faqSource,
+  referenceSource,
+} from "@/lib/source";
 
 export const revalidate = false;
 
@@ -57,9 +62,7 @@ export async function GET() {
   } catch {
     lines.push("## API Reference");
     lines.push("");
-    lines.push(
-      "- [OpenAPI Spec](https://app.recommand.eu/openapi)",
-    );
+    lines.push("- [OpenAPI Spec](https://app.recommand.eu/openapi)");
     lines.push("");
   }
 

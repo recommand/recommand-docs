@@ -20,7 +20,12 @@ export const SITE_URL = "https://docs.recommand.eu";
 export const GUIDE_BASE_URL = "/getting-started";
 
 export type AudienceId = "platform" | "business";
-export type CountryId = "belgium" | "france" | "germany" | "netherlands" | "other";
+export type CountryId =
+  | "belgium"
+  | "france"
+  | "germany"
+  | "netherlands"
+  | "other";
 export type DirectionId = "sending" | "receiving" | "sending-and-receiving";
 
 export type Audience = {
@@ -146,7 +151,8 @@ export const countries: readonly Country[] = [
     code: null,
     label: "Another country",
     prose: "other countries",
-    registeredIn: "a country other than Belgium, France, Germany or the Netherlands",
+    registeredIn:
+      "a country other than Belgium, France, Germany or the Netherlands",
     company: "company in another country",
     companies: "companies in other countries",
     flag: "🌍",
@@ -340,7 +346,11 @@ export function answersForCountry(country: Country): GuideAnswers[] {
  */
 
 /** The `<h1>`, and the anchor text other pages link this guide by. */
-export function guideHeading({ country, audience, direction }: GuideAnswers): string {
+export function guideHeading({
+  country,
+  audience,
+  direction,
+}: GuideAnswers): string {
   const forWhom =
     audience.id === "platform"
       ? "for the companies you onboard"
@@ -349,7 +359,11 @@ export function guideHeading({ country, audience, direction }: GuideAnswers): st
 }
 
 /** The `<title>`, kept front-loaded with the terms people actually search for. */
-export function guideTitle({ country, audience, direction }: GuideAnswers): string {
+export function guideTitle({
+  country,
+  audience,
+  direction,
+}: GuideAnswers): string {
   const what =
     direction.id === "sending"
       ? "Send e-invoices"
@@ -391,7 +405,11 @@ export function guideDescription({
 }
 
 /** The paragraph directly under the selector, unique per combination. */
-export function guideIntro({ country, audience, direction }: GuideAnswers): string {
+export function guideIntro({
+  country,
+  audience,
+  direction,
+}: GuideAnswers): string {
   const who =
     audience.id === "platform"
       ? `you are integrating Recommand into your own product and onboarding ${country.companies} as your users`

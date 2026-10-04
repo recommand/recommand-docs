@@ -13,6 +13,7 @@ import { useLayoutEffect } from "react";
 export function LayoutTransitionGuard() {
   const pathname = usePathname();
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on every navigation; pathname is the trigger, not an input
   useLayoutEffect(() => {
     const layouts = document.querySelectorAll<HTMLElement>("#nd-docs-layout");
     for (const layout of layouts) {

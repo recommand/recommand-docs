@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -12,10 +11,11 @@ import {
   Puzzle,
   Send,
 } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import type { ReactNode } from "react";
 import { SearchTrigger } from "@/components/search-trigger";
 import { changelogSource } from "@/lib/source";
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Peppol API Documentation",
@@ -156,8 +156,8 @@ export default function HomePage() {
             </div>
             <p className="max-w-md text-lg leading-relaxed text-fd-muted-foreground lg:justify-self-end lg:pb-2">
               Everything you need to send and receive documents over the Peppol
-              network. Explore guides, API references, and examples to
-              integrate in minutes.
+              network. Explore guides, API references, and examples to integrate
+              in minutes.
             </p>
           </div>
 
