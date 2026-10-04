@@ -52,6 +52,15 @@ export const chromeClassName = [
   "[&_#nd-sidebar-mobile_p]:tracking-[0.14em]",
   "[&_#nd-sidebar-mobile_p]:text-stone-dark",
   "dark:[&_#nd-sidebar-mobile_p]:text-stone",
+  // Sidebar footer: fumadocs frames the theme switch in a bar meant for icon
+  // links. We have none, so drop the frame and keep the switch a round pill.
+  "[&_#nd-sidebar_div:has(>[data-theme-toggle])]:border-0",
+  "[&_#nd-sidebar_div:has(>[data-theme-toggle])]:bg-transparent",
+  "[&_#nd-sidebar_div:has(>[data-theme-toggle])]:p-0",
+  "[&_#nd-sidebar_[data-theme-toggle]]:rounded-full",
+  "[&_#nd-sidebar_[data-theme-toggle]]:border",
+  "[&_#nd-sidebar_[data-theme-toggle]]:p-1",
+  "[&_#nd-sidebar_[data-theme-toggle]>*]:rounded-full",
 ].join(" ");
 
 export function baseOptions(): BaseLayoutProps {

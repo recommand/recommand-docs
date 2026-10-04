@@ -1,7 +1,7 @@
 import { generateFiles } from "fumadocs-openapi";
-import { createOpenAPI } from "fumadocs-openapi/server";
 import fs from "fs";
 import path from "path";
+import { SPEC_URL, openapi } from "../src/lib/openapi";
 import {
   referenceGroupDescriptions,
   referenceGroupNames,
@@ -12,7 +12,6 @@ import {
 // Shared constants
 // ──────────────────────────────────────────────
 
-const SPEC_URL = "https://app.recommand.eu/openapi";
 const REFERENCE_DIR = "./content/reference";
 const REFERENCE_MD_DIR = "./content/reference-md";
 
@@ -35,23 +34,19 @@ const spec: any = await specRes.json();
 // Part 1: Fumadocs reference (content/reference)
 // ──────────────────────────────────────────────
 
-const openapi = createOpenAPI({ input: [SPEC_URL] });
-
 await generateFiles({
   input: openapi,
   output: REFERENCE_DIR,
   includeDescription: true,
   per: "operation",
   groupBy: "tag",
-  name(output, document) {
+  name(output) {
     let defaultName: string;
     if (output.type === "operation") {
-      const operation =
-        document.paths?.[output.item.path]?.[output.item.method];
+      const operation = this.fromExtractedOperation(output.item)?.operation;
       defaultName = operation?.operationId ?? output.item.path;
     } else {
-      const hook =
-        document.webhooks?.[output.item.name]?.[output.item.method];
+      const hook = this.fromExtractedWebhook(output.item)?.operation;
       defaultName = hook?.operationId ?? output.item.name;
     }
     return toKebabCase(defaultName);
