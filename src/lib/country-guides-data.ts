@@ -91,7 +91,7 @@ export const audiences: readonly Audience[] = [
   {
     id: "business",
     label: "One company",
-    plural: "individual businesses",
+    plural: "your own business",
     short: "My own business",
     subject: (country) => `your own ${country.company}`,
   },

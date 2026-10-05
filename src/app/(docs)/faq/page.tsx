@@ -7,7 +7,8 @@ import { Eyebrow, hairline } from "./faq-ui";
 
 export const metadata: Metadata = {
   title: "FAQ",
-  description: "Frequently asked questions about Recommand and Peppol.",
+  description:
+    "Answers to common questions about Peppol and the Recommand API: addressing, sending, receiving, VAT, security, pricing and getting started.",
 };
 
 export default function FaqIndex() {

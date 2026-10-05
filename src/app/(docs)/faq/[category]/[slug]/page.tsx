@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx-components";
 import { getCategoryItems, getCategoryLabel } from "@/lib/faq";
+import { bodyText, metaDescription, pageTitle } from "@/lib/seo";
 import { faqSource } from "@/lib/source";
 import { BackLink, Eyebrow, hairline } from "../../faq-ui";
 
@@ -19,8 +20,11 @@ export async function generateMetadata(props: {
   const page = faqSource.getPage([category, slug]);
   if (!page) return {};
   return {
-    title: page.data.title,
-    description: page.data.excerpt || page.data.description,
+    title: pageTitle(page.data.title),
+    description: metaDescription(
+      page.data.excerpt || page.data.description,
+      ...bodyText(page.data.structuredData),
+    ),
   };
 }
 

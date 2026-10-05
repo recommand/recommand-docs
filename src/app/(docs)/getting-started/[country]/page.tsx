@@ -16,6 +16,7 @@ import {
   guideUrl,
   SITE_URL,
 } from "@/lib/country-guides-data";
+import { metaDescription } from "@/lib/seo";
 import { GuidePicker } from "../guide-picker";
 import { Breadcrumbs, Eyebrow, hairline } from "../guide-ui";
 
@@ -152,7 +153,7 @@ export async function generateMetadata(props: {
   const description = pageDescription(country);
   return {
     title,
-    description,
+    description: metaDescription(description),
     alternates: { canonical: countryUrl(country) },
     openGraph: {
       title,

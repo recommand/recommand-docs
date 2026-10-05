@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { searchOptions } from "@/lib/layout.shared";
 import "./globals.css";
 import "./api-reference.css";
+import { titleTemplate } from "@/lib/seo";
 
 const rethinkSans = Rethink_Sans({
   variable: "--font-rethink-sans",
@@ -25,7 +26,7 @@ const nohemi = localFont({
 export const metadata: Metadata = {
   title: {
     default: "Recommand Docs",
-    template: "%s - Recommand Docs",
+    template: titleTemplate,
   },
   description: "Documentation for the Recommand Peppol API",
   metadataBase: new URL("https://docs.recommand.eu"),

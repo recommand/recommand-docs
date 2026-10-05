@@ -17,7 +17,7 @@ export async function generateMetadata(props: {
   const label = items ? getCategoryLabel(category, items) : category;
   return {
     title: `FAQ - ${label}`,
-    description: `Frequently asked questions about ${label}.`,
+    description: `Frequently asked questions about ${label} with the Recommand Peppol API, answered briefly with links to the relevant guides.`,
   };
 }
 

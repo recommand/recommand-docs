@@ -23,6 +23,7 @@ import {
   resolveAnswers,
   SITE_URL,
 } from "@/lib/country-guides";
+import { metaDescription, pageTitle } from "@/lib/seo";
 import { GuideSelector } from "../../../guide-selector";
 import { Breadcrumbs, hairline } from "../../../guide-ui";
 
@@ -159,8 +160,8 @@ export async function generateMetadata(props: {
   const description = guideDescription(answers);
 
   return {
-    title,
-    description,
+    title: pageTitle(title),
+    description: metaDescription(description),
     alternates: { canonical: url },
     openGraph: {
       title,
