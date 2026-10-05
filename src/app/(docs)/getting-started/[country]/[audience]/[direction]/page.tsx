@@ -23,7 +23,12 @@ import {
   resolveAnswers,
   SITE_URL,
 } from "@/lib/country-guides";
-import { metaDescription, pageTitle } from "@/lib/seo";
+import {
+  defaultTwitter,
+  metaDescription,
+  openGraphFor,
+  pageTitle,
+} from "@/lib/seo";
 import { GuideSelector } from "../../../guide-selector";
 import { Breadcrumbs, hairline } from "../../../guide-ui";
 
@@ -163,12 +168,7 @@ export async function generateMetadata(props: {
     title: pageTitle(title),
     description: metaDescription(description),
     alternates: { canonical: url },
-    openGraph: {
-      title,
-      description,
-      url,
-      type: "article",
-    },
-    twitter: { title, description },
+    openGraph: openGraphFor(url, { title, description, type: "article" }),
+    twitter: { ...defaultTwitter, title, description },
   };
 }

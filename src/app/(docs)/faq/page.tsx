@@ -3,12 +3,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { JsonLd } from "@/components/letterhead";
 import { getAllFaq, getCategoryLabel } from "@/lib/faq";
+import { openGraphFor } from "@/lib/seo";
 import { Eyebrow, hairline } from "./faq-ui";
 
 export const metadata: Metadata = {
   title: "FAQ",
   description:
     "Answers to common questions about Peppol and the Recommand API: addressing, sending, receiving, VAT, security, pricing and getting started.",
+  openGraph: openGraphFor("/faq"),
 };
 
 export default function FaqIndex() {

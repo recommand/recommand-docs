@@ -6,7 +6,7 @@ import { Providers } from "@/components/providers";
 import { searchOptions } from "@/lib/layout.shared";
 import "./globals.css";
 import "./api-reference.css";
-import { titleTemplate } from "@/lib/seo";
+import { defaultOpenGraph, defaultTwitter, titleTemplate } from "@/lib/seo";
 
 const rethinkSans = Rethink_Sans({
   variable: "--font-rethink-sans",
@@ -30,16 +30,8 @@ export const metadata: Metadata = {
   },
   description: "Documentation for the Recommand Peppol API",
   metadataBase: new URL("https://docs.recommand.eu"),
-  openGraph: {
-    siteName: "Recommand Docs",
-    type: "website",
-    locale: "en_BE",
-    images: ["/rcmd-opengraph.jpg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    images: ["/rcmd-opengraph.jpg"],
-  },
+  openGraph: defaultOpenGraph,
+  twitter: defaultTwitter,
 };
 
 export default function RootLayout({

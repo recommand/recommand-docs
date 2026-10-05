@@ -15,12 +15,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SearchTrigger } from "@/components/search-trigger";
+import { openGraphFor } from "@/lib/seo";
 import { changelogSource } from "@/lib/source";
 
 export const metadata: Metadata = {
   title: "Peppol API Documentation",
   description:
     "Everything you need to send and receive documents over the Peppol network. Explore guides, API references, and examples to integrate in minutes.",
+  openGraph: openGraphFor("/"),
 };
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */

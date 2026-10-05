@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCategories, getCategoryItems, getCategoryLabel } from "@/lib/faq";
+import { openGraphFor } from "@/lib/seo";
 import { BackLink, Eyebrow, hairline } from "../faq-ui";
 
 export function generateStaticParams() {
@@ -18,6 +19,7 @@ export async function generateMetadata(props: {
   return {
     title: `FAQ - ${label}`,
     description: `Frequently asked questions about ${label} with the Recommand Peppol API, answered briefly with links to the relevant guides.`,
+    openGraph: openGraphFor(`/faq/${category}`),
   };
 }
 

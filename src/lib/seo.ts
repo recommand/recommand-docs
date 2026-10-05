@@ -61,3 +61,30 @@ export function metaDescription(
 function withStop(text: string): string {
   return /[.!?:]$/.test(text) ? text : `${text}.`;
 }
+
+type OpenGraph = NonNullable<Metadata["openGraph"]>;
+
+/**
+ * Open Graph and Twitter defaults shared by every page. A page that sets its
+ * own openGraph or twitter object replaces the layout's rather than merging
+ * with it, so the helpers below spread these back in.
+ */
+export const defaultOpenGraph = {
+  siteName: "Recommand Docs",
+  type: "website",
+  locale: "en_BE",
+  images: ["/rcmd-opengraph.jpg"],
+} satisfies OpenGraph;
+
+export const defaultTwitter = {
+  card: "summary_large_image",
+  images: ["/rcmd-opengraph.jpg"],
+} satisfies NonNullable<Metadata["twitter"]>;
+
+/** Open Graph for a page, naming its own URL as og:url. */
+export function openGraphFor(
+  url: string,
+  overrides: { title?: string; description?: string; type?: "article" } = {},
+): OpenGraph {
+  return { ...defaultOpenGraph, ...overrides, url };
+}
