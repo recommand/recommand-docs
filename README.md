@@ -1,6 +1,6 @@
 # Recommand Docs
 
-The official documentation for the [Recommand Peppol API](https://github.com/brbxai/recommand-peppol), hosted at [docs.recommand.eu](https://docs.recommand.eu).
+The official documentation for the [Recommand Peppol API](https://github.com/recommand/recommand-peppol), hosted at [docs.recommand.eu](https://docs.recommand.eu).
 
 Built with [Next.js](https://nextjs.org) and [Fumadocs](https://fumadocs.vercel.app).
 
