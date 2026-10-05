@@ -10,6 +10,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { markdownToPlainText } from "@/lib/markdown-text";
 import { openapi } from "@/lib/openapi";
 import { referenceGroupDescriptions } from "@/lib/reference-groups";
+import { metaDescription, pageTitle } from "@/lib/seo";
 import { referenceSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
@@ -207,9 +208,21 @@ export async function generateMetadata(props: {
   if (!page) return {};
 
   return {
-    title: page.data.title,
-    description: page.data.description
-      ? markdownToPlainText(page.data.description)
-      : undefined,
+    title: pageTitle(page.data.title),
+    description: metaDescription(
+      page.data.description
+        ? markdownToPlainText(page.data.description)
+        : undefined,
+      referenceContext(page.url, page.data.title),
+    ),
   };
+}
+
+// Endpoint and schema pages render from the OpenAPI document: their summary
+// is often a single short line and their body is mostly tables, which read
+// badly as a description. This names what the page documents instead.
+function referenceContext(url: string, title: string): string {
+  return url.startsWith("/reference/models/")
+    ? `Schema reference for the ${title} object in the Recommand Peppol API: its fields, their types and where it is used.`
+    : "Endpoint reference for the Recommand Peppol API with parameters, request body, responses and code samples.";
 }

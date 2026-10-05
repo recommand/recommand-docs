@@ -9,6 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { getMDXComponents } from "@/components/mdx-components";
+import { bodyText, metaDescription, pageTitle } from "@/lib/seo";
 import { integrationsSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
@@ -232,7 +233,10 @@ export async function generateMetadata(props: {
   if (!page) return {};
 
   return {
-    title: page.data.title,
-    description: page.data.description,
+    title: pageTitle(page.data.title),
+    description: metaDescription(
+      page.data.description,
+      ...bodyText(page.data.structuredData),
+    ),
   };
 }

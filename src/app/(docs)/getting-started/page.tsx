@@ -18,7 +18,7 @@ import { Eyebrow, hairline } from "./guide-ui";
 
 const title = "Country-specific getting started guides";
 const description =
-  "Answer three questions — one company or many, where they are registered, which way documents flow — and get the Peppol integration guide for exactly that situation. Belgium, France, the Netherlands and beyond.";
+  "Answer three questions and get the Peppol integration guide for your situation: one company or many, where they are registered, which way documents flow.";
 
 export const metadata: Metadata = {
   title,
