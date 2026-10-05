@@ -75,7 +75,7 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: <RecommandLogo className="h-7 w-auto" />,
     },
-    githubUrl: "https://github.com/brbxai/recommand-peppol",
+    githubUrl: "https://github.com/recommand/recommand-peppol",
     links: [
       {
         text: "Getting started",

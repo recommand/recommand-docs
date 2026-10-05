@@ -15,6 +15,6 @@ Discord: [discord.com/invite/a2tcQYA3ew](https://discord.com/invite/a2tcQYA3ew)
 
 - for quick help, announcements and community discussions.
 
-GitHub: [github.com/brbxai/recommand-peppol](https://github.com/brbxai/recommand-peppol)
+GitHub: [github.com/recommand/recommand-peppol](https://github.com/recommand/recommand-peppol)
 
 - for source code, issues and contributions.
