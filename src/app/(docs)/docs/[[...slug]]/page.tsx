@@ -7,7 +7,7 @@ import {
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx-components";
 import { PageActions } from "@/components/page-actions";
-import { bodyText, metaDescription, pageTitle } from "@/lib/seo";
+import { bodyText, metaDescription, openGraphFor, pageTitle } from "@/lib/seo";
 import { docsSource } from "@/lib/source";
 
 export default async function Page(props: {
@@ -52,5 +52,6 @@ export async function generateMetadata(props: {
       page.data.description,
       ...bodyText(page.data.structuredData),
     ),
+    openGraph: openGraphFor(page.url),
   };
 }

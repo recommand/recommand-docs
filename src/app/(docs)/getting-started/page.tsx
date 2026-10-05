@@ -13,6 +13,7 @@ import {
   guideUrl,
   SITE_URL,
 } from "@/lib/country-guides-data";
+import { openGraphFor } from "@/lib/seo";
 import { GuidePicker } from "./guide-picker";
 import { Eyebrow, hairline } from "./guide-ui";
 
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: GUIDE_BASE_URL },
-  openGraph: { title, description, url: GUIDE_BASE_URL, type: "website" },
+  openGraph: openGraphFor(GUIDE_BASE_URL, { title, description }),
 };
 
 export default function GettingStartedIndex() {

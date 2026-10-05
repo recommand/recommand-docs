@@ -10,7 +10,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { markdownToPlainText } from "@/lib/markdown-text";
 import { openapi } from "@/lib/openapi";
 import { referenceGroupDescriptions } from "@/lib/reference-groups";
-import { metaDescription, pageTitle } from "@/lib/seo";
+import { metaDescription, openGraphFor, pageTitle } from "@/lib/seo";
 import { referenceSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
@@ -215,6 +215,7 @@ export async function generateMetadata(props: {
         : undefined,
       referenceContext(page.url, page.data.title),
     ),
+    openGraph: openGraphFor(page.url),
   };
 }
 

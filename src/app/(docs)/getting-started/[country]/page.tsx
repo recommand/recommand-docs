@@ -16,7 +16,7 @@ import {
   guideUrl,
   SITE_URL,
 } from "@/lib/country-guides-data";
-import { metaDescription } from "@/lib/seo";
+import { metaDescription, openGraphFor } from "@/lib/seo";
 import { GuidePicker } from "../guide-picker";
 import { Breadcrumbs, Eyebrow, hairline } from "../guide-ui";
 
@@ -155,11 +155,6 @@ export async function generateMetadata(props: {
     title,
     description: metaDescription(description),
     alternates: { canonical: countryUrl(country) },
-    openGraph: {
-      title,
-      description,
-      url: countryUrl(country),
-      type: "website",
-    },
+    openGraph: openGraphFor(countryUrl(country), { title, description }),
   };
 }

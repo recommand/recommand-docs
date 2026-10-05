@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { getMDXComponents } from "@/components/mdx-components";
 import { PageActions } from "@/components/page-actions";
-import { bodyText, metaDescription, pageTitle } from "@/lib/seo";
+import { bodyText, metaDescription, openGraphFor, pageTitle } from "@/lib/seo";
 import { changelogSource } from "@/lib/source";
 
 /* Hairline rule, letterhead style: ink on light, sheet on dark */
@@ -252,6 +252,7 @@ export async function generateMetadata(props: {
       title: "Changelog",
       description:
         "New endpoints, features and fixes across the Recommand Peppol API, recorded as they ship. Follow along on this page or through the RSS feed.",
+      openGraph: openGraphFor("/changelog"),
       alternates: {
         types: {
           "application/rss+xml": [
@@ -273,5 +274,6 @@ export async function generateMetadata(props: {
       page.data.description,
       ...bodyText(page.data.structuredData),
     ),
+    openGraph: openGraphFor(page.url),
   };
 }
