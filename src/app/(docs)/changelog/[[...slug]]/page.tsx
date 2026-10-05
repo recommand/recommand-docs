@@ -109,7 +109,7 @@ function ChangelogIndex() {
                 RSS feed
               </a>
               <a
-                href="https://discord.gg/a2tcQYA3ew"
+                href="https://discord.com/invite/a2tcQYA3ew"
                 className="group inline-flex items-center gap-1 text-sm font-medium text-folder-dark transition-colors hover:text-darkslate dark:text-folder dark:hover:text-sheet"
               >
                 Discord announcements

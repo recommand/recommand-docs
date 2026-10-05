@@ -39,7 +39,7 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ## Community & Support
 
-- [Discord](https://discord.gg/a2tcQYA3ew)
+- [Discord](https://discord.com/invite/a2tcQYA3ew)
 - [Contact](https://recommand.eu/contact) or email us at [support@recommand.eu](mailto:support@recommand.eu)
 
 ## License
