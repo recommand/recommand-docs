@@ -48,13 +48,13 @@ This IBAN will be included in the Peppol invoice for payment processing.
 For each client you want to send Peppol invoices to, add their VAT number or Peppol address in the **address field**.
 You can manage clients by navigating to Manage > Clients.
 
-- **VAT Number**: Only Belgian (BE) VAT numbers are supported.
-- **Peppol Identifier**: For other countries or if preferred, add their Peppol identifier instead.
+- **VAT Number**: a Belgian (BE) VAT number, for example `BE0123456789`. The client's legal name and address are looked up in the Belgian enterprise register. Other countries are not supported yet.
+- **Peppol Address without a VAT number**: for a Belgian organisation that has no VAT number, such as a school or a non-profit, add its enterprise number as a Peppol address: `0208:` followed by the 10-digit enterprise number, for example `0208:0123456789`. Its details are looked up by enterprise number, and the invoice is sent without a buyer VAT number.
 
 Clients for which no VAT number or Peppol address is set will not be sent via Peppol.
 
 <Callout type="info" title="Identifier selection">
-  Whichever identifier you choose, the invoice will be sent via Peppol using that identifier.
+  If a client has both a VAT number and a Peppol address, its details are looked up by VAT number and the invoice is sent to the Peppol address. Any other Peppol address, such as a GLN (`0088:`), only works together with the client's Belgian VAT number; without it, the invoice is reported as a failed task in the integration logs.
 </Callout>
 
 Example client configuration:
@@ -117,6 +117,8 @@ The Harvest integration works as follows:
 3. **Email Fallback**: If Peppol delivery fails and email fallback is enabled, the invoice is sent via email to all client contacts
 4. **Status Updates**: The integration tracks the status of each invoice transmission
 
+Each invoice is sent over Peppol once, when it is first sent or marked as sent in Harvest. Payment reminders, thank-you messages and sending the same invoice again from Harvest do not send it over Peppol again. To send an invoice again, for example after correcting the client's details, set it back to draft in Harvest and mark it as sent again.
+
 ## Configuration Reference
 
 ### Line Items Mapping
@@ -157,7 +159,7 @@ If the integration is not syncing invoices:
 
 If invoices are not being sent via Peppol:
 
-1. **Client Configuration**: Verify that clients have either a Belgian VAT number or a Peppol identifier in their address field
+1. **Client Configuration**: Verify that clients have either a Belgian VAT number or a `0208:` enterprise number Peppol address in their address field
 2. **Recipient Verification**: Ensure the recipient is registered in the Peppol network
 3. **Check Integration Status**: Verify the integration is active and running
 
