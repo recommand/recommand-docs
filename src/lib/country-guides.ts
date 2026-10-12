@@ -1,4 +1,5 @@
 import { guideFragments } from "@/.source/server";
+import { flattenMdx } from "@/lib/flatten-mdx";
 import {
   allAnswers,
   fragmentCandidates,
@@ -77,7 +78,7 @@ export async function guideMarkdown(answers: GuideAnswers): Promise<string> {
   return [
     `# ${guideHeading(answers)} (${guideUrl(answers)})`,
     guideIntro(answers),
-    ...sections.map((section) => section.trim()),
+    ...sections.map((section) => flattenMdx(section).trim()),
     "## Guides for other situations",
     siblings.join("\n"),
   ].join("\n\n");
