@@ -26,6 +26,16 @@ const legacyDocSlugs = [
   "working-with-webhooks",
 ];
 
+// Sections that have a markdown rendition under /llms.mdx/.
+const markdownSections =
+  "docs|getting-started|integrations|changelog|faq|reference";
+
+// Clients that prefer markdown (`Accept: text/markdown`) get it at the same
+// URL as the HTML page.
+const acceptsMarkdown = [
+  { type: "header" as const, key: "accept", value: ".*text/markdown.*" },
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
@@ -72,56 +82,72 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [
-      {
-        source: "/getting-started/:path*.md",
-        destination: "/llms.mdx/getting-started/:path*",
-      },
-      {
-        source: "/getting-started/:path*.mdx",
-        destination: "/llms.mdx/getting-started/:path*",
-      },
-      {
-        source: "/docs/:path*.md",
-        destination: "/llms.mdx/docs/:path*",
-      },
-      {
-        source: "/docs/:path*.mdx",
-        destination: "/llms.mdx/docs/:path*",
-      },
-      {
-        source: "/integrations/:path*.md",
-        destination: "/llms.mdx/integrations/:path*",
-      },
-      {
-        source: "/integrations/:path*.mdx",
-        destination: "/llms.mdx/integrations/:path*",
-      },
-      {
-        source: "/changelog/:path*.md",
-        destination: "/llms.mdx/changelog/:path*",
-      },
-      {
-        source: "/changelog/:path*.mdx",
-        destination: "/llms.mdx/changelog/:path*",
-      },
-      {
-        source: "/faq/:path*.md",
-        destination: "/llms.mdx/faq/:path*",
-      },
-      {
-        source: "/faq/:path*.mdx",
-        destination: "/llms.mdx/faq/:path*",
-      },
-      {
-        source: "/reference/:path*.md",
-        destination: "/llms.mdx/reference/:path*",
-      },
-      {
-        source: "/reference/:path*.mdx",
-        destination: "/llms.mdx/reference/:path*",
-      },
-    ];
+    return {
+      // Checked before the pages themselves, which would otherwise answer
+      // with HTML.
+      beforeFiles: [
+        {
+          source: "/",
+          has: acceptsMarkdown,
+          destination: "/llms.txt",
+        },
+        {
+          source: `/:section(${markdownSections})/:path*`,
+          has: acceptsMarkdown,
+          destination: "/llms.mdx/:section/:path*",
+        },
+      ],
+      afterFiles: [
+        {
+          source: "/getting-started/:path*.md",
+          destination: "/llms.mdx/getting-started/:path*",
+        },
+        {
+          source: "/getting-started/:path*.mdx",
+          destination: "/llms.mdx/getting-started/:path*",
+        },
+        {
+          source: "/docs/:path*.md",
+          destination: "/llms.mdx/docs/:path*",
+        },
+        {
+          source: "/docs/:path*.mdx",
+          destination: "/llms.mdx/docs/:path*",
+        },
+        {
+          source: "/integrations/:path*.md",
+          destination: "/llms.mdx/integrations/:path*",
+        },
+        {
+          source: "/integrations/:path*.mdx",
+          destination: "/llms.mdx/integrations/:path*",
+        },
+        {
+          source: "/changelog/:path*.md",
+          destination: "/llms.mdx/changelog/:path*",
+        },
+        {
+          source: "/changelog/:path*.mdx",
+          destination: "/llms.mdx/changelog/:path*",
+        },
+        {
+          source: "/faq/:path*.md",
+          destination: "/llms.mdx/faq/:path*",
+        },
+        {
+          source: "/faq/:path*.mdx",
+          destination: "/llms.mdx/faq/:path*",
+        },
+        {
+          source: "/reference/:path*.md",
+          destination: "/llms.mdx/reference/:path*",
+        },
+        {
+          source: "/reference/:path*.mdx",
+          destination: "/llms.mdx/reference/:path*",
+        },
+      ],
+    };
   },
 };
 
