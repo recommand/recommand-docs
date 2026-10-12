@@ -1,4 +1,5 @@
 import type { InferPageType } from "fumadocs-core/source";
+import { flattenMdx } from "@/lib/flatten-mdx";
 import type { docsSource } from "@/lib/source";
 
 export async function getLLMText(
@@ -8,5 +9,5 @@ export async function getLLMText(
 
   return `# ${page.data.title} (${page.url})
 
-${processed}`;
+${flattenMdx(processed)}`;
 }
