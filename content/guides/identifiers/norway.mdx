@@ -42,13 +42,11 @@ Before a `0192` identifier is published as a receiver on the production network,
 the organisation number is looked up in Enhetsregisteret:
 
 - a number the register does not know is refused, with a message that says so;
-- a number the register has deleted is refused, with the date it was deleted;
-- when the register cannot be reached, the registration goes ahead, so an outage
-  at the register does not block receiving.
+- a number the register has deleted is refused, with the date it was deleted.
 
-The register is checked again every day. When an organisation is deleted from
-Enhetsregisteret, its `0192` identifier is unregistered and removed from the
-company, and the team is told by email.
+When an organisation is deleted from Enhetsregisteret later, its `0192`
+identifier is removed and the company stops receiving on it. The team members
+get an email about it.
 
 On the test network, organisation numbers are not looked up, so you can test with
 synthetic organisations.
