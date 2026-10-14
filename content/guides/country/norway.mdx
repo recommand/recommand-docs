@@ -1,0 +1,33 @@
+---
+title: Country context - Norway
+---
+
+## Peppol in Norway
+
+Norway is one of the oldest Peppol countries: public sector buyers have required
+EHF invoices for years, and EHF Billing 3.0 is Peppol BIS Billing 3.0. Documents
+are exchanged as **Peppol BIS 3 UBL** over the standard Peppol billing process,
+through Recommand's own access point.
+
+What is specific to Norway:
+
+- **A B2B mandate in two steps.** From 1 January 2027, businesses with a
+  bookkeeping obligation must issue e-invoices to other such businesses. Until
+  receiving becomes mandatory as well, on 1 January 2030, the obligation in
+  practice applies when the buyer can receive them, which means being registered
+  in ELMA or on Peppol.
+- **Receivers are registered in ELMA.** ELMA (Elektronisk mottakeradresseregister)
+  is the Norwegian receiver register, run by the Norwegian Digitalisation Agency.
+  Norwegian companies that receive through Recommand are published there rather
+  than on Recommand's own SMP, and ELMA keeps their entries in the Peppol SML and
+  the Peppol Directory up to date. Senders find them the usual way, through the SML.
+- **The organisation number is the Peppol address.** Norwegian companies are
+  published under scheme `0192` with their 9-digit organisasjonsnummer, so a
+  Norwegian Peppol address looks like `0192:123456785`.
+- **Organisations are checked against Enhetsregisteret.** An organisation number
+  that the Norwegian register of legal entities does not know, or has deleted,
+  is not registered as a receiver, and a registration is removed when the
+  organisation is deleted from the register later.
+- **Representatives are checked for signing authority.** During verification, the
+  representative is held against the people Enhetsregisteret lists as able to
+  sign for the company or holding procuration.

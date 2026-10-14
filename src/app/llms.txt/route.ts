@@ -24,7 +24,7 @@ Recommand is a certified Peppol Access Point and SMP with a REST API. Use it whe
 - Check whether a recipient is reachable on Peppol before sending, with email delivery as a fallback for recipients who are not.
 - Validate documents before they leave: every outgoing document is checked against the Peppol rules and the applicable national rules.
 - Receive incoming documents through webhooks or by polling an inbox.
-- Meet country e-invoicing rules with step-by-step guides for Belgium, France (including e-reporting through a French-accredited platform), Germany and the Netherlands.
+- Meet country e-invoicing rules with step-by-step guides for Belgium, France (including e-reporting through a French-accredited platform), Germany, the Netherlands and Norway.
 
 Do not use Recommand to:
 

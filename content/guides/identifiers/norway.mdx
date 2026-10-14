@@ -1,0 +1,54 @@
+---
+title: Norwegian identifiers
+---
+
+### Norwegian identifiers and Peppol address
+
+| Field                    | Norwegian value                                          |
+| ------------------------ | -------------------------------------------------------- |
+| `country`                | `"NO"`                                                   |
+| `enterpriseNumber`       | The organisasjonsnummer, exactly 9 digits                |
+| `enterpriseNumberScheme` | Optional: `"0192"`                                       |
+| `vatNumber`              | Optional: `NO` + organisation number + `MVA`, for companies in the VAT register |
+
+```json title="company.json"
+{
+  "name": "Eksempel AS",
+  "address": "Storgata 1",
+  "postalCode": "0155",
+  "city": "Oslo",
+  "country": "NO",
+  "enterpriseNumber": "123456785",
+  "vatNumber": "NO123456785MVA"
+}
+```
+
+The organisation number is checked against its format and its check digit (modulo
+11), and registered as the company's Peppol identifier: **`0192:` followed by the
+organisation number**. The VAT number is written into the documents the company
+sends, but it is not registered as a Peppol identifier.
+
+### Only `0192` in ELMA
+
+ELMA registers Norwegian organisation numbers and nothing else. A Norwegian
+company registered in ELMA therefore carries `0192` identifiers only: adding an
+identifier under another scheme, such as a GLN (`0088`), is refused with an error
+that names the scheme. Without an organisation number the company has no Peppol
+address, so `enterpriseNumber` is effectively required in Norway.
+
+### The organisation has to exist
+
+Before a `0192` identifier is published as a receiver on the production network,
+the organisation number is looked up in Enhetsregisteret:
+
+- a number the register does not know is refused, with a message that says so;
+- a number the register has deleted is refused, with the date it was deleted;
+- when the register cannot be reached, the registration goes ahead, so an outage
+  at the register does not block receiving.
+
+The register is checked again every day. When an organisation is deleted from
+Enhetsregisteret, its `0192` identifier is unregistered and removed from the
+company, and the team is told by email.
+
+On the test network, organisation numbers are not looked up, so you can test with
+synthetic organisations.

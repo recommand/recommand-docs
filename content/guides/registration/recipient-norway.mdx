@@ -1,0 +1,39 @@
+---
+title: Recipient registration in Norway
+---
+
+### Registration in ELMA
+
+A Norwegian company registered as a recipient is published in ELMA under its
+organisation number, with the processes its document types belong to, and with
+its name and contact details (name, email address and phone number) as the
+participant's contact. When the company's name, email address or phone number
+changes, the ELMA entry is updated with it.
+
+ELMA publishes the participant in the Peppol SML and the Peppol Directory itself,
+and points senders to Recommand's access point. Lookups over the SML, including
+the [verify endpoint](/reference/recipients/verify-recipient), find the company
+once ELMA has published it, usually within a minute.
+
+On the test network, Norwegian companies are registered in ELMA's test
+environment in the same way.
+
+### Moving an existing Norwegian registration
+
+Recipient registration is exclusive. How a Norwegian company that already
+receives elsewhere moves to Recommand depends on where it is registered:
+
+- **In ELMA, through another service provider.** When the verified company is
+  registered, Recommand asks ELMA to transfer the participant to it. If ELMA does
+  not allow the transfer, the registration fails with a message that names the
+  organisation number, and the current provider has to transfer it to Recommand
+  in ELMA.
+- **On another SMP.** The company has to be deregistered there first. ELMA does
+  not take over participants with SML [migration
+  keys](/docs/managing-companies#moving-from-another-provider-with-a-migration-key),
+  so they do not apply to Norwegian companies.
+
+If you do not know who the current provider is, look the organisation number up
+as a recipient (`0192:123456785`): the [verify
+endpoint](/reference/recipients/verify-recipient) returns the SMP it is published
+on.

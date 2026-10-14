@@ -1,0 +1,23 @@
+---
+title: Norwegian receivers registered in ELMA
+description: Norwegian companies are now registered as receivers in ELMA, the Norwegian receiver register, with their organisation number checked against Enhetsregisteret and their representative checked for signing authority.
+date: 2026-10-13
+---
+
+From 1 January 2027, Norwegian businesses with a bookkeeping obligation must issue e-invoices to other such businesses, and from 1 January 2030 they must all be able to receive them. Until then, the obligation in practice applies to buyers that can receive e-invoices, registered in ELMA or on Peppol. Norwegian companies that receive through Recommand are now registered in ELMA, and the checks the Norwegian Peppol Authority asks of service providers are built in.
+
+### What changed
+
+- **Registration in ELMA**: A Norwegian company registered as a recipient is published in ELMA, the Norwegian receiver register, under its organisation number (`0192`), instead of on Recommand's own SMP. Documents still arrive through Recommand's access point, and ELMA keeps the company's entry in the Peppol SML and the Peppol Directory up to date. The company's name, email address and phone number are published as its ELMA contact and updated when they change. On the test network, companies are registered in ELMA's test environment.
+- **Organisation numbers checked against Enhetsregisteret**: On the production network, an organisation number that the Norwegian register of legal entities does not know, or has deleted, is refused as a receiver. The register is checked daily: when an organisation is deleted, its `0192` identifier is unregistered and removed from the company, and the team is told by email.
+- **Signing authority checked during verification**: The verification form lists the people Enhetsregisteret names for signature (signatur) or procuration (prokura), and the representative picks their name. Someone who is not listed cannot verify the company. A representative who may only sign jointly with others, or whose authority the register cannot settle, completes the identity check and the verification is then held for review by our team.
+- **Moving from another provider**: A company registered in ELMA through another service provider is transferred to Recommand when it is registered here, if ELMA allows the transfer; otherwise the current provider has to transfer it. ELMA does not use SML migration keys, so a company on another SMP has to be deregistered there first.
+- **`0192` only**: ELMA registers Norwegian organisation numbers only, so a Norwegian company registered in ELMA carries `0192` identifiers only, and document types are registered as the ELMA processes they belong to.
+
+### Why this matters
+
+ELMA is where Norwegian buyers and their software expect to find receivers, and it is the register the Norwegian e-invoicing rules refer to. Registering Norwegian companies there, with the checks the Norwegian Peppol Authority requires, makes them reachable the way Norwegian senders expect ahead of the 2027 mandate.
+
+### What you need to do
+
+Nothing for new companies: a Norwegian company with an organisation number is registered in ELMA when it is registered as a recipient. Make sure Norwegian companies have their organisation number set as `enterpriseNumber`, since it is their only Peppol address. Norwegian companies registered before this change are moved to ELMA by Recommand, without changes to their identifiers or document types. The [Norwegian getting started guides](/getting-started/norway) cover identifiers, verification and registration.
