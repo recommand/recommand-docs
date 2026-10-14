@@ -1,0 +1,38 @@
+---
+title: Verifying a Norwegian company
+---
+
+## Verify the company
+
+A company cannot exchange documents on Peppol until an authorised representative
+has confirmed their identity. The company object exposes this as `isVerified`,
+and it stays `false` until the check is done.
+
+For Norwegian companies, the representative's authority is held against
+Enhetsregisteret:
+
+1. Open the verification URL (from the create-company response, the dashboard, or
+   a fresh one from the [verify company
+   endpoint](/reference/companies/verify-company)).
+2. Pick your name from the list. The list shows the people Enhetsregisteret names
+   for signature (signatur) or procuration (prokura). Someone who is not on it
+   cannot verify the company and is asked to contact
+   [support@recommand.eu](mailto:support@recommand.eu). When the register lists
+   nobody, the representative types their name instead, and it is checked the same
+   way.
+3. Complete the identity check. When the representative may act for the company
+   alone, `isVerified` flips to `true` and the company is published in ELMA.
+
+Of the people on the list, a representative may act alone when the register says
+they can sign or hold procuration on their own, or when they hold a role with full
+rights, such as
+general manager (daglig leder), chair of the board (styrets leder) or owner of a
+sole proprietorship (innehaver).
+
+### When the register cannot settle it
+
+Some cases need a person to look at them, for example a board member who may only
+sign together with others, or a register entry that cannot be interpreted. The
+identity check still runs, and the verification is then held for review by our
+team: `isVerified` stays `false` until it is decided, and the representative is
+told so during the verification.

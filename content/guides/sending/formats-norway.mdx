@@ -1,0 +1,22 @@
+---
+title: Document formats for Norway
+---
+
+## Pick the document format
+
+Send **Peppol BIS 3 UBL**, over the standard Peppol billing process. EHF Billing
+3.0, the Norwegian invoice format, is Peppol BIS Billing 3.0, so there is no
+separate Norwegian document type to select:
+
+| What you send | `doctypeId`                              |
+| ------------- | ---------------------------------------- |
+| Invoice       | not needed, defaults to Peppol BIS 3 UBL |
+| Credit note   | not needed, defaults to Peppol BIS 3 UBL |
+
+Peppol BIS 3 has a rule of its own for Norwegian sellers: a VAT number, when
+there is one, has to be written as `NO` + organisation number + `MVA`, for example
+`NO123456785MVA`.
+
+Before a first send to a new recipient, check that the recipient exists with the
+[verify endpoint](/reference/recipients/verify-recipient). That lookup also tells
+you whether a Norwegian buyer can receive e-invoices over Peppol at all.

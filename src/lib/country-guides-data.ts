@@ -25,6 +25,7 @@ export type CountryId =
   | "france"
   | "germany"
   | "netherlands"
+  | "norway"
   | "other";
 export type DirectionId = "sending" | "receiving" | "sending-and-receiving";
 
@@ -147,12 +148,24 @@ export const countries: readonly Country[] = [
     hint: "KVK numbers under scheme 0106, and SI-UBL 2.0 (NLCIUS) alongside Peppol BIS 3.",
   },
   {
+    id: "norway",
+    code: "NO",
+    label: "Norway",
+    prose: "Norway",
+    registeredIn: "Norway",
+    company: "Norwegian company",
+    companies: "Norwegian companies",
+    flag: "🇳🇴",
+    short: "0192 · EHF / BIS 3",
+    hint: "Organisation numbers under scheme 0192, registered in ELMA, the Norwegian receiver register, and checked against Enhetsregisteret.",
+  },
+  {
     id: "other",
     code: null,
     label: "Another country",
     prose: "other countries",
     registeredIn:
-      "a country other than Belgium, France, Germany or the Netherlands",
+      "a country other than Belgium, France, Germany, the Netherlands or Norway",
     company: "company in another country",
     companies: "companies in other countries",
     flag: "🌍",
