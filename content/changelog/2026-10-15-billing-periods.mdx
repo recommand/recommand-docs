@@ -1,0 +1,44 @@
+---
+title: Billing periods on documents and lines
+description: Invoices and credit notes can now state the period they bill for, on the document and on each line, for example the month of a subscription.
+date: 2026-10-15
+---
+
+Invoices and credit notes often bill for a period of time, such as a month of a subscription or a quarter of rent. You can now state that period on the document and on each line with the new `billingPeriod` field, and read it from documents you receive.
+
+### What changed
+
+- **New `billingPeriod` field**: An optional `billingPeriod` with a `startDate` and `endDate` (`YYYY-MM-DD`) on invoices, credit notes, self-billing invoices and self-billing credit notes. It is the invoicing period (BG-14) of EN 16931.
+- **Billing periods on lines**: Lines take the same `billingPeriod`, the invoice line period (BG-26), so each line can state the period it covers, for example when one invoice bills several subscriptions.
+- **Every format**: The period is written to and read from UBL as `cac:InvoicePeriod` and CII as `ram:BillingSpecifiedPeriod`, so Peppol BIS 3, XRechnung, the French formats and Factur-X all carry it.
+- **Shown in the PDF**: The generated PDF shows the document period in the header and the line period under each line.
+
+### Validation
+
+A period needs at least a `startDate` or an `endDate`, and the `endDate` may not be before the `startDate`. When the document has a billing period, the period of each line must fall within it (PEPPOL-EN16931-R110 and R111). A document that breaks these rules is refused before anything is sent; for a line outside the document period, the error names the line.
+
+### Example
+
+```json
+{
+  "invoiceNumber": "INV-2025-0042",
+  "billingPeriod": {
+    "startDate": "2025-03-01",
+    "endDate": "2025-03-31"
+  },
+  "lines": [
+    {
+      "name": "Pro plan subscription",
+      "netPriceAmount": "49.00",
+      "billingPeriod": {
+        "startDate": "2025-03-01",
+        "endDate": "2025-03-31"
+      }
+    }
+  ]
+}
+```
+
+### What you need to do
+
+Nothing: `billingPeriod` is optional, and documents without it are sent as before. If your invoices bill for a period, add it so the buyer's software can book the cost in the right period.
