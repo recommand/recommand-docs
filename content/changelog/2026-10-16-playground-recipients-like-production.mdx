@@ -1,14 +1,16 @@
 ---
-title: Playgrounds answer recipient checks like production
-description: A playground that is not connected to the Peppol Test Network now looks recipients up the way production does, so sends and recipient checks give the answer you will get live. Only the delivery is left out.
+title: Playgrounds behave like production, without delivering
+description: A playground that is not connected to the Peppol Test Network now looks recipients up the way production does, so sends and recipient checks give the answer you will get live. Every playground now emails documents only to its own members. Only the delivery is left out.
 date: 2026-10-16
 ---
 
-A playground should tell you how a request will behave in production. Until now, a simulated send to an address outside your playground always succeeded, even when that address was not on Peppol or did not receive the document type. The recipient checks also looked at a different place than sending did: for a company in your own playground, the [verify document support endpoint](/reference/recipients/verify-document-support) could report a document type as supported while the send refused it.
+A playground should tell you how a request will behave in production, without delivering anything. Until now, a simulated send to an address outside your playground always succeeded, even when that address was not on Peppol or did not receive the document type. The recipient checks also looked at a different place than sending did: for a company in your own playground, the [verify document support endpoint](/reference/recipients/verify-document-support) could report a document type as supported while the send refused it. And email was delivered for real: a playground mailed a document to any address you gave it, so a test could reach a real inbox.
 
-This applies to playgrounds that are **not** connected to the Peppol Test Network. Test Network playgrounds and production teams are unchanged.
+Production teams are unchanged.
 
-### What changed
+### Recipient lookups
+
+This applies to playgrounds that are **not** connected to the Peppol Test Network. Test Network playgrounds look recipients up on the Test Network, as before.
 
 - **Companies in your playground**: An address that belongs to a company in the same playground, set up to receive, is answered from that company's [document types](/reference/company-document-types/create-company-document-type). Sending, [verify recipient](/reference/recipients/verify-recipient) and [verify document support](/reference/recipients/verify-document-support) all use them, and a send is delivered to that company only when it is registered for the document type and process.
 - **Every other address**: Looked up on the production Peppol network, as a production send would look it up. A send succeeds when the recipient is registered for the document type and process, and nothing is delivered. When it is not, the send fails with `document_not_supported`; an address that is not on Peppol fails with `recipient_not_found`.
@@ -17,8 +19,19 @@ This applies to playgrounds that are **not** connected to the Peppol Test Networ
 - **Changes count right away**: A document type you add to a company in your playground applies to the next send.
 - `404:404` and `0208:1234567894` keep failing as an address that does not exist.
 
+### Email delivery
+
+This applies to every playground, including Test Network playgrounds: there is no test network for email, so an address outside your team is always a real inbox.
+
+- **Members of your playground team**: An email to the verified address of a team member goes out as before, with `[PLAYGROUND/TEST]` in the subject, so you can see what your customers will receive.
+- **Every other address**: The email is simulated. The send succeeds, `sentOverEmail` and `emailRecipients` report the address as in production, and its email delivery is `delivered` straight away, without a message ID. Nothing is sent.
+- **Email fallback**: Follows the same rule, whether the Peppol transmission is refused at send time or the access point reports the failure later.
+- Notification emails to the addresses configured on your companies are unchanged.
+
 ### What you need to do
 
 If your tests send from a playground to addresses that are not on Peppol, or to recipients that do not receive the document type, those sends now return **422** instead of succeeding, unless email delivery is configured as a fallback. Send to a real participant that receives the document type, or to a company in your playground that has it registered.
+
+If your tests check the emails a playground sends, send them to the address of a member of your playground team. Other addresses no longer receive them.
 
 To receive a document type in a playground company that its defaults do not include, such as self-billing invoices, add it with [create company document type](/reference/company-document-types/create-company-document-type).
