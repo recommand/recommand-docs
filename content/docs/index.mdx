@@ -82,7 +82,7 @@ const body = await res.json();
 - Use the same endpoints as production; just ensure your `{teamId}`/`{companyId}` belong to the playground team
 - Configure webhooks on the playground team to receive simulated inbound events (e.g. `document.received`)
 
-A playground that is **not** connected to the Peppol Test Network answers every request the way production would, and only leaves out the delivery. Sending, [verify recipient](/reference/recipients/verify-recipient) and [verify document support](/reference/recipients/verify-document-support) look a recipient up in the same place:
+A playground that is **not** connected to the Peppol Test Network looks recipients up the way production does, and only leaves out the delivery. Sending, [verify recipient](/reference/recipients/verify-recipient) and [verify document support](/reference/recipients/verify-document-support) look a recipient up in the same place:
 
 | Recipient | Looked up in | Delivery |
 | --- | --- | --- |
