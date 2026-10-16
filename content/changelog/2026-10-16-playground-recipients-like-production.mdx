@@ -1,0 +1,24 @@
+---
+title: Playgrounds answer recipient checks like production
+description: A playground that is not connected to the Peppol Test Network now looks recipients up the way production does, so sends and recipient checks give the answer you will get live. Only the delivery is left out.
+date: 2026-10-16
+---
+
+A playground should tell you how a request will behave in production. Until now, a simulated send to an address outside your playground always succeeded, even when that address was not on Peppol or did not receive the document type. The recipient checks also looked at a different place than sending did: for a company in your own playground, the [verify document support endpoint](/reference/recipients/verify-document-support) could report a document type as supported while the send refused it.
+
+This applies to playgrounds that are **not** connected to the Peppol Test Network. Test Network playgrounds and production teams are unchanged.
+
+### What changed
+
+- **Companies in your playground**: An address that belongs to a company in the same playground, set up to receive, is answered from that company's [document types](/reference/company-document-types/create-company-document-type). Sending, [verify recipient](/reference/recipients/verify-recipient) and [verify document support](/reference/recipients/verify-document-support) all use them, and a send is delivered to that company only when it is registered for the document type and process.
+- **Every other address**: Looked up on the production Peppol network, as a production send would look it up. A send succeeds when the recipient is registered for the document type and process, and nothing is delivered. When it is not, the send fails with `document_not_supported`; an address that is not on Peppol fails with `recipient_not_found`.
+- **Format selection follows the recipient**: Leave `doctypeId` or `processId` off and a send or [generate document](/reference/sending/generate) call now picks the format a real recipient is registered for, as in production. A document for a recipient that only receives another format, such as CII or XRechnung, can come back in that format instead of Peppol BIS 3.
+- **Explicit `doctypeId` and `processId`**: A send that names both is checked against the recipient's registration too, as production would refuse an unregistered combination.
+- **Changes count right away**: A document type you add to a company in your playground applies to the next send.
+- `404:404` and `0208:1234567894` keep failing as an address that does not exist.
+
+### What you need to do
+
+If your tests send from a playground to addresses that are not on Peppol, or to recipients that do not receive the document type, those sends now return **422** instead of succeeding, unless email delivery is configured as a fallback. Send to a real participant that receives the document type, or to a company in your playground that has it registered.
+
+To receive a document type in a playground company that its defaults do not include, such as self-billing invoices, add it with [create company document type](/reference/company-document-types/create-company-document-type).

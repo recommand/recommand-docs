@@ -80,17 +80,23 @@ const body = await res.json();
 ### Using a playground
 
 - Use the same endpoints as production; just ensure your `{teamId}`/`{companyId}` belong to the playground team
-- Sending documents simulates delivery; a document is only “received” if the recipient company exists in the same playground team
 - Configure webhooks on the playground team to receive simulated inbound events (e.g. `document.received`)
 
-To test Peppol send failure handling in playgrounds that are **not** connected to the Peppol Test Network, send to one of these recipient addresses:
+A playground that is **not** connected to the Peppol Test Network looks recipients up the way production does, and only leaves out the delivery. Sending, [verify recipient](/reference/recipients/verify-recipient) and [verify document support](/reference/recipients/verify-document-support) look a recipient up in the same place:
+
+| Recipient | Looked up in | Delivery |
+| --- | --- | --- |
+| A company in the same playground team, set up to receive | That company's [document types](/reference/company-document-types/create-company-document-type) | Simulated: the company receives the document |
+| Any other address | The production Peppol network | None: nothing leaves the playground |
+
+A send succeeds when the recipient is registered for the document type and process, as in production. Otherwise it fails with the same delivery failure category production would give: `document_not_supported` for a recipient that does not receive the document type, `recipient_not_found` for an address that is not on Peppol. A company in your playground starts with the default document types for its country; add others, such as self-billing invoices, to receive them.
+
+To test Peppol send failure handling, send to one of these recipient addresses:
 
 - `404:404` - always fails, simulating a Peppol address that does not exist
 - `0208:1234567894` - same behavior, but using a valid Peppol address
 
-The send endpoint returns **422** unless email delivery is configured as a fallback.
-
-For any other recipient that is not registered as an SMP recipient in the same playground team, Peppol delivery is skipped without an error. That is different from the addresses above, which always return an explicit failure.
+A failed Peppol delivery makes the send endpoint return **422** unless email delivery is configured as a fallback.
 
 These addresses only apply when delivery is simulated. Test Network playgrounds send over the real Peppol test infrastructure instead.
 
