@@ -38,6 +38,13 @@ await generateFiles({
   input: openapi,
   output: REFERENCE_DIR,
   includeDescription: true,
+  // `includeDescription` moves an operation's description into the page body,
+  // so it no longer fills the `description` frontmatter field. The reference
+  // page reads that field for its meta tag, so it gets the first sentence.
+  frontmatter: (_title, description, context) =>
+    context.type === "operation" && description
+      ? { description: firstSentence(description) }
+      : {},
   per: "operation",
   groupBy: "tag",
   name(output) {
@@ -67,8 +74,6 @@ function firstSentence(text?: string): string {
 
 // Build ordered list of operation slugs per tag from the spec
 const tagOperations: Record<string, string[]> = {};
-// tag/slug -> the one-line summary used as the page's meta description
-const operationSummaries: Record<string, string> = {};
 for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
   for (const [, op] of Object.entries(methods as Record<string, any>)) {
     if (!op?.tags) continue;
@@ -78,8 +83,6 @@ for (const [pathStr, methods] of Object.entries(spec.paths ?? {})) {
       const tagSlug = tag.replace(/\s+/g, "-").toLowerCase();
       if (!tagOperations[tagSlug]) tagOperations[tagSlug] = [];
       tagOperations[tagSlug].push(slug);
-      const summary = firstSentence(op.description) || op.summary || "";
-      if (summary) operationSummaries[`${tagSlug}/${slug}`] = summary;
     }
   }
 }
@@ -96,25 +99,6 @@ if (unlistedTags.length > 0) {
   throw new Error(
     `The API spec carries ${unlistedTags.length === 1 ? "a tag that is" : "tags that are"} missing from referenceGroupOrder in src/lib/reference-groups.ts: ${unlistedTags.join(", ")}. Pages for ${unlistedTags.length === 1 ? "it" : "them"} would be generated but unreachable. Add ${unlistedTags.length === 1 ? "it" : "them"} to referenceGroupOrder, referenceGroupNames and referenceGroupDescriptions.`,
   );
-}
-
-// fumadocs' generateFiles puts the operation description in the body and in
-// _openapi.structuredData, but never in a `description` frontmatter field. The
-// reference page reads page.data.description for its meta tag, so without this
-// every endpoint page ships without one.
-for (const [key, summary] of Object.entries(operationSummaries)) {
-  const file = path.join(REFERENCE_DIR, `${key}.mdx`);
-  if (!fs.existsSync(file)) continue;
-
-  const content = fs.readFileSync(file, "utf8");
-  if (/^description:/m.test(content)) continue;
-
-  const escaped = summary.replace(/"/g, '\\"');
-  const updated = content.replace(
-    /^(---\ntitle: .*\n)/,
-    `$1description: "${escaped}"\n`,
-  );
-  if (updated !== content) fs.writeFileSync(file, updated);
 }
 
 // Write root meta.json with ordered pages
