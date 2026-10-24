@@ -9,7 +9,7 @@ Peppol address:
 
 | Identifier                   | What it is for                                                   | Where it goes                                  |
 | ---------------------------- | ---------------------------------------------------------------- | ---------------------------------------------- |
-| Participant identifier       | The company's address on the Peppol network                      | A company identifier, e.g. `9930:DE123456788`  |
+| Participant identifier       | The company's address on the Peppol network                      | A company identifier, e.g. `9930:DE123456788` or `0246:DE123456788` |
 | Legal registration identifier | The register entry, e.g. `HRB 12345 B`, shown on the invoice (BT-30) | `enterpriseNumber`, with an optional `enterpriseNumberScheme` |
 | Buyer reference (BT-10)      | The buyer's routing reference; for an authority, its Leitweg-ID   | `buyerReference` on the document               |
 
@@ -35,8 +35,37 @@ Peppol address:
 ```
 
 The VAT number is checked against the German format and its check digit, and
-registered as the company's Peppol identifier: **`9930:` followed by the VAT
-number**. The register number is never registered as a Peppol identifier.
+registered as two Peppol identifiers:
+
+- **`9930:` followed by the VAT number**, e.g. `9930:DE123456788`
+- **`0246:` followed by the VAT number**, e.g. `0246:DE123456788`: the
+  company's German Electronic Business Address (GEBA). Its value is the
+  business identification number (W-IdNr), which is the same as the VAT number.
+
+The German identifier guideline recommends the GEBA as the first address a
+sender looks a German business up under, so with both registered the company is
+found whichever of the two a sender uses. The register number is never
+registered as a Peppol identifier.
+
+### More GEBAs: distinctive feature and sub-address
+
+A GEBA can extend the W-IdNr with a hyphen and a 5 digit distinctive feature
+(Unterscheidungsmerkmal), and with a full stop and a sub-address of up to 8
+letters or digits, for example `0246:DE123456788-00001` or
+`0246:DE123456788-00001.EINKAUF`. Add these yourself with the [create
+identifier endpoint](/reference/company-identifiers/create-company-identifier)
+or in the dashboard. A GEBA always has to start with the company's own VAT
+number. Adding the plain `0246:` VAT number again returns the identifier the
+company already has.
+
+### When the VAT number changes
+
+Identifiers are not rewritten when you change a company's VAT number or remove
+it: the `9930` and `0246` identifiers stay as they were registered. Update or
+remove them with the [company identifier
+endpoints](/reference/company-identifiers/create-company-identifier). Moving a
+company to another country removes both and adds that country's default
+identifiers.
 
 ### Without a VAT number
 
@@ -61,6 +90,8 @@ scheme `9958` is deprecated on Peppol and is refused.
 ### Which identifier you send from
 
 A company sends from the identifier with the lowest scheme, but never from a
-Leitweg-ID: that one only names an authority's invoice reception. An invoice to
+Leitweg-ID: that one only names an authority's invoice reception. A GEBA is
+passed over as well while the company has its VAT number under `9930`, so a
+German company keeps sending from `9930:` and its VAT number. An invoice to
 a Leitweg-ID always goes out under the company's VAT number (`9930`) or, without
 one, its GLN (`0088`), the sender identifiers the federal invoice portals list.
