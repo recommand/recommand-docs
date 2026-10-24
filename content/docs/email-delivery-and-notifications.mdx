@@ -109,12 +109,12 @@ A document that fails validation is refused with a `400` that lists the failing 
 A structured invoice names the buyer's electronic address (BT-49). Without a Peppol recipient, Recommand takes it from the document, using the first that applies:
 
 1. The buyer's `enterpriseNumber` under its `enterpriseNumberScheme`.
-2. The buyer's `vatNumber`, under the Peppol VAT scheme of the country its prefix names, such as `9930` for a `DE` number.
+2. The buyer's `vatNumber`, under the Peppol VAT scheme of the country its prefix names, such as `9930` for a `DE` number. A number without its country prefix is a validation error.
 3. The first address in `email.to`, under scheme `EM`.
 
 On a self-billing invoice or credit note the receiving party is the seller, so the seller's numbers are used.
 
-Peppol BIS 3 does not accept an email address as electronic address. A Peppol BIS document whose buyer has neither a VAT number nor an enterprise number is refused with a `400`; add one of them, or send XRechnung or CII, which accept the email address. French regulated documents cannot be delivered by email only: send them to a Peppol recipient.
+Peppol BIS 3 does not accept an email address as electronic address. A Peppol BIS document is refused with a `400` when the buyer has no enterprise number and no VAT number that Peppol has a VAT scheme for (Danish, Finnish, Swedish and Icelandic VAT numbers have none). Add the enterprise number, or send XRechnung or CII, which accept the email address. French regulated documents cannot be delivered by email only: send them to a Peppol recipient.
 
 This means you can use a single API endpoint and document format for all your customers. Recommand handles the delivery method based on the recipient.
 
