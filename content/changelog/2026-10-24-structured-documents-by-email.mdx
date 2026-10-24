@@ -1,23 +1,26 @@
 ---
-title: Structured e-invoices by email, and no Peppol attempt to unregistered recipients
-description: Name a doctypeId on an email-only send and the email carries the validated XML, not only a PDF. A recipient the Peppol network does not know is no longer sent to, so the email fallback runs straight away and the failure reads recipient_not_found.
+title: Send e-invoices by email to buyers that are not on Peppol
+description: Buyers that are not on Peppol can now receive a real e-invoice by email, with the XML attached, instead of only a PDF. Sending over Peppol with an email fallback now reaches buyers that are not on Peppol straight away.
 date: 2026-10-24
 ---
 
-A structured e-invoice does not have to travel over Peppol. In Germany, where domestic B2B invoices have to be structured e-invoices from 2027 (2028 for smaller companies), an XRechnung or Peppol BIS XML delivered by email counts, and a PDF does not. Many buyers are not on Peppol yet. Until now an email-only send carried a PDF only, and a send to an address that was not on Peppol at all first went through a transmission that could only fail.
+Not every e-invoicing mandate requires Peppol. In Germany, from 2027 (2028 for smaller companies), an XRechnung or Peppol BIS invoice sent by email counts as an e-invoice, and a PDF does not. Many German businesses are not on Peppol yet. You can now send them a compliant e-invoice through the same API call you already use.
 
-### What changed
+### What you can do now
 
-- **Structured documents by email**: On a send with `recipient: null`, set `doctypeId` (and, if needed, `processId`). The document is written in that format, validated as it would be for a Peppol recipient, stored with the document, and attached to the email as XML. A document that fails validation is refused with a `400` listing the failing rules. Without `doctypeId`, nothing changes: the email carries the PDF.
-- **Buyer's electronic address**: Such a document needs the buyer's electronic address (BT-49). It is taken from the buyer's enterprise number under its scheme, else its VAT number, else the first address in `email.to`. Peppol BIS 3 does not accept an email address there, so a Peppol BIS document for a buyer with neither number is refused; XRechnung and CII accept it. On self-billing documents the seller's numbers are used.
-- **French regulated documents** cannot be delivered by email only.
-- **Unregistered Peppol recipients**: When the Peppol network says a recipient is not registered, no transmission is attempted. The Peppol delivery fails with category `recipient_not_found`, and email fallback, if configured, runs straight away with the XML attached. Any other lookup problem, such as a directory that does not answer, does not count as not registered: the transmission is attempted as usual, and the fallback only runs if that attempt fails.
+- **Email an e-invoice instead of a PDF.** For a buyer you know is not on Peppol, leave out the Peppol recipient and choose the format, for example XRechnung. Recommand writes the invoice in that format, checks it against the official rules before anything is sent, and emails it with the XML attached, together with your PDF if you include one. The invoice is kept with your other documents, XML included.
+- **Use Peppol where you can, email where you can't.** Address the buyer on Peppol, for a German company by its VAT number, and add an email address. When the buyer is on Peppol, the invoice goes over Peppol. When it is not, the email with the XML goes out straight away, and the document shows that the buyer was not found on Peppol. One flow covers all your customers, without checking first who is on Peppol.
 
-### What you need to do
+Sending a PDF by email, for example to consumers, works as before.
 
-Nothing, unless one of these applies:
+### Good to know
 
-- **You already pass `doctypeId` on email-only sends**, for example the default Peppol BIS 3 identifier. Those documents are now validated, and the email carries the XML as well. A buyer without a VAT number or enterprise number gets a `400` for Peppol BIS 3: add the number, or leave `doctypeId` out to keep sending a PDF only.
-- **You react to delivery failure categories.** A send to an address that is not on Peppol now fails with `recipient_not_found` instead of `transport`. Without email delivery the response stays a `422` with the same message prefix; the detail now says the recipient is not registered.
+- A Peppol BIS invoice needs the buyer's VAT number or company number. For a buyer without one, choose XRechnung, which can use the buyer's email address instead.
+- French regulated invoices still go over Peppol through an accredited platform. They cannot be sent by email only.
 
-The [email delivery guide](/docs/email-delivery-and-notifications#structured-documents-by-email) and the [German getting started guide](/getting-started/germany) describe both ways to reach German buyers that are not on Peppol.
+### For developers
+
+- Set `doctypeId` on a send with `recipient: null` to email a structured document. If you already set it on email-only sends, those are now validated, and a Peppol BIS invoice for a buyer without a VAT or company number is refused with a `400`. Leave `doctypeId` out to keep sending a PDF only.
+- A send to an address that is not on Peppol now fails with category `recipient_not_found` instead of `transport`.
+
+The [email delivery guide](/docs/email-delivery-and-notifications#structured-documents-by-email) and the [German getting started guide](/getting-started/germany) show both ways in detail.
