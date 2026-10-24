@@ -1,5 +1,5 @@
 {
-  "recipient": "0208:0123456789",
+  "recipient": "0208:0123456848",
   "documentType": "invoice",
   "document": {
     "invoiceNumber": "INV-2026-001",
@@ -12,7 +12,7 @@
       "city": "Antwerp",
       "postalZone": "2000",
       "country": "BE",
-      "vatNumber": "BE0987654321"
+      "vatNumber": "BE0987654394"
     },
     "paymentMeans": [{ "iban": "BE68539007547034" }],
     "lines": [

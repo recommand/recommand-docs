@@ -90,8 +90,8 @@ const newCompany = await createCompany("your_team_id", {
   postalCode: "1000",
   city: "Brussels",
   country: "BE",
-  enterpriseNumber: "0123456789",
-  vatNumber: "BE0123456789",
+  enterpriseNumber: "0123456848",
+  vatNumber: "BE0123456848",
 });
 
 if (newCompany.success) {
@@ -120,9 +120,9 @@ country.
 | `postalCode`       | Postal/zip code                  | Yes      | `"1000"`             |
 | `city`             | City                             | Yes      | `"Brussels"`         |
 | `country`          | Country code (2-letter ISO code) | Yes      | `"BE"`               |
-| `enterpriseNumber` | Enterprise number                | No       | `"0123456789"`       |
+| `enterpriseNumber` | Enterprise number                | No       | `"0123456848"`       |
 | `enterpriseNumberScheme` | Scheme of the enterprise number, written into the documents the company sends | No | `"0208"` |
-| `vatNumber`        | VAT registration number          | No       | `"BE0123456789"`     |
+| `vatNumber`        | VAT registration number          | No       | `"BE0123456848"`     |
 | `email`            | Contact email                    | No       | `"billing@acme.be"`  |
 | `phone`            | Contact phone number             | No       | `"+32 3 123 45 67"`  |
 | `isSmpRecipient`   | Register the company to receive documents after verification (defaults to `true`) | No | `true` |
@@ -246,8 +246,8 @@ const updateResult = await updateCompany("company_id", {
   postalCode: "1000",
   city: "Brussels",
   country: "BE",
-  enterpriseNumber: "0123456789",
-  vatNumber: "BE0123456789",
+  enterpriseNumber: "0123456848",
+  vatNumber: "BE0123456848",
 });
 
 if (updateResult.success) {
@@ -346,8 +346,8 @@ async function createCompany() {
       postalCode: "1000",
       city: "Brussels",
       country: "BE",
-      enterpriseNumber: "0123456789",
-      vatNumber: "BE0123456789",
+      enterpriseNumber: "0123456848",
+      vatNumber: "BE0123456848",
     }),
   });
 
@@ -394,8 +394,8 @@ async function updateCompany(companyId) {
       postalCode: "1000",
       city: "Brussels",
       country: "BE",
-      enterpriseNumber: "0123456789",
-      vatNumber: "BE0123456789",
+      enterpriseNumber: "0123456848",
+      vatNumber: "BE0123456848",
     }),
   });
 

@@ -192,8 +192,8 @@ The document object contains the following key fields:
 | `companyId` | The company that received the document | `"c_xxx"` |
 | `direction` | Always `"incoming"` for received documents | `"incoming"` |
 | `type` | Document type: `invoice`, `creditNote`, `selfBillingInvoice`, `selfBillingCreditNote`, `messageLevelResponse`, `frenchInvoicingCdar`, `frenchB2CSalesReport`, `frenchB2CPaymentReport`, `frenchB2BiInvoiceReport`, `frenchB2BiPaymentReport`, or `unknown` | `"invoice"` |
-| `senderId` | Peppol address of the sender | `"0208:0123456789"` |
-| `receiverId` | Peppol address of the receiver (your company) | `"0208:9876543210"` |
+| `senderId` | Peppol address of the sender | `"0208:0123456848"` |
+| `receiverId` | Peppol address of the receiver (your company) | `"0208:0987654394"` |
 | `parsed` | The structured document content (invoice, credit note, etc.) | See below |
 | `xml` | The raw UBL XML | `"<?xml ..."` |
 | `validation` | Validation results against EN16931 and Peppol BIS 3.0, or `null` when the document was not validated | `{ "result": "valid", "errors": [] }` |
@@ -358,7 +358,7 @@ Send it with the [send document endpoint](/reference/sending/send-document) usin
 
 ```json
 {
-  "recipient": "0208:0123456789",
+  "recipient": "0208:0123456848",
   "documentType": "messageLevelResponse",
   "document": {
     "envelopeId": "7c2e5a19-64bd-4c73-8f05-91ab3de60f27",

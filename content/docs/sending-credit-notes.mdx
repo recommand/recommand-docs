@@ -63,7 +63,7 @@ const creditNote = {
 
   // Buyer information (recipient)
   buyer: {
-    vatNumber: "BE0123456789",
+    vatNumber: "BE0123456848",
     name: "Customer Company",
     street: "Customer Street 1",
     city: "Brussels",
@@ -76,7 +76,7 @@ const creditNote = {
     {
       paymentMethod: "credit_transfer",
       reference: "CN-2025-001",
-      iban: "BE1234567890", // Usually your bank account for refunds
+      iban: "BE68539007547034", // Usually your bank account for refunds
     },
   ],
 
@@ -128,7 +128,7 @@ async function sendCreditNote(companyId, recipientPeppolId, creditNote) {
 // Example usage
 const result = await sendCreditNote(
   "your_company_id",
-  "0208:0123456789",
+  "0208:0123456848",
   creditNote
 );
 

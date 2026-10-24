@@ -50,7 +50,7 @@ async function verifyRecipient(peppolAddress) {
 }
 
 // Example usage
-const result = await verifyRecipient("0208:0123456789");
+const result = await verifyRecipient("0208:0123456848");
 console.log("Recipient exists:", result.isValid);
 console.log("SMP URL:", result.smpUrl);
 ```
@@ -94,7 +94,7 @@ const result = await fetch("https://app.recommand.eu/api/v1/verify", {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    peppolAddress: "0208:0123456789",
+    peppolAddress: "0208:0123456848",
     includeEndpointDetails: true,
     includeBusinessCard: true,
   }),
@@ -135,7 +135,7 @@ async function verifyDocumentSupport(peppolAddress, documentType) {
 // Example usage
 const documentType =
   "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1";
-const result = await verifyDocumentSupport("0208:0123456789", documentType);
+const result = await verifyDocumentSupport("0208:0123456848", documentType);
 console.log("Document type supported:", result.isValid);
 ```
 
@@ -176,7 +176,7 @@ without its scheme prefix:
 
 ```javascript
 body: JSON.stringify({
-  peppolAddress: "0208:0123456789",
+  peppolAddress: "0208:0123456848",
   documentType: "invoice",
   processId: "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
 });
@@ -226,7 +226,7 @@ console.log("Search results:", searchResults.results);
   "success": true,
   "results": [
     {
-      "peppolAddress": "0208:0123456789",
+      "peppolAddress": "0208:0123456848",
       "name": "Example Company",
       "supportedDocumentTypes": [
         "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1"
@@ -337,7 +337,7 @@ async function verifyAndSendInvoice(companyId, recipientId, invoice) {
 
 // Example usage
 const companyId = "your_company_id";
-const recipientId = "0208:0123456789";
+const recipientId = "0208:0123456848";
 const invoice = {
   invoiceNumber: "INV-2024-001",
   issueDate: "2024-05-15",
@@ -387,7 +387,7 @@ async function verifyRecipientWithMultipleSchemes(identifier) {
 }
 
 // Example usage
-const result = await verifyRecipientWithMultipleSchemes("0123456789");
+const result = await verifyRecipientWithMultipleSchemes("0123456848");
 ```
 
 ## Finding Recipients by Name

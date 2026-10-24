@@ -46,7 +46,7 @@ async function verifyRecipient(peppolAddress) {
 }
 
 // Example usage
-const recipientExists = await verifyRecipient("0208:0123456789");
+const recipientExists = await verifyRecipient("0208:0123456848");
 if (!recipientExists) {
   console.error("Recipient is not registered in the Peppol network");
   return;
@@ -66,7 +66,7 @@ const invoice = {
 
   // Buyer information (recipient)
   buyer: {
-    vatNumber: "BE0123456789",
+    vatNumber: "BE0123456848",
     name: "Recipient Company",
     street: "Recipient Street 1",
     city: "Brussels",
@@ -77,7 +77,7 @@ const invoice = {
   // Payment information
   paymentMeans: [
     {
-      iban: "BE1234567890",
+      iban: "BE68539007547034",
     },
   ],
 
@@ -123,7 +123,7 @@ const invoice = {
 
 ```javascript
 {
-  vatNumber: "BE0123456789",      // Optional, but needed on most VAT invoices
+  vatNumber: "BE0123456848",      // Optional, but needed on most VAT invoices
   name: "Company Name",           // Required
   street: "Street Address",       // Required
   street2: "Building B",          // Optional
@@ -140,7 +140,7 @@ const invoice = {
   {
     paymentMethod: "credit_transfer", // Optional, defaults to "credit_transfer"
     reference: "INV-2025-001", // Optional, payment reference
-    iban: "BE1234567890", // Required, bank account number
+    iban: "BE68539007547034", // Required, bank account number
   },
 ];
 ```
@@ -191,7 +191,7 @@ async function sendInvoice(companyId, recipientPeppolId, invoice) {
 }
 
 // Example usage
-const result = await sendInvoice("your_company_id", "0208:0123456789", invoice);
+const result = await sendInvoice("your_company_id", "0208:0123456848", invoice);
 
 if (result.success) {
   console.log("Invoice sent successfully!");
@@ -304,7 +304,7 @@ Here's a full example incorporating all the steps:
 
 ```javascript
 const companyId = "c_xxx";
-const recipientPeppolId = "0208:0123456789";
+const recipientPeppolId = "0208:0123456848";
 const token = Buffer.from("your_api_key:your_api_secret").toString("base64");
 
 async function sendPeppolInvoice() {
@@ -317,7 +317,7 @@ async function sendPeppolInvoice() {
     buyerReference: "PO-2024-001",
 
     buyer: {
-      vatNumber: "BE0123456789",
+      vatNumber: "BE0123456848",
       name: "Recipient Company",
       street: "Recipient Street 1",
       city: "Brussels",
@@ -329,7 +329,7 @@ async function sendPeppolInvoice() {
       {
         paymentMethod: "credit_transfer",
         reference: "INV-2025-001",
-        iban: "BE1234567890",
+        iban: "BE68539007547034",
       },
     ],
 
@@ -439,7 +439,7 @@ have to take it apart and rebuild it as an invoice object. Send it as it is with
 
 ```json
 {
-  "recipient": "0208:0123456789",
+  "recipient": "0208:0123456848",
   "documentType": "xml",
   "doctypeId": "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0::2.1",
   "document": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>..."
