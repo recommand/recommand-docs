@@ -26,7 +26,7 @@ Sending an invoice through Peppol involves:
 ## Verify the Recipient
 
 Before sending an invoice, you might want to verify if the recipient is registered in the Peppol network using the [verify endpoint](/reference/recipients/verify-recipient).
-If you don't do this and the recipient is not registered on the Peppol network, you will receive an error when sending the invoice.
+If the recipient is not registered on the Peppol network, the send fails with a `422` and delivery failure category `recipient_not_found`, unless you configure [email delivery](/docs/email-delivery-and-notifications) as a fallback: the invoice is then emailed with its XML attached, without a Peppol attempt.
 
 ```javascript
 async function verifyRecipient(peppolAddress) {

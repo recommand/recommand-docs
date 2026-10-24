@@ -12,6 +12,7 @@ Recommand uses a single API endpoint for sending all your documents, whether the
 Common use cases:
 
 - **B2C customers** who aren't on the Peppol network
+- **Business customers who need a structured e-invoice** but aren't on the Peppol network, such as many German businesses (see [Structured documents by email](#structured-documents-by-email))
 - **International recipients** outside countries with Peppol mandates
 - **Fallback delivery** when Peppol transmission fails
 - **Additional delivery** when you want both Peppol and email
@@ -77,7 +78,43 @@ For customers who aren't on the Peppol network, you can set `recipient` to `null
 
 When `recipient` is `null`, email becomes the primary delivery method and `email.to` is required. The `when` field is ignored since there is no Peppol delivery to fall back from.
 
-Since these emails are not sent over the Peppol network, the PDF attachment effectively becomes the document your recipient receives. You can either let Recommand generate a PDF from your document data, or attach your own custom PDF. See [PDF Attachments](#pdf-attachments) below.
+Without a `doctypeId`, these emails carry no XML, so the PDF attachment effectively becomes the document your recipient receives. You can either let Recommand generate a PDF from your document data, or attach your own custom PDF. See [PDF Attachments](#pdf-attachments) below.
+
+### Structured Documents by Email
+
+Some buyers need a structured e-invoice, not a PDF, even when they aren't on Peppol. German businesses are the main example: from 2027, or 2028 for smaller companies, their domestic B2B invoices have to be structured e-invoices, and an XRechnung or Peppol BIS XML delivered by email counts as one, while a PDF does not.
+
+Set `doctypeId` on a send with `recipient: null`, and the document is written in that format, validated exactly as it would be for a Peppol recipient, stored with the document, and attached to the email as XML:
+
+```javascript
+{
+  recipient: null,
+  documentType: "invoice",
+  doctypeId:
+    "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0::2.1",
+  document: {
+    // ... your invoice data
+  },
+  email: {
+    to: ["rechnung@kunde.example"],
+  },
+  pdfGeneration: {
+    enabled: true,
+  },
+}
+```
+
+A document that fails validation is refused with a `400` that lists the failing rules and fields, before any email is sent. Add `processId` if you need a process other than the default. Leave `doctypeId` out and nothing changes: the email carries the PDF only.
+
+A structured invoice names the buyer's electronic address (BT-49). Without a Peppol recipient, Recommand takes it from the document, using the first that applies:
+
+1. The buyer's `enterpriseNumber` under its `enterpriseNumberScheme`.
+2. The buyer's `vatNumber`, under the Peppol VAT scheme of the country its prefix names, such as `9930` for a `DE` number. A number without its country prefix is a validation error.
+3. The first address in `email.to`, under scheme `EM`.
+
+On a self-billing invoice or credit note the receiving party is the seller, so the seller's numbers are used.
+
+Peppol BIS 3 does not accept an email address as electronic address. A Peppol BIS document is refused with a `400` when the buyer has no enterprise number and no VAT number that Peppol has a VAT scheme for (Danish, Finnish, Swedish and Icelandic VAT numbers have none). Add the enterprise number, or send XRechnung or CII, which accept the email address. French regulated documents cannot be delivered by email only: send them to a Peppol recipient.
 
 This means you can use a single API endpoint and document format for all your customers. Recommand handles the delivery method based on the recipient.
 
@@ -98,7 +135,7 @@ When sending documents via email, you can attach a PDF in two ways:
 
 **Custom PDF.** Include your own PDF via the document's `attachments` field. This is useful if you have a branded invoice template or generate PDFs in your own system. See the [sending invoices guide](/docs/sending-invoices) for details on attachments.
 
-When sending via Peppol, emails also include the UBL XML document as an attachment.
+Emails also include the XML document whenever one was written: on every send with a Peppol recipient, including fallback emails, and on a send without one when `doctypeId` is set.
 
 ### Response
 
@@ -158,6 +195,8 @@ Each entry in `deliveries` represents one attempt to one address over `peppol` o
 - `failed`: the attempt failed. The `failure` object contains a category, message and provider code when available.
 
 The document-level `deliveryStatus` is `delivered` if any attempt is delivered, `failed` if all attempts failed, and `pending` otherwise. It is `null` when there are no deliveries. Inspect individual attempts to detect a failed channel even when another succeeded. The document list supports `deliveryStatus` and `deliveryFailed` filters.
+
+When the Peppol network says the recipient is not registered at all, Recommand does not attempt the transmission: the Peppol delivery fails with category `recipient_not_found` and email fallback, if configured, runs straight away with the XML attached. A lookup that fails for any other reason, such as an unreachable directory, does not count as not registered: the transmission is attempted as usual, and fallback only runs if that attempt fails.
 
 With `email.when: "on_peppol_failure"`, fallback also runs when the access point reports a failure after the send request returned. The resulting email attempts appear in `deliveries` when you fetch the document; `sentOverEmail` and `emailRecipients` in the original send response describe only what that request sent. A failed Peppol attempt is not automatically resent.
 
