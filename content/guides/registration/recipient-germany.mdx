@@ -14,3 +14,13 @@ If you do not know who the current provider is, look the VAT number up as a
 recipient (`9930:DE123456788`): the [verify
 endpoint](/reference/recipients/verify-recipient) returns the SMP it is
 published on, which names the provider to ask.
+
+### The GEBA
+
+A German company is registered under its GEBA (`0246:DE123456788`) next to its
+VAT number. When another provider already publishes the GEBA, the company is
+not refused: it is registered without the GEBA, which then no longer appears
+among its identifiers. Look `0246:` and the VAT number up the same way to find
+that provider. Add the GEBA again with that provider's [migration
+key](/docs/managing-companies#moving-from-another-provider-with-a-migration-key)
+to move it over, or once the provider has deregistered it.
