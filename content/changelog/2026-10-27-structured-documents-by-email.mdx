@@ -1,7 +1,7 @@
 ---
 title: Structured e-invoices by email, and no Peppol attempt to unregistered recipients
 description: Name a doctypeId on an email-only send and the email carries the validated XML, not only a PDF. A recipient the Peppol network does not know is no longer sent to, so the email fallback runs straight away and the failure reads recipient_not_found.
-date: 2026-10-24
+date: 2026-10-27
 ---
 
 A structured e-invoice does not have to travel over Peppol. In Germany, where domestic B2B invoices have to be structured e-invoices from 2027 (2028 for smaller companies), an XRechnung or Peppol BIS XML delivered by email counts, and a PDF does not. Many buyers are not on Peppol yet. Until now an email-only send carried a PDF only, and a send to an address that was not on Peppol at all first went through a transmission that could only fail.
@@ -11,7 +11,7 @@ A structured e-invoice does not have to travel over Peppol. In Germany, where do
 - **Structured documents by email**: On a send with `recipient: null`, set `doctypeId` (and, if needed, `processId`). The document is written in that format, validated as it would be for a Peppol recipient, stored with the document, and attached to the email as XML. A document that fails validation is refused with a `400` listing the failing rules. Without `doctypeId`, nothing changes: the email carries the PDF.
 - **Buyer's electronic address**: Such a document needs the buyer's electronic address (BT-49). It is taken from the buyer's enterprise number under its scheme, else its VAT number, else the first address in `email.to`. Peppol BIS 3 does not accept an email address there, so a Peppol BIS document for a buyer with neither number is refused; XRechnung and CII accept it. On self-billing documents the seller's numbers are used.
 - **French regulated documents** cannot be delivered by email only.
-- **Unregistered Peppol recipients**: When the Peppol network says a recipient is not registered, no transmission is attempted. The Peppol delivery fails with category `recipient_not_found`, and email fallback, if configured, runs straight away with the XML attached. Any other lookup problem still leads to a normal transmission attempt, so a document is never emailed to a buyer who may be on Peppol.
+- **Unregistered Peppol recipients**: When the Peppol network says a recipient is not registered, no transmission is attempted. The Peppol delivery fails with category `recipient_not_found`, and email fallback, if configured, runs straight away with the XML attached. Any other lookup problem, such as a directory that does not answer, does not count as not registered: the transmission is attempted as usual, and the fallback only runs if that attempt fails.
 
 ### What you need to do
 

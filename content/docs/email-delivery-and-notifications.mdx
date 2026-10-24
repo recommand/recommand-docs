@@ -196,7 +196,7 @@ Each entry in `deliveries` represents one attempt to one address over `peppol` o
 
 The document-level `deliveryStatus` is `delivered` if any attempt is delivered, `failed` if all attempts failed, and `pending` otherwise. It is `null` when there are no deliveries. Inspect individual attempts to detect a failed channel even when another succeeded. The document list supports `deliveryStatus` and `deliveryFailed` filters.
 
-When the Peppol network says the recipient is not registered at all, Recommand does not attempt the transmission: the Peppol delivery fails with category `recipient_not_found` and email fallback, if configured, runs straight away with the XML attached. A lookup that fails for any other reason, such as an unreachable directory, never diverts the document to email: the transmission is attempted as usual.
+When the Peppol network says the recipient is not registered at all, Recommand does not attempt the transmission: the Peppol delivery fails with category `recipient_not_found` and email fallback, if configured, runs straight away with the XML attached. A lookup that fails for any other reason, such as an unreachable directory, does not count as not registered: the transmission is attempted as usual, and fallback only runs if that attempt fails.
 
 With `email.when: "on_peppol_failure"`, fallback also runs when the access point reports a failure after the send request returned. The resulting email attempts appear in `deliveries` when you fetch the document; `sentOverEmail` and `emailRecipients` in the original send response describe only what that request sent. A failed Peppol attempt is not automatically resent.
 

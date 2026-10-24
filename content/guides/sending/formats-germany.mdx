@@ -80,7 +80,7 @@ emailed straight away, with the XML attached. The Peppol delivery then reports
 
 ```javascript title="Peppol first, email as fallback"
 {
-  recipient: "9930:DE811569869",
+  recipient: "9930:DE123456788",
   documentType: "invoice",
   document: {
     // ... your invoice data, with the buyer's vatNumber
@@ -91,8 +91,9 @@ emailed straight away, with the XML attached. The Peppol delivery then reports
 
 `email.when` defaults to `on_peppol_failure`, so the email only goes out when
 Peppol delivery fails. A Peppol lookup that fails for another reason, such as a
-directory that does not answer, does not count as not registered: the invoice
-is not diverted to email while the buyer may be on Peppol.
+directory that does not answer, does not count as not registered: the
+transmission is attempted as usual, and the email only goes out if that
+attempt fails.
 
 **Email only.** When you know the buyer is not on Peppol, set `recipient` to
 `null` and name the format with `doctypeId`. The invoice is written in that
