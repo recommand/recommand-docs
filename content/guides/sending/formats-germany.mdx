@@ -63,3 +63,57 @@ refused, because the authority would reject the invoice; put order numbers in
   [verify document support endpoint](/reference/recipients/verify-document-support)
   before the first send.
 </Callout>
+
+## Buyers that are not on Peppol
+
+Every German business has to be able to receive structured e-invoices, but not
+every one is on Peppol. The law does not prescribe a channel: an XRechnung or
+Peppol BIS XML delivered by email is a valid e-invoice, a PDF is not. Two ways
+to reach every buyer with a structured document:
+
+**Peppol first, email as fallback (recommended).** Address the buyer by its VAT
+number, `9930:` followed by the number, and add `email.to`. When the buyer is
+on Peppol, the invoice goes over Peppol. When the Peppol network says the
+address is not registered, no transmission is attempted and the invoice is
+emailed straight away, with the XML attached. The Peppol delivery then reports
+`recipient_not_found`.
+
+```javascript title="Peppol first, email as fallback"
+{
+  recipient: "9930:DE811569869",
+  documentType: "invoice",
+  document: {
+    // ... your invoice data, with the buyer's vatNumber
+  },
+  email: { to: ["rechnung@kunde.example"] },
+}
+```
+
+`email.when` defaults to `on_peppol_failure`, so the email only goes out when
+Peppol delivery fails. A Peppol lookup that fails for another reason, such as a
+directory that does not answer, does not count as not registered: the invoice
+is not diverted to email while the buyer may be on Peppol.
+
+**Email only.** When you know the buyer is not on Peppol, set `recipient` to
+`null` and name the format with `doctypeId`. The invoice is written in that
+format, validated as for a Peppol send, and attached to the email as XML.
+
+```javascript title="XRechnung by email"
+{
+  recipient: null,
+  documentType: "invoice",
+  doctypeId:
+    "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0::2.1",
+  document: {
+    // ... your invoice data
+  },
+  email: { to: ["rechnung@kunde.example"] },
+}
+```
+
+The invoice names the buyer's VAT number as its electronic address (BT-49), or
+the first address in `email.to` when the buyer has no VAT or enterprise
+number. XRechnung accepts the email address; Peppol BIS 3 does not, and needs
+the buyer's VAT number. Without `doctypeId`, an email-only send carries a PDF
+and no XML. See [email delivery](/docs/email-delivery-and-notifications#structured-documents-by-email)
+for the details.
