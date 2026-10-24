@@ -9,7 +9,7 @@ The German identifier guideline (KoSIT, Germany Identifier Guideline v1.3) recom
 ### What changed
 
 - **Registered under both schemes**: A new German company with a VAT number gets two identifiers: `9930:DE123456788` and `0246:DE123456788`. Both are registered on Peppol when the company is registered as a recipient, and moving a company to Germany adds both.
-- **Existing German companies**: Existing German companies get the GEBA added as well. Companies that already have a GEBA of their own, with a distinctive feature or sub-address, are left as they are.
+- **Existing German companies**: Existing German companies get the GEBA added as well, including companies that already have a GEBA with a distinctive feature or sub-address. Their own GEBAs stay as they are.
 - **Sending is unchanged**: A German company keeps sending from `9930:` and its VAT number. The GEBA only adds an address it can receive on.
 - **Never a reason to be refused**: When another provider already publishes the company's GEBA, the company is registered without it. Look the GEBA up with the [verify recipient endpoint](/reference/recipients/verify-recipient) to find that provider, and move it over with a [migration key](/docs/managing-companies#moving-from-another-provider-with-a-migration-key).
 - **Adding it yourself**: Adding the plain GEBA with the [create company identifier endpoint](/reference/company-identifiers/create-company-identifier) returns the identifier the company already has instead of an error. GEBAs with a distinctive feature or sub-address, such as `0246:DE123456788-00001`, are still added that way.
