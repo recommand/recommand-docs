@@ -7,7 +7,7 @@ updatedAt: 2026-04-02
 
 A Global Location Number (GLN) is a 13-digit identifier issued by GS1 that uniquely identifies a legal entity, a function within an entity, or a physical location such as a warehouse or accounting department.
 
-On the Peppol network, GLNs use the scheme code `0088`. A Peppol address based on a GLN looks like `0088:1234567890123`.
+On the Peppol network, GLNs use the scheme code `0088`. A Peppol address based on a GLN looks like `0088:5412345000013`.
 
 ### When to use a GLN
 
