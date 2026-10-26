@@ -297,7 +297,7 @@ Keep in mind this feature is only available for enterprise customers on request.
 - **Team ID**: Your team identifier (found in the API Keys section of the dashboard)
 - **JWKS (JSON Web Key Set)**: A JSON document containing your public key(s) in JWKS format. The public key(s) will be used to verify the JWT assertions you sign with your corresponding private key(s).
 
-The JWKS should follow the [RFC 7517](https://tools.ietf.org/html/rfc7517) specification and contain at least one RSA public key (for RS256 algorithm). The JWKS MUST only contain the public portion of the RSA keys. Example JWKS structure:
+The JWKS should follow the [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) specification and contain at least one RSA public key (for RS256 algorithm). The JWKS MUST only contain the public portion of the RSA keys. Example JWKS structure:
 
 ```json
 {

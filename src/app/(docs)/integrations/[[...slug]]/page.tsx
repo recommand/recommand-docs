@@ -159,7 +159,7 @@ function IntegrationsIndex({
             </p>
           </div>
           <a
-            href="https://recommand.eu/integrations"
+            href="https://recommand.eu/en/integrations"
             className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-folder-dark transition-colors hover:text-darkslate dark:text-folder dark:hover:text-sheet"
           >
             All integrations
