@@ -67,7 +67,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // Changelog pages
+  // Changelog index (rendered by the catch-all route, not a content page) and
+  // its entries
+  entries.push({ url: `${BASE_URL}/changelog`, lastModified: new Date() });
   for (const page of changelogSource.getPages()) {
     entries.push({
       url: `${BASE_URL}${page.url}`,
