@@ -23,7 +23,7 @@ Each company has an `isVerified` field. As long as this field is `false`, the co
 
 ## Initiating Verification
 
-When you create a company, the response already includes a `verificationUrl`. No additional API call is needed to obtain this URL. The verification page itself lets them forward the link to an authorised representative if needed. If you need a fresh URL later (e.g. the original link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company) to generate a new verification session.
+When you create a company, the response already includes a `verificationUrl`. No additional API call is needed to obtain this URL. The verification page itself lets them forward the link to an authorised representative if needed. If you need the URL later (e.g. the original link was lost or you want to verify an existing company), call the [verify company endpoint](/reference/companies/verify-company). While the company's current session is still open and its enterprise number, name and address have not changed, the endpoint returns the URL of that same session. Otherwise it starts a new session. Verification links do not expire after a fixed time. A link to a session that has ended shows its outcome and, where it makes sense, lets the user start again.
 
 ```javascript
 async function initiateVerification(companyId) {
@@ -98,15 +98,15 @@ if (result.success) {
 }
 ```
 
-`isVerified` becomes `true` once the identity check is successfully completed. It is automatically reset to `false` if the company's `vatNumber` or `enterpriseNumber` is changed. In that case the company must go through verification again before it can participate on the Peppol network.
+`isVerified` becomes `true` once the identity check is successfully completed. It is automatically reset to `false` if the company's `vatNumber` or `enterpriseNumber` is changed. That change also cancels any open verification session, and a `company.verification` webhook with status `"rejected"` is sent. In that case the company must go through verification again before it can participate on the Peppol network.
 
 ## Webhook Notification
 
 Rather than polling, you can listen for the `company.verification` webhook event, which fires when verification reaches a final state. The payload includes a `status` field:
 
 - `"verified"`: identity check passed and the company is active on the Peppol network
-- `"rejected"`: identity check failed
-- `"error"`: identity check completed, but a subsequent Peppol network operation failed; the company is not yet active. An `errorMessage` field is included with details. Contact [support@recommand.eu](mailto:support@recommand.eu) if this occurs and you are not sure what to do.
+- `"rejected"`: the company is not verified. Either the identity check failed or was not completed, or the `vatNumber` or `enterpriseNumber` of a verified company changed. An `errorMessage` field may include the reason.
+- `"error"`: identity check completed, but a subsequent Peppol network operation failed; the company is not yet active. An `errorMessage` field is included with details. Do not start a new verification for this: it would ask for a new identity check. Contact [support@recommand.eu](mailto:support@recommand.eu) if this occurs and you are not sure what to do.
 
 ```json
 {
@@ -124,7 +124,7 @@ See [Working with Webhooks](/docs/working-with-webhooks) for how to register a w
 1. **Verify early**: Verify as soon as the company is ready. If its identifiers are still registered with another provider, prepare their migration or deregistration first to avoid registration conflicts.
 2. **Present the URL to your user**: Display it in your UI or redirect to it. The verification page lets the user forward the link to whoever in their organisation can complete the identity check.
 3. **Watch for reverification after updates**: If you update a company's `vatNumber` or `enterpriseNumber`, `isVerified` is reset automatically. Check the field after updates and present a new `verificationUrl` to your user if needed.
-4. **One session at a time**: Each call to the verify endpoint creates a new session. Avoid initiating multiple sessions for the same company unnecessarily.
+4. **Use the webhook to track the outcome**: Calling the verify endpoint again is safe while a session is open, since it returns the same URL. After a session has ended it starts a new one, so do not use it to check status. Listen for the `company.verification` webhook and read `isVerified` instead.
 
 ## Next Steps
 

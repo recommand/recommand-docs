@@ -482,9 +482,9 @@ For a full walkthrough of the verification process, see the [Company Verificatio
 
 - `status`: One of `"verified"`, `"rejected"`, or `"error"`
   - `"verified"`: identity check passed and the company is active on the Peppol network
-  - `"rejected"`: identity check failed
+  - `"rejected"`: the company is not verified: the identity check failed or was not completed, or the `vatNumber` or `enterpriseNumber` of a verified company changed
   - `"error"`: identity check completed, but a subsequent Peppol network operation failed; the company is not yet active
-- `errorMessage`: Only present when `status` is `"error"`. Contains a description of what went wrong.
+- `errorMessage`: Always present when `status` is `"error"`, and may be present when `status` is `"rejected"`. Contains a description of what went wrong.
 
 ```javascript
 if (event.eventType === "company.verification") {
