@@ -129,9 +129,15 @@ const invoice = {
   street2: "Building B",          // Optional
   city: "Brussels",               // Required
   postalZone: "1000",             // Required
-  country: "BE"                   // Required, 2-letter country code
+  country: "BE",                  // Required, 2-letter country code
+  taxRegistrationId: "Foretaksregisteret" // Optional, seller only
 }
 ```
+
+`taxRegistrationId` is the seller's tax registration identifier (BT-32): a local
+tax number, or a statement of the seller's registered tax status that its country
+requires. A Norwegian AS or ASA states `Foretaksregisteret`, and a Swedish seller
+approved for F-tax states `Godkänd för F-skatt`. Only the seller can have one.
 
 #### Payment Means Structure
 
