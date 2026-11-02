@@ -28,6 +28,11 @@ What is specific to Norway:
   that the Norwegian register of legal entities does not know, or has deleted,
   is not registered as a receiver, and a registration is removed when the
   organisation is deleted from the register later.
+- **An AS or ASA states "Foretaksregisteret" on its invoices.** Norwegian law
+  requires it of an AS, an ASA and a Norwegian branch of a foreign company, and
+  Peppol warns when it is missing (rule NO-R-002). Set
+  `seller.taxRegistrationId` to `Foretaksregisteret` on the invoice or credit
+  note; leave it out for other sellers.
 - **Representatives are checked for signing authority.** During verification, the
   representative is held against the people Enhetsregisteret lists as able to
   sign for the company or holding procuration.
