@@ -1,0 +1,20 @@
+---
+title: Replies to document emails reach the issuer
+description: A recipient who replies to an invoice or credit note you sent by email now reaches the issuer's email address from the document, or the address you set with the new `email.replyTo` option.
+date: 2026-11-02
+---
+
+When a buyer replies to an invoice they received by email, for example to ask about an amount, the reply should reach whoever issued the invoice. Until now, document emails carried no reply address, so a reply went to Recommand's sending address, which is not monitored.
+
+### What changed
+
+- **Replies go to the issuer**: A document email now sets its reply address to the issuer's email address as the document states it: the seller's contact email (`seller.email`), or the buyer's for self-billing documents. This applies to raw XML documents too, and to every way a document is emailed: email-only sends, `email.when: "always"`, and the fallback when Peppol delivery fails, also when that failure is reported later.
+- **`email.replyTo`**: Set it on a [send](/reference/sending/send-document) to choose the reply address yourself, for example a shared billing inbox.
+
+Emails are still sent from Recommand's address, with the issuer's name from the document as the sender name.
+
+### What you need to do
+
+Nothing. To have replies reach your users, make sure the issuer's party in the document carries an email address, or pass `email.replyTo`. A document without either keeps the previous behaviour.
+
+See the [email delivery guide](/docs/email-delivery-and-notifications#email-options) for all email options.
