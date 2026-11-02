@@ -1,0 +1,18 @@
+---
+title: Email your own XML invoices to buyers that are not on Peppol
+description: "A raw XML invoice or credit note can now be sent with `recipient: null`. It is validated, stored and emailed exactly as you wrote it."
+date: 2026-11-02
+---
+
+Software that writes its own UBL or CII documents could send them over Peppol as raw XML, but not to a buyer by email only: a send with `documentType: "xml"` and `recipient: null` was refused. The only email-only route was the JSON document, which Recommand writes itself, so the XML your buyer received was not the one your software produced.
+
+### What changed
+
+- **Raw XML by email only**: Send `documentType: "xml"` with `recipient: null` and `email.to`. The XML is validated as it would be for a Peppol recipient, stored with the document, and attached to the email exactly as given. A PDF embedded in it is attached separately.
+- **Billing documents only**: The XML has to be an invoice, credit note, self-billing invoice or self-billing credit note in a format Recommand reads. Anything else is refused with a `400`, as are French regulated documents, which have to go over Peppol.
+
+### What you need to do
+
+Nothing. If you send to buyers whether or not they are on Peppol, you can also keep one route for all of them: send the raw XML to the buyer's Peppol address with `email.to`. A buyer that is not on Peppol then receives it by email straight away.
+
+See the [email delivery guide](/docs/email-delivery-and-notifications#structured-documents-by-email).
