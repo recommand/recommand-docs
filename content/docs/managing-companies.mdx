@@ -146,7 +146,7 @@ receives a one-time **migration key**, which the company passes on to its new
 provider. The new provider claims the registration with that key, and the
 network switches the company over in one step.
 
-First create the company with receiving enabled (`isSmpRecipient: true`, the default), even if it is still registered with the previous provider. Use the returned `company.id` to [list its identifiers](/reference/company-identifiers/get-company-identifiers) and find each `identifierId`.
+First create the company, even if it is still registered with the previous provider. Use the returned `company.id` to [list its identifiers](/reference/company-identifiers/get-company-identifiers) and find each `identifierId`.
 
 Ask the previous provider for a migration key for the exact identifier that is
 registered with them, for example `0208:1012081766`. Submit it with the
@@ -165,26 +165,36 @@ and pass the `migrationKey` in the same request.
 
 For a company that has not yet been verified, we recommend submitting all required keys before completing verification using the `verificationUrl` returned when creating the company. This avoids trying to register identifiers that are still held by the previous provider. For an already verified company with receiving enabled, you can submit a key at any time; the migration is attempted immediately.
 
+A company that only sends (`isSmpRecipient: false`) can also take a key. The key is kept until you turn on receiving, which then takes the identifier over instead of failing because it is still registered elsewhere.
+
 If the previous provider cannot supply migration keys, ask them to fully deregister the identifiers before registering them with Recommand. For an unverified company, do this before completing verification. Recommand can then register them normally, but there will be a gap in receiving between deregistration and the new registration.
 
 What happens next depends on whether the company can be published already:
 
-- A company that is verified is taken over immediately. The response has
-  status `completed`, and the network routes to Recommand within minutes.
-- A company whose identity check is still open keeps the key with status
-  `pending`. The moment the company is verified and registered, the key is used.
+- A company that is verified and receives is taken over immediately. The
+  response has status `completed`, and the network routes to Recommand within
+  minutes.
+- A company whose identity check is still open, or that does not receive yet,
+  keeps the key with status `pending`. The moment the company is verified and
+  registered to receive, the key is used.
   Check the outcome with the
   [list company identifier migrations endpoint](/reference/company-identifiers/get-company-identifier-migrations).
 - A key the network refuses ends in status `failed` with the reason. The usual
   causes are a key issued for a different identifier, a copy error, or a
   previous provider that cancelled the migration. Ask them for a fresh key and
   submit it again; a newer key replaces a pending one.
+- Deleting an identifier or changing its value cancels its pending key. An
+  identifier that is moving to another provider cannot be deleted or changed
+  until that move is finalized or cancelled.
 
 A key covers one identifier. A company that was published under two
 identifiers at the previous provider, for example both its enterprise number
-and its VAT number, needs a key for each. After the move the company receives
-the document types Recommand registers for it, not the ones the previous
-provider had published.
+and its VAT number, needs a key for each. Submit a key for every identifier
+that is still registered elsewhere before you turn on receiving or complete
+verification. Identifiers without a key are registered first, so a missing key
+makes the registration fail before any key is used. After the move the company
+receives the document types Recommand registers for it, not the ones the
+previous provider had published.
 
 
 ## Retrieving a Company
