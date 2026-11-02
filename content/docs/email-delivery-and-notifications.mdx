@@ -81,7 +81,7 @@ For customers who aren't on the Peppol network, you can set `recipient` to `null
 
 When `recipient` is `null`, email becomes the primary delivery method and `email.to` is required. The `when` field is ignored since there is no Peppol delivery to fall back from.
 
-Without a `doctypeId`, these emails carry no XML, so the PDF attachment effectively becomes the document your recipient receives. You can either let Recommand generate a PDF from your document data, or attach your own custom PDF. See [PDF Attachments](#pdf-attachments) below.
+For a JSON document without a `doctypeId`, these emails carry no XML, so the PDF attachment effectively becomes the document your recipient receives. You can either let Recommand generate a PDF from your document data, or attach your own custom PDF. See [PDF Attachments](#pdf-attachments) below.
 
 ### Structured Documents by Email
 
@@ -107,7 +107,7 @@ Set `doctypeId` on a send with `recipient: null`, and the document is written in
 }
 ```
 
-A document that fails validation is refused with a `400` that lists the failing rules and fields, before any email is sent. Add `processId` if you need a process other than the default. Leave `doctypeId` out and nothing changes: the email carries the PDF only.
+A document that fails validation is refused with a `400` that lists the failing rules and fields, before any email is sent. Add `processId` if you need a process other than the default. Leave `doctypeId` out of a JSON document and nothing changes: the email carries the PDF only.
 
 A structured invoice names the buyer's electronic address (BT-49). Without a Peppol recipient, Recommand takes it from the document, using the first that applies:
 
@@ -118,6 +118,19 @@ A structured invoice names the buyer's electronic address (BT-49). Without a Pep
 On a self-billing invoice or credit note the receiving party is the seller, so the seller's numbers are used.
 
 Peppol BIS 3 does not accept an email address as electronic address. A Peppol BIS document is refused with a `400` when the buyer has no enterprise number and no VAT number that Peppol has a VAT scheme for (Danish, Finnish, Swedish and Icelandic VAT numbers have none). Add the enterprise number, or send XRechnung or CII, which accept the email address. French regulated documents cannot be delivered by email only: send them to a Peppol recipient.
+
+If your software already writes its own invoices, send the XML as it is with `documentType: "xml"`. It is validated, stored and attached to the email exactly as given, with any PDF embedded in it as a separate attachment. The document has to be an invoice, credit note, self-billing invoice or self-billing credit note in a format Recommand reads, and it carries its own electronic addresses:
+
+```javascript
+{
+  recipient: null,
+  documentType: "xml",
+  document: "<Invoice xmlns=\"urn:oasis:names:specification:ubl:schema:xsd:Invoice-2\">...</Invoice>",
+  email: {
+    to: ["accounting@customer.example"],
+  },
+}
+```
 
 This means you can use a single API endpoint and document format for all your customers. Recommand handles the delivery method based on the recipient.
 
