@@ -55,6 +55,9 @@ const response = await fetch(
 | `email.to`       | Array of recipient email addresses.                                                                                    | Required                                     |
 | `email.subject`  | Custom email subject line.                                                                                             | Auto-generated from document type and number |
 | `email.htmlBody` | Custom HTML body for the email.                                                                                        | Auto-generated                               |
+| `email.replyTo`  | Address that replies to the email go to.                                                                               | The issuer's email address from the document |
+
+Document emails are sent from Recommand's address, with the issuer's name from the document as the sender name. A recipient who replies reaches `email.replyTo`, or without it the issuer's email address as the document states it: the seller's contact email (`seller.email`), or the buyer's for self-billing documents. Set that address in the document or pass `email.replyTo`; otherwise replies go to Recommand's sending address, which is not monitored.
 
 ### Sending Without a Peppol Recipient
 
