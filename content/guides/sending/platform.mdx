@@ -32,7 +32,7 @@ const response = await fetch(
 
 const result = await response.json();
 if (!result.success) {
-  // result.errors is keyed by field path, e.g. { "buyer.vatNumber": [...] }
+  // result.errors is keyed by field path, e.g. { "document.buyer.name": [...] }
 }
 ```
 

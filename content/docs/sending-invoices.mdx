@@ -267,37 +267,62 @@ Peppol transmission took place. Keep available references to trace a transmissio
 {
   "success": false,
   "errors": {
-    "document.buyer.vatNumber": ["document.buyer.vatNumber: Required"]
+    "document.buyer.name": ["document.buyer.name: Required"]
   },
   "invalidInputDetails": [
-    { "path": "document.buyer.vatNumber", "message": "Required" }
+    { "path": "document.buyer.name", "message": "Required" }
   ]
 }
 ```
 
 The keys of `errors` are full paths from the root of the request body. The
-invoice you are sending sits under `document`, so a missing buyer VAT number
-reads as `document.buyer.vatNumber`. Each value is a list of messages that
-repeat the path, so you can show them to a user as they are.
+invoice you are sending sits under `document`, so a missing buyer name reads as
+`document.buyer.name`. Each value is a list of messages that already name the
+path, so you can show them to a user as they are.
 
 `errors` is what you display. `invalidInputDetails` is the same information as a
 structured list, which is easier to walk in code when you want to map problems
-back onto your own form fields. If the body matched none of the document types,
-each entry also carries a `unionErrors` array with the errors every document
-type reported, so you can see why the one you meant was rejected.
+back onto your own form fields.
+
+A `documentType` the API does not know, or none at all, is reported under
+`documentType` with the accepted values:
+
+```json
+{
+  "success": false,
+  "errors": {
+    "documentType": [
+      "documentType: Invalid discriminator value, accepted values are: \"invoice\", \"creditNote\", \"selfBillingInvoice\", \"selfBillingCreditNote\", \"messageLevelResponse\", \"frenchInvoicingCdar\", \"xml\"."
+    ]
+  },
+  "invalidInputDetails": [
+    {
+      "path": "documentType",
+      "message": "Invalid discriminator value, accepted values are: \"invoice\", \"creditNote\", \"selfBillingInvoice\", \"selfBillingCreditNote\", \"messageLevelResponse\", \"frenchInvoicingCdar\", \"xml\"."
+    }
+  ]
+}
+```
+
+Once `documentType` names a known type, the document is checked against that
+type only, so its errors are listed under their own paths like the example
+above. A field that accepts more than one shape, such as `vat`, reports a value
+that fits none of them under the field's path; that entry in
+`invalidInputDetails` also carries a `unionErrors` array with the errors each
+shape reported.
 
 Implement proper error handling to address validation issues:
 
 ```javascript
 if (!result.success && result.errors) {
-  // Display errors to the user
-  Object.entries(result.errors).forEach(([path, messages]) => {
-    console.error(`${path}: ${messages.join(", ")}`);
-  });
+  // Display errors to the user; each message already names its path
+  Object.values(result.errors)
+    .flat()
+    .forEach((message) => console.error(message));
 
   // Attempt to fix the issues
-  if (result.errors["document.buyer.vatNumber"]) {
-    // Prompt user to correct VAT number
+  if (result.errors["document.buyer.name"]) {
+    // Prompt user to fill in the buyer name
   }
 }
 ```
