@@ -52,9 +52,13 @@ document in agreement.
 
 Things worth wiring up while you are here:
 
-- **Validation errors.** Outgoing documents are always validated. A `success:
-  false` response with `errors` keyed by field path is a document your recipient
-  would have rejected, so surface it to the user who typed the data.
+- **Validation errors.** Outgoing documents are always validated. A `400` whose
+  `errors.root` starts with "Document validation failed" is a document your
+  recipient would have rejected, so surface it to the user who typed the data.
+  Its other keys are [XPath](https://www.w3.org/TR/xpath-10/#location-paths)
+  locations in the generated document, not request fields, as the
+  [troubleshooting guide](/docs/troubleshooting-guide#validation-errors)
+  explains.
 - **Delivery outcomes.** `success: true` confirms the send request succeeded. Check
   `deliveryStatus` and `deliveries`, and subscribe to [delivery status
   webhooks](/docs/working-with-webhooks#document-delivery-status-changed-event)
