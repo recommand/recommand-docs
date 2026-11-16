@@ -1,0 +1,22 @@
+---
+title: Know whether a failed send may have gone out
+description: "A failed send's `422` now says with `outcomeUnknown` whether the document may have been delivered all the same."
+date: 2026-11-16
+---
+
+A send can fail after the document already went out, such as when the connection to the access point drops. Until now, its `422` looked the same as one for a document that was refused, so you couldn't tell whether sending it again could deliver it twice.
+
+### What changed
+
+The `422` of a failed send carries `outcomeUnknown`:
+
+- `false`: every channel refused the document and nothing went out. Fix the cause and send it again.
+- `true`: a channel may have delivered it, such as after a lost connection to the access point or an email the mail service didn't confirm. Check with the recipient before sending it again.
+
+A send that fails on Recommand's side after the document was handed to a channel now answers this `422` with `outcomeUnknown: true` too, instead of a `400`.
+
+The [send document endpoint](/reference/sending/send-document) now also describes the `422` body, including the `deliveryFailure` it already carried. See [Delivery Errors](/docs/troubleshooting-guide#delivery-errors) for details.
+
+### What you need to do
+
+Nothing: the field is new and the rest of the response is unchanged, apart from the failure above. To avoid sending a document twice, check `outcomeUnknown` before resending after a `422`.
