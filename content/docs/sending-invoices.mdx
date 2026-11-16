@@ -307,9 +307,8 @@ A `documentType` the API does not know, or none at all, is reported under
 Once `documentType` names a known type, the document is checked against that
 type only, so its errors are listed under their own paths like the example
 above. A field that accepts more than one shape, such as `vat`, reports a value
-that fits none of them under the field's path; that entry in
-`invalidInputDetails` also carries a `unionErrors` array with the errors each
-shape reported.
+that fits none of them with an entry in `invalidInputDetails` that carries a
+`unionErrors` array with the errors each shape reported.
 
 Implement proper error handling to address validation issues:
 

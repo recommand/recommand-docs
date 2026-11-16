@@ -314,9 +314,9 @@ which makes them safe to show to a user as they are. `errors` is what you
 display; `invalidInputDetails` is the same information as a structured list you
 can walk in code. An unknown or missing `documentType` is reported under
 `documentType` with the accepted values. A field that accepts more than one
-shape and got a value that fits none of them is reported under the field's
-path, and its entry in `invalidInputDetails` also carries a `unionErrors` array
-holding the errors each shape reported.
+shape and got a value that fits none of them has an entry in
+`invalidInputDetails` with a `unionErrors` array holding the errors each shape
+reported.
 
 ## Complete Invoice Example
 
