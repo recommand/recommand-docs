@@ -366,7 +366,7 @@ A retry under the same key never sends the invoice again:
 
 A `422` with code `idempotency_conflict` is about the key, not the invoice: a `422` of a send that failed has no `code`. It comes with a `Link` header pointing to this section.
 
-A request is refused before anything was sent when Recommand couldn't act on it, such as an invoice with invalid content or a recipient that isn't registered on Peppol, or when the sending access point refused the request before handing the invoice on.
+A request is refused before anything was sent when Recommand couldn't act on it, such as an invoice with invalid content or a recipient that isn't registered on Peppol, or when the sending access point refused the request before handing the invoice on. A send that fails on Recommand's side before anything was sent answers `500` and doesn't use up its key either, so you can retry it under the same key.
 
 Any other failure leaves it unknown whether the invoice went out, such as a lost connection to the access point, a transmission the access point reports as failed (it reports one that got no receipt from the buyer's access point the same way as one that was refused), an email the mail service didn't confirm, or an unexpected error on Recommand's side once it started sending. Its key then stays used, and a retry under it gets the same failure again, so retrying doesn't send the invoice twice. Before sending it again under a new key, check with the buyer whether the invoice arrived, and check the company's documents: after an unexpected error on Recommand's side, the invoice may have been stored as well.
 

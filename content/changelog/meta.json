@@ -2,6 +2,7 @@
   "title": "Changelog",
   "defaultOpen": true,
   "pages": [
+    "2026-11-23-send-outcome-unknown",
     "2026-11-23-idempotency-key",
     "2026-11-02-raw-xml-by-email",
     "2026-11-02-email-reply-to",
