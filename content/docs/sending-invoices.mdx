@@ -330,7 +330,7 @@ if (!result.success && result.errors) {
 
 ## Retry Safely
 
-A request can time out, or its connection can drop, after Recommand already sent the invoice. Sending it again then delivers the same invoice twice. To retry safely, add an `Idempotency-Key` header: a value of your own, unique for each invoice you send, such as a UUID you store with the invoice. Send the same key with every retry of that invoice, with the same request body to the same URL:
+A request can time out, or its connection can drop, after Recommand already sent the invoice. Sending it again then delivers the same invoice twice. To retry safely, add an `Idempotency-Key` header: a value of your own, unique for each invoice you send, such as a UUID you store with the invoice, written in double quotes as in `Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"`. Send the same key with every retry of that invoice, with the same request body to the same URL:
 
 ```javascript
 const response = await fetch(
@@ -342,7 +342,7 @@ const response = await fetch(
         "Basic " +
         Buffer.from("your_api_key:your_api_secret").toString("base64"),
       "Content-Type": "application/json",
-      "Idempotency-Key": invoice.sendKey,
+      "Idempotency-Key": `"${invoice.sendKey}"`,
     },
     body: JSON.stringify({
       recipient: recipientPeppolId,
@@ -359,10 +359,12 @@ A retry under the same key never sends the invoice again:
 | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | A retry of a request that succeeded                                  | The first response again, with the header `Idempotency-Replayed: true`. Nothing is sent again.                                           |
 | A retry while the first request is still running                     | `409` with code `idempotency_in_progress` and a `Retry-After` header: wait that many seconds and retry.                                  |
-| A different request under a key you already used                     | `409` with code `idempotency_conflict`. A retry with a changed body counts as a different request: use a new key only for a new invoice. |
+| A different request under a key you already used                     | `422` with code `idempotency_conflict`. A retry with a changed body counts as a different request: use a new key only for a new invoice. |
 | A retry of a request refused before anything was sent                | The request runs again: it didn't use up its key, so you can fix it and retry under the same key.                                        |
 | A retry of a request that failed after the invoice may have gone out | The first response again, with the same status and body and the header `Idempotency-Replayed: true`. Nothing is sent again.              |
 | A retry of a request that ended without a response to repeat         | `409` with code `idempotency_outcome_unknown`, until the key expires. Retrying doesn't change this answer.                               |
+
+A `422` with code `idempotency_conflict` is about the key, not the invoice: a `422` of a send that failed has no `code`. It comes with a `Link` header pointing to this section.
 
 A request is refused before anything was sent when Recommand couldn't act on it, such as an invoice with invalid content or a recipient that isn't registered on Peppol, or when the sending access point refused the request before handing the invoice on.
 
@@ -372,7 +374,7 @@ A request can also end without a response to repeat, such as when the server sto
 
 A retry counts as the same request when it has the same method, URL, query parameters in any order and body. The body is compared as JSON, so its whitespace and the order of its keys don't matter. That also means that numbers that only differ beyond what a JavaScript number holds, such as `12345678901234567890` and `12345678901234567891`, count as the same, and that of a key an object has twice, only the last value counts.
 
-Keys are 1 to 255 printable ASCII characters and only apply within your team and the company you send for. The key may be sent as it is or in double quotes, as the [IETF draft for the header](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.1) writes it. An empty header counts as no key. Any other value, or the header sent twice, gets a `400` with code `invalid_idempotency_key` and a `Link` header pointing to this section.
+Keys are 1 to 255 printable ASCII characters and only apply within your team and the company you send for. The [IETF draft for the header](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.1) writes the key in double quotes; Recommand also takes it without them, as the same key. An empty header counts as no key. Any other value, or the header sent twice, gets a `400` with code `invalid_idempotency_key` and a `Link` header pointing to this section.
 
 Recommand keeps a key for at least 24 hours after its request finished; the response's `Idempotency-Key-Expires-At` header says until when. After that, the same key starts a new request.
 
@@ -380,7 +382,6 @@ Recommand follows the [IETF draft for the header](https://datatracker.ietf.org/d
 
 - It also takes a key without double quotes, as the same key, where the draft defines only the quoted one ([section 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.1)).
 - A request refused before anything was sent frees its key, so you can retry the corrected request under it, where the draft asks for a new key for a different request ([section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.2)).
-- A different request under a key you already used gets a `409`, where the draft answers it with a `422` ([section 2.7](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.7)).
 - A retry of a request that ended without a response to repeat gets a `409`, which the draft uses only for a request that is still running ([section 2.7](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.7)).
 
 Without the header, every request is handled as a new one.
