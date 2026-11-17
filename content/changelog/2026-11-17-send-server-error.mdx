@@ -1,0 +1,17 @@
+---
+title: A send that fails on Recommand's side answers 500
+description: "A send that fails on Recommand's side before the document went out now answers `500` instead of `400`."
+date: 2026-11-17
+---
+
+A send could fail because of a problem on Recommand's side, such as a lost database connection. It answered `400` with the error's own message, which looked like a problem with your request, so you might have changed a document that was fine.
+
+### What changed
+
+When such a failure happens before the document was handed to Peppol or email, nothing went out. The [send document endpoint](/reference/sending/send-document) now answers `500` with "Failed to send document", without the internal error message.
+
+An error that says what to correct, such as a company without a sending identifier, still answers `400` with its message.
+
+### What you need to do
+
+Nothing. If you handle a `500` from the send endpoint, you can send the same document again, since nothing went out.
