@@ -228,7 +228,7 @@ function validateInvoice(invoice) {
 
 ### Delivery Errors
 
-If sending fails during the request and no email fallback succeeds, the response is **HTTP 422**. No document is stored and the failed attempt does not count toward your usage, unless the failure happened on Recommand's side after the document was handed to a channel (see `outcomeUnknown` below):
+If sending fails during the request and no email fallback succeeds, the response is **HTTP 422**. No document is stored and the failed attempt does not count toward your usage:
 
 ```json
 {
