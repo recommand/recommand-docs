@@ -1,7 +1,7 @@
 ---
 title: Retry a send without sending the invoice twice
 description: "Send an `Idempotency-Key` header, and a retry after a timeout or a lost connection returns the first response instead of sending the document again."
-date: 2026-11-13
+date: 2026-11-21
 ---
 
 A send can time out, or its connection can drop, after the document already went out. Until now, a retry then sent it a second time, and the only safe alternative was to look the document up before retrying.
