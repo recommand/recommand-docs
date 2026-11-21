@@ -1,0 +1,23 @@
+---
+title: Retry a send without sending the invoice twice
+description: "Send an `Idempotency-Key` header, and a retry after a timeout or a lost connection returns the first response instead of sending the document again."
+date: 2026-11-21
+---
+
+A send can time out, or its connection can drop, after the document already went out. Until now, a retry then sent it a second time, and the only safe alternative was to look the document up before retrying.
+
+### What changed
+
+Sending a document accepts an optional `Idempotency-Key` header. Use a value of your own that is unique for each document you send, written in double quotes, such as `Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"`, and send the same key with every retry of it, with the same request body:
+
+- A retry of a request that succeeded gets the first response again, with `Idempotency-Replayed: true`. Nothing is sent again.
+- A retry while the first request is still running gets a `409` with code `idempotency_in_progress` and a `Retry-After` header.
+- A different request under a key you already used gets a `422` with code `idempotency_conflict`.
+- A request refused before anything was sent, such as one with invalid content, doesn't use up its key, so you can fix it and retry under the same key.
+- A request that failed after the document may have gone out, such as after a lost connection, keeps its key: a retry gets the same failure again, so the document isn't sent twice.
+
+Keys are kept for at least 24 hours after their request finished. See [Retry Safely](/docs/sending-invoices#retry-safely) for how it works and what to do when a request ends without a known outcome.
+
+### What you need to do
+
+Nothing: without the header, the [send document endpoint](/reference/sending/send-document) works as before. To retry sends safely, add an `Idempotency-Key` to them.
