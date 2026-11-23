@@ -374,15 +374,15 @@ A request can also end without a response to repeat, such as when the server sto
 
 A retry counts as the same request when it has the same method, URL, query parameters in any order and body. The body is compared as JSON, so its whitespace and the order of its keys don't matter. That also means that numbers that only differ beyond what a JavaScript number holds, such as `12345678901234567890` and `12345678901234567891`, count as the same, and that of a key an object has twice, only the last value counts.
 
-Keys are 1 to 255 printable ASCII characters and only apply within your team and the company you send for. The [IETF draft for the header](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.1) writes the key in double quotes; Recommand also takes it without them, as the same key. An empty header counts as no key. Any other value, or the header sent twice, gets a `400` with code `invalid_idempotency_key` and a `Link` header pointing to this section.
+Keys are 1 to 255 printable ASCII characters and only apply within your team and the company you send for. The [IETF draft for the header](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-09#section-2.1) writes the key in double quotes; Recommand also takes it without them, as the same key. An empty header counts as no key. Any other value, or the header sent twice, gets a `400` with code `invalid_idempotency_key` and a `Link` header pointing to this section.
 
 Recommand keeps a key for at least 24 hours after its request finished; the response's `Idempotency-Key-Expires-At` header says until when. After that, the same key starts a new request.
 
-Recommand follows the [IETF draft for the header](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08), with these differences:
+Recommand follows the [IETF draft for the header](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-09), with these differences:
 
-- It also takes a key without double quotes, as the same key, where the draft defines only the quoted one ([section 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.1)).
-- A request refused before anything was sent frees its key, so you can retry the corrected request under it, where the draft asks for a new key for a different request ([section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.2)).
-- A retry of a request that ended without a response to repeat gets a `409`, which the draft uses only for a request that is still running ([section 2.7](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-08#section-2.7)).
+- It also takes a key without double quotes, as the same key, where the draft defines only the quoted one ([section 2.1](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-09#section-2.1)).
+- A request refused before anything was sent frees its key, so you can retry the corrected request under it, where the draft asks for a new key for a different request ([section 2.2](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-09#section-2.2)).
+- A retry of a request that ended without a response to repeat gets a `409`, which the draft uses only for a request that is still running ([section 2.7](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-09#section-2.7)).
 
 Without the header, every request is handled as a new one.
 
