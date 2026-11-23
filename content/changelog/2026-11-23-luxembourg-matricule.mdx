@@ -1,0 +1,18 @@
+---
+title: Luxembourg companies are registered under their matricule
+description: A new Luxembourg company with a matricule is now registered under scheme 0240, as Luxembourg prescribes for new Peppol participants. Its VAT number is only registered under 9938 when it has no matricule.
+date: 2026-11-23
+---
+
+Luxembourg changed its rule for Peppol identifiers. A new participant established in Luxembourg is registered under its matricule, the 11 digit number of the register of legal persons, with scheme `0240` (LU:MAT). The VAT number under `9938` is only for a participant that has no matricule. Until now, a Luxembourg company with a matricule was registered under `9938` with both its matricule and its VAT number.
+
+### What changed
+
+- **Registered under 0240**: A new Luxembourg company whose enterprise number is its matricule gets one identifier, `0240:12345678910`, and sends from it.
+- **VAT number only without a matricule**: A company whose enterprise number is empty or an RCS number still gets its VAT number under `9938`, for example `9938:LU12345613`.
+- **9938 stays available**: You can still add a company's VAT number or matricule under `9938` with the [create company identifier endpoint](/reference/company-identifiers/create-company-identifier), for example while a sender still looks the company up under `9938`.
+- **Existing companies**: Companies created before this change keep their `9938` identifiers and keep sending from them. Luxembourg lets existing identifiers stay in use for now; its Peppol Authority Specific Requirements will set a transition period.
+
+### What you need to do
+
+Nothing for existing companies. When you create a Luxembourg company, put its matricule in `enterpriseNumber` and expect a `0240` identifier instead of the `9938` ones. To send to a Luxembourg business, use the exact identifier it is published under; the [verify recipient endpoint](/reference/recipients/verify-recipient) finds it under `0240` and under `9938`.
