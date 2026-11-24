@@ -239,11 +239,18 @@ If sending fails during the request and no email fallback succeeds, the response
   "deliveryFailure": {
     "channel": "peppol",
     "category": "transport"
-  }
+  },
+  "outcomeUnknown": true
 }
 ```
 
-`deliveryFailure` identifies a Peppol failure's channel and category, such as `transport`, `recipient_not_found` or `document_not_supported`. Read `errors.root` for the accompanying message.
+`deliveryFailure` identifies a Peppol failure's channel and category, such as `transport`, `recipient_not_found` or `document_not_supported`. Read `errors.root` for the accompanying message. An email-only send has no `deliveryFailure`.
+
+`outcomeUnknown` says whether the document may have been delivered all the same. It is `true` after a lost connection to the access point, a transmission the access point reports as failed (it reports one that got no receipt from the recipient's access point the same way as one that was refused), an email the mail service didn't confirm, or a failure on Recommand's side after the document was handed to a channel. The last has no `deliveryFailure`, and the document may have been stored as well. A retry under the same `Idempotency-Key` gets the same `422` again, without sending the document a second time. Check your documents and with the recipient before sending such a document again. When it is `false`, nothing went out and you can fix the cause and send again.
+
+A `422` with code `idempotency_conflict` is a different one: the `Idempotency-Key` was already used for a different request, and the body has no `outcomeUnknown`. See [Retry Safely](/docs/sending-invoices#retry-safely).
+
+A send that fails on Recommand's side before the document was handed to any channel answers **HTTP 500** instead. Nothing went out and nothing is stored, so you can send the document again, under the same `Idempotency-Key` too.
 
 A failure reported after the send request succeeded does not produce a new HTTP error response. It changes the stored delivery to `failed` and emits `document.delivery_status_changed`. Fetch the document's `deliveries` for the failure category, message and provider code. A document can be `delivered` overall while another channel failed.
 
@@ -351,9 +358,9 @@ app.post("/peppol-webhook", (req, res) => {
 | 401        | Unauthorized                | Verify API key and secret                    |
 | 403        | Forbidden                   | Check permissions for the API key            |
 | 404        | Not Found                   | Verify endpoint path and resource IDs        |
-| 422        | Recipient could not be reached | Retry later; check the recipient's registration; configure email fallback |
+| 422        | Recipient could not be reached | Retry later, unless `outcomeUnknown` is `true`; check the recipient's registration; configure email fallback |
 | 429        | Too Many Requests           | Implement rate limiting and backoff strategy |
-| 500        | Server Error                | Contact support if persistent                |
+| 500        | Server Error                | Retry later; contact support if persistent. A send's `500` means nothing went out, so you can send it again under the same `Idempotency-Key` |
 
 ## Debugging Network Issues
 
